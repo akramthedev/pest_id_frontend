@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   descView: {
-    minHeight: 30,
+    minHeight: 29,
     marginBottom: 70,
     width: '90%',
     marginLeft: 'auto',
