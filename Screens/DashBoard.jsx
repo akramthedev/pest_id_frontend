@@ -1,35 +1,89 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, Text, View, Animated } from 'react-native';
-import Card from './CardCalculation'; // Your card component
+import {Image ,ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
+
+import Card from './CardCalculation'; 
+import { Ionicons } from '@expo/vector-icons'; 
+import { MaterialIcons } from '@expo/vector-icons'; 
+
+
+const { width: screenWidth } = Dimensions.get('window');
+
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate a 2-second loading time
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
 
-    // Cleanup timer on component unmount
     return () => clearTimeout(timer);
   }, []);
 
+
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+
+
+ 
+  const toggleMenu = () => {
+    if (isMenuVisible) {
+      Animated.timing(slideAnim, {
+        toValue: screenWidth,
+        duration: 300,
+        useNativeDriver: false,
+      }).start(() => {
+        setIsMenuVisible(false);
+      });
+    } else {
+      setIsMenuVisible(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (evt, gestureState) => {
+        if (gestureState.dx > 0) {
+          // User is swiping to the right
+          Animated.timing(slideAnim, {
+            toValue: screenWidth,
+            duration: 300,
+            useNativeDriver: false,
+          }).start(() => {
+            setIsMenuVisible(false);
+          });
+        }
+      },
+    })
+  ).current;
+
+
+
   return (
     <View style={styles.container}>
+
+      
       <ScrollView>
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}>Historique des calculs</Text>
+          <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+            <Ionicons name="menu" size={24} color="#3E6715" />
+          </TouchableOpacity>
         </View>
 
         {loading ? (
-          // Render the skeleton loader when loading
           <>
             <SkeletonLoader />
             <SkeletonLoader />
           </>
         ) : (
-          // Render the actual cards after loading
           <>
             <Card
               idFarm="Harvest House"
@@ -56,7 +110,6 @@ const Dashboard = () => {
       </ScrollView>
 
       {loading ? (
-        // Render the skeleton loader for the button when loading
         <View style={styles.skeletonButtonContainer}>
           <SkeletonButtonLoader />
         </View>
@@ -65,11 +118,99 @@ const Dashboard = () => {
           <Text style={styles.addButtonText}>+ Ajouter un nouveau calcul</Text>
         </TouchableOpacity>
       )}
+
+      {isMenuVisible && (
+          <Animated.View
+            style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
+            {...panResponder.panHandlers}
+          >
+          <View style={styles.popupContent}>
+
+            <View style={styles.logo}>
+              <Image
+                source={require('../images/logo.png')}          
+                style={styles.imageLogo}
+                resizeMode="cover"
+              />
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="person-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mon Profile</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="bar-chart-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Tableau de board</Text>
+            </View>
+
+
+            <View style={styles.menuItem}>
+              <MaterialIcons name="history" size={24} color="black" />
+              <Text style={styles.menuText}>Historique de calcul</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              
+              <Ionicons name="add-circle-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Ajouter un calcul</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="business" size={24} color="black" />
+              <Text style={styles.menuText}>Mes fermes</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="add-circle-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Ajouter une ferme</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes personnels</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="add-circle-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Ajouter un personel</Text>
+            </View>
+
+            
+
+            <View style={styles.menuItem}>
+              <Ionicons name="help-circle-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Lorem ipsum</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="call-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Lorem ipsum</Text>
+            </View>
+
+            <View style={styles.menuItem}>
+              <Ionicons name="log-out-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Logout</Text>
+            </View>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>PCS AGRI</Text>
+            <Text style={styles.footerText}>© all rights reserved • 2024</Text>
+          </View>
+
+          <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>            
+              <Ionicons style={styles.iconX} name="close" size={20} color="#325A0A" />
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
     </View>
   );
 };
 
-// Skeleton Loader for the button with Animated Shimmer Effect
 const SkeletonButtonLoader = () => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -98,14 +239,13 @@ const SkeletonButtonLoader = () => {
   return (
     <Animated.View
       style={[
-        styles.skeletonButtonLoader, // apply animated style to button loader
+        styles.skeletonButtonLoader, 
         { backgroundColor: animatedStyle },
       ]}
     />
   );
 };
 
-// Skeleton Loader for the main cards
 const SkeletonLoader = () => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -164,7 +304,13 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
+    position : "relative"
   },
+  menu :{
+    position : "absolute",
+    right : 23,
+    zIndex: 10, 
+  }, 
   titleText: {
     color: 'black',
     fontSize: 19,
@@ -249,6 +395,72 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: '#e0e0e0',
     borderRadius: 6,
+  },
+
+
+
+  //pop Up Menu 
+  popup: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: '105%',
+    width: '66%',
+    backgroundColor: '#CCFF99',  
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 15,
+    zIndex: 9999,
+  },
+  popupContent: {
+    padding: 20,
+  },
+  logo: {
+    marginTop : 50,
+    marginLeft : "auto",
+    marginRight : "auto",
+    marginBottom: 20,
+    height : 40,
+    width : 130,
+  },
+  imageLogo : {
+    height : "100%", 
+    width : "100%"
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  menuText: {
+    fontSize: 18,
+    color: 'black',
+    marginLeft: 10,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 53,
+    width: '100%',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#656565',
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 30,
+    right: 17,
+    backgroundColor: '#B9FF75',
+    padding: 10,
+    borderRadius: 50,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: 'white',
   },
 });
 
