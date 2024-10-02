@@ -129,7 +129,7 @@ const Calculation = () => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Détails du Calcul</Text>
+            <Text style={styles.titleText}>{isModifyClicked ? "Modifier le Calcul" : "Détails du Calcul"}</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
             </TouchableOpacity>
