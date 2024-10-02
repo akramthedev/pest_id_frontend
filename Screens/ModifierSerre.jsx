@@ -7,43 +7,16 @@ import { MaterialIcons } from '@expo/vector-icons';
 const { width: screenWidth } = Dimensions.get('window');
 
 
-const serres = [
-  { id: 1, name: "Serre lorem ipsum dolor es mit" },
-  { id: 2, name: "Serre lorem ipsum dolor es mit" },
-  { id: 3, name: "Serre lorem ipsum dolor es mit" }
-];
+const ModifierSerre = () => {
 
-
-
-const CreateFarm = () => {
-
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [locationCoords, setLocationCoords] = useState(null); 
-  const [mapUrl, setMapUrl] = useState(''); 
   const navigation = useNavigation();
-  const [region, setRegion] = useState('');
-  const [NombrePersonel, setNombrePersonel] = useState('');
+  const [fermeAssocie, setFermeAssocie] = useState('');
+  const [typedeSerre, settypedeSerre] = useState('');
   const [Mesure, setMesure] = useState('');
   const [Appelation, setAppelation] = useState('');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
 
-
-
-  const fetchCoordinates = async () => {
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
-      const data = await response.json();
-      if (data.length > 0) {
-        const { lat, lon } = data[0];
-        setLocationCoords({ lat, lon });
-        setMapUrl(`https://maps.locationiq.com/v2/staticmap?key=pk.1705505b29c5df0924b07d671b88b7b9&center=${lat},${lon}&zoom=13&size=400x400&markers=icon:large-blue-cutout|${lat},${lon}`);
-      }
-    } catch (error) {
-      console.error('Error fetching coordinates:', error);
-    }
-  };
 
 
   const toggleMenu = () => {
@@ -92,7 +65,7 @@ const CreateFarm = () => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Nouvelle Ferme</Text>
+            <Text style={styles.titleText}>Modifier Serre</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
             </TouchableOpacity>
@@ -101,19 +74,9 @@ const CreateFarm = () => {
           <Text style={styles.label}>Appelation</Text>
           <TextInput
             style={styles.input}
-            placeholder="Veuillez saisir le nom de la ferme..."
+            placeholder="Veuillez saisir le nom de la serre..."
             value={Appelation}
             onChangeText={setAppelation}
-          />
-
-        {
-          /*
-        <Text style={styles.label}>Nombre de personels</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Veuillez saisir la nombre..."
-            value={NombrePersonel}
-            onChangeText={setNombrePersonel}
           />
 
 
@@ -124,75 +87,42 @@ const CreateFarm = () => {
             value={Mesure}
             onChangeText={setMesure}
           />
-
-        <Text style={styles.label}>Région</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Veuillez saisir la région..."
-            value={region}
-            onChangeText={setRegion}
-          />
-          */
-        }
-
-        <Text style={styles.label}>Chercher la localisation</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Veuillez saisir une région ou ville..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity onPress={fetchCoordinates} style={styles.searchButton}>
-          <Text style={styles.buttonTextB}>Search</Text>
-        </TouchableOpacity>
-
-        {mapUrl ? (
-          <View style={styles.mapContainer}>
-            <Image source={{ uri: mapUrl }} style={styles.mapImage} />
-          </View>
-        ) : (
-          <></>
-        )}
-
-              <Text style={styles.label}>Serres Associées</Text>
-
-
-                 {serres.map((serre) => (
-                  <TouchableOpacity onPress={()=>{navigation.navigate('ModifierSerre')}} key={serre.id} style={styles.serreContainer}>
-
-                    <View   style={styles.serreIdContainer}>
-                      <Text style={styles.serreId}>{serre.id}</Text>
-                    </View>
-                    <View   style={styles.serreIdContainer}>
-                      <Text style={styles.serreName}>{serre.name}</Text>
-                    </View>
-
-                    <View   style={styles.iconContainer}>
-                      <MaterialIcons name="settings" size={24} color="#487C15" />
-                    </View>
-                  </TouchableOpacity>
-                ))}
-
-              <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate('AjouterUneSerre')}} >
-                <Text style={styles.addButtonText}>+ Ajouter une nouvelle serre</Text>
-              </TouchableOpacity>
  
-          
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.buttonOutline}>
-              <Text style={styles.buttonTextB}>Choisir une photo</Text>
-            </TouchableOpacity>
+
+         <Text style={styles.label}>Type de serre</Text>
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={typedeSerre}
+              style={styles.picker} 
+              onValueChange={(itemValue) => settypedeSerre(itemValue)}
+            >
+              <Picker.Item label="Veuillez saisir la valeur..." value="" />
+              <Picker.Item label="Option 1" value="option1" />
+              <Picker.Item label="Option 2" value="option2" />
+            </Picker>
           </View>
 
 
+         <Text style={styles.label}>Ferme associée</Text>
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={fermeAssocie}
+              style={styles.picker} 
+              onValueChange={(itemValue) => setFermeAssocie(itemValue)}
+            >
+              <Picker.Item label="Veuillez saisir la valeur..." value="" />
+              <Picker.Item label="Option 1" value="option1" />
+              <Picker.Item label="Option 2" value="option2" />
+            </Picker>
+          </View>
       </ScrollView>
 
       <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.navigate('Historique')}} style={styles.cancelButton}>
+        <TouchableOpacity onPress={()=>{navigation.navigate('AjouterUneFerme')}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB} >Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.buttonTextW}>Enregistrer la ferme</Text>
+          <Text style={styles.buttonTextW}>Enregistrer la serre</Text>
         </TouchableOpacity>
       </View>
 
@@ -312,31 +242,11 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
   },
-  searchButton: {
-    backgroundColor: '#B1E77B',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+   
   label: {
     fontSize: 16,
     marginBottom: 8,
   },
-
-  mapContainer: {
-    marginTop: 16,
-    height: 200,
-    width: '100%',
-    borderRadius: 10,
-    marginBottom : 16,
-    overflow: 'hidden',
-  },
-  mapImage: {
-    width: '100%',
-    height: '100%',
-  },
-
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -366,52 +276,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     fontSize : 16,
   },
-
-
-
-  serreContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    marginBottom: 8,
-    position : "relative"
-  },
-  serreIdContainer: {
-    backgroundColor: 'white',
-    padding: 8,
-    borderRadius: 8,
-    marginRight: 16,
-  },
-  serreId: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  serreName: {
-    flex: 1,
-    fontSize: 16,
-  },
-  iconContainer: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    position : "absolute", 
-    right : 0
-  },
-  addButton: {
-    backgroundColor: 'white',
-    height : 45,
-    borderRadius: 8,
-    marginTop: 16,
-    justifyContent: 'center',
-    backgroundColor : "#B1E77B", 
-    alignItems : "center"
-  },
-  addButtonText: {
-    color: 'black',
-    fontSize: 16,
-  },
-
-
   buttonRow1: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -420,10 +284,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    height: 48,
-    justifyContent :"center" ,
+    paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '100%',    fontSize : 16,
+    width: '48%',    fontSize : 16,
 
     alignItems: 'center',
   },
@@ -519,6 +382,6 @@ const styles = StyleSheet.create({
 
 
 });
-export default CreateFarm;
+export default ModifierSerre;
 
 

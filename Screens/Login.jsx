@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
  import * as Font from 'expo-font';
@@ -29,7 +30,9 @@ const Login = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
           <View style={styles.btnRond}>
-            <Ionicons name="arrow-back" size={24} color="#3E6715" />
+            <BlurView intensity={33} tint="light" style={styles.backgroundBlur}>
+              <Ionicons name="arrow-back" size={24} color="#78B142" />
+            </BlurView>
           </View>
         </TouchableOpacity>
 
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 20,
-    backgroundColor: '#D4FFAB',
+    backgroundColor: '#DDFFBD',
   },
   input: {
     flex: 1,
@@ -246,7 +249,15 @@ const styles = StyleSheet.create({
     width: 49,
     height: 49,
     borderRadius: 40,
-    backgroundColor: '#D4FFAB',
+    overflow : 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backgroundBlur: {
+    width: 49,
+    height: 49,
+    borderRadius: 40,
+    overflow : 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 20,
-    backgroundColor: '#D4FFAB',
+    backgroundColor: '#DDFFBD',
   },
   input: {
     flex: 1,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     width: 49,
     height: 49,
     borderRadius: 40,
-    backgroundColor: '#D4FFAB',
+    backgroundColor: '#DDFFBD',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -10,8 +10,11 @@ import Profile from './Screens/Profile';
 import MesPersonels from './Screens/AllStaffs';
 import MesFermes from './Screens/AllFarms';
 import AjouterUnCalcul from './Screens/CreateCalculation';
+import AjouterUneSerre from './Screens/CreateSerre';
 import AjouterUneFerme from './Screens/CreateFarm';
 import AjouterUnPersonel from './Screens/CreateStaff';
+import ModifierSerre from './Screens/ModifierSerre'
+
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +67,16 @@ export default function App() {
       <Stack.Screen 
         name="AjouterUneFerme" 
         component={AjouterUneFerme} 
+        options={{ headerShown: false }}  
+      />
+      <Stack.Screen 
+        name="AjouterUneSerre" 
+        component={AjouterUneSerre} 
+        options={{ headerShown: false }}  
+      />
+      <Stack.Screen 
+        name="ModifierSerre" 
+        component={ModifierSerre} 
         options={{ headerShown: false }}  
       />
       <Stack.Screen 

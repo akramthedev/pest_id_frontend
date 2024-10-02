@@ -18,7 +18,7 @@ const History = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -116,7 +116,7 @@ const History = () => {
           <SkeletonButtonLoader />
         </View>
       ) : (
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('AjouterUnCalcul')}  style={styles.addButton}>
           <Text style={styles.addButtonText}>+ Ajouter un nouveau calcul</Text>
         </TouchableOpacity>
       )}
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: '105%',
     width: '66%',
-    backgroundColor: '#CCFF99',  
+    backgroundColor: '#C4EA9E',  
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 5 },
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50,
     right: 17,
-    backgroundColor: '#B9FF75',
+    backgroundColor: '#BAE790',
     padding: 10,
     borderRadius: 50,
   },
