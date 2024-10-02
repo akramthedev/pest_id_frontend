@@ -293,14 +293,17 @@ const CreateFarm = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 23,
-    backgroundColor: '#fff',
+     backgroundColor: '#fff',
   },
   titleContainer: {
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    position : "relative"
+    position : "relative",
+    marginLeft : 23, 
+    marginTop : 23,
+    marginRight : 23
+
   },
   menu :{
     position : "absolute",
@@ -314,23 +317,28 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: '#B1E77B',
-    padding: 10,
+    padding: 10,    marginLeft : 23, 
+    marginRight : 23,
+
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 16,
   },
   label: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 8,    marginLeft : 23, 
+    marginRight : 23,
+
   },
 
   mapContainer: {
     marginTop: 16,
     height: 200,
-    width: '100%',
     borderRadius: 10,
     marginBottom : 16,
-    overflow: 'hidden',
+    overflow: 'hidden',    marginLeft : 23, 
+    marginRight : 23,
+
   },
   mapImage: {
     width: '100%',
@@ -343,12 +351,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize : 16,
     paddingLeft: 20,
-    paddingRight: 20,
+    paddingRight: 20,    marginLeft : 23, 
+    marginRight : 23,
+
     marginBottom: 16,
-    height: 48
+    height: 48,
+    marginLeft : 23, 
+    marginRight : 23,
+
   },
   pickerWrapper: {  
-    borderWidth: 1,
+    borderWidth: 1,    marginLeft : 23, 
+    marginRight : 23,
+
     borderColor: '#ccc',
     borderRadius: 10,
     marginBottom: 16,
@@ -364,7 +379,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 16,
-    fontSize : 16,
+    fontSize : 16,    marginLeft : 23, 
+    marginRight : 23,
+
   },
 
 
@@ -375,7 +392,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     marginBottom: 8,
-    position : "relative"
+    position : "relative",    marginLeft : 23, 
+    marginRight : 23,
+
   },
   serreIdContainer: {
     backgroundColor: 'white',
@@ -404,7 +423,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     justifyContent: 'center',
     backgroundColor : "#B1E77B", 
-    alignItems : "center"
+    alignItems : "center",    marginLeft : 23, 
+    marginRight : 23,
+
   },
   addButtonText: {
     color: 'black',
@@ -415,6 +436,9 @@ const styles = StyleSheet.create({
   buttonRow1: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginVertical: 20,
+    marginLeft: 23,
+    marginRight: 23,
   },
   buttonOutline: {
     borderWidth: 1,
