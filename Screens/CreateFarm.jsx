@@ -31,6 +31,8 @@ const CreateFarm = () => {
 
 
 
+  // Service used in this part : https://my.locationiq.com/
+  // to use it go to tokens and create a new one and put it instead of  "pk.1705505b29c5df0924b07d671b88b7b9"
   const fetchCoordinates = async () => {
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
@@ -431,7 +433,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
   },
-
 
   buttonRow1: {
     flexDirection: 'row',

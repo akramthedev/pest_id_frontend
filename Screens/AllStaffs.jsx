@@ -90,7 +90,7 @@ export default function AllStaffs() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -172,7 +172,7 @@ export default function AllStaffs() {
             <SkeletonButtonLoader />
           </View>
         ) : (
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate('AjouterUnPersonel')}} >
             <Text style={styles.addButtonText}>+ Ajouter un nouveau personel</Text>
           </TouchableOpacity>
         )

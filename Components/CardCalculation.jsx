@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity , Dimensions} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const CardCalculation = ({ idFarm, idSerre, mineuse, mouche, thrips, date, percentage, chrImpact }) => {
 
   const { width: screenWidth } = Dimensions.get('window');
-
+  const navigation = useNavigation();
   
   return (
     <View style={styles.card}>
@@ -21,10 +23,10 @@ const CardCalculation = ({ idFarm, idSerre, mineuse, mouche, thrips, date, perce
       </Text>
       <Text style={styles.dateText}>{date}</Text>
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.modifyButton}>
+        <TouchableOpacity style={styles.modifyButton} onPress={()=>{navigation.navigate('Calculation')}}  >
           <Text style={styles.buttonText1}>Modifier</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.detailsButton}>
+        <TouchableOpacity style={styles.detailsButton} onPress={()=>{navigation.navigate('Calculation')}}  >
           <Text style={styles.buttonText}>Voir détails</Text>
         </TouchableOpacity>
       </View>

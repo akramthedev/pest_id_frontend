@@ -175,7 +175,7 @@ export default function AllFarms() {
             <SkeletonButtonLoader />
           </View>
         ) : (
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={()=>{ navigation.navigate('AjouterUneFerme') }} >
             <Text style={styles.addButtonText}>+ Ajouter une nouvelle ferme</Text>
           </TouchableOpacity>
         )
