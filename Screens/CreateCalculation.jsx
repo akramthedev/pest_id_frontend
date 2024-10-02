@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
+import CustomDatePicker from "../Components/CustomDatePicker";
+
 
 
 const CreateCalculation = () => {
@@ -15,7 +17,7 @@ const CreateCalculation = () => {
   const [ferme, setFerme] = useState('');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
 
   const toggleMenu = () => {
@@ -104,7 +106,10 @@ const CreateCalculation = () => {
             </Picker>
           </View>
 
+          <Text style={styles.label}>Date de réalisation</Text>
+          <CustomDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
+            
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.buttonOutline}>
               <Text style={styles.buttonTextB}>Prendre une photo</Text>
@@ -125,6 +130,9 @@ const CreateCalculation = () => {
           <Text style={styles.buttonTextW}>Enregistrer le calcul</Text>
         </TouchableOpacity>
       </View>
+
+
+
     </View>
 
       {isMenuVisible && (

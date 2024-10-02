@@ -500,9 +500,9 @@ const styles = StyleSheet.create({
   },
   titleXX: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "bold",
     color: '#000000',
-    color : "gray",
+    color : "black",
     marginBottom : 11
   },
   info: {
