@@ -1,7 +1,11 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity , Dimensions} from 'react-native';
 
 const CardCalculation = ({ idFarm, idSerre, mineuse, mouche, thrips, date, percentage, chrImpact }) => {
+
+  const { width: screenWidth } = Dimensions.get('window');
+
+  
   return (
     <View style={styles.card}>
       <View style={styles.row}>
@@ -41,7 +45,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4, 
     elevation: 2,
-    borderColor: "#E3E3E3",
+    borderColor: "#F1F1F1",
     borderStyle : "solid",
     borderWidth : 1,
     shadowColor: "#000", 

@@ -21,7 +21,7 @@ const History = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [navigation]);
 
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -54,8 +54,7 @@ const History = () => {
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (evt, gestureState) => {
         if (gestureState.dx > 0) {
-          // User is swiping to the right
-          Animated.timing(slideAnim, {
+           Animated.timing(slideAnim, {
             toValue: screenWidth,
             duration: 300,
             useNativeDriver: false,
@@ -127,9 +126,9 @@ const History = () => {
             style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
             {...panResponder.panHandlers}
           >
-          <View style={styles.popupContent}>
+          <ScrollView style={styles.popupContent}>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Historique')} style={styles.logo}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('Historique') ;toggleMenu()}} style={styles.logo}>
               <Image
                 source={require('../images/logo.png')}          
                 style={styles.imageLogo}
@@ -137,43 +136,43 @@ const History = () => {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Profile')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('Profile');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('Dashboard');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
               <Text style={styles.menuText}>Tableau de board</Text>
             </TouchableOpacity>
 
 
-            <TouchableOpacity onPress={() => navigation.navigate('Historique')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() => {navigation.navigate('Historique');toggleMenu()}}  style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('AjouterUnCalcul')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('AjouterUnCalcul');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('MesFermes')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('MesFermes');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="business" size={24} color="black" />
               <Text style={styles.menuText}>Mes fermes</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('AjouterUneFerme')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() => {navigation.navigate('AjouterUneFerme');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter une ferme</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('MesPersonels')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('MesPersonels');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="people-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mes personnels</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('AjouterUnPersonel')}  style={styles.menuItem}>
+            <TouchableOpacity onPress={() =>{ navigation.navigate('AjouterUnPersonel');toggleMenu()}}  style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un personel</Text>
             </TouchableOpacity>
@@ -194,7 +193,7 @@ const History = () => {
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
-          </View>
+          </ScrollView>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>PCS AGRI</Text>
@@ -342,6 +341,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
+
+  
+
   // Skeleton Loader Styles
   skeletonCard: {
     marginLeft: 23,
@@ -420,7 +422,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    marginTop : 50,
+    marginTop : 70,
     marginLeft : "auto",
     marginRight : "auto",
     marginBottom: 20,
@@ -454,7 +456,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 30,
+    top: 50,
     right: 17,
     backgroundColor: '#B9FF75',
     padding: 10,
