@@ -1,22 +1,44 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-
-
-
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet, View, Animated } from 'react-native';
 
 const SkeletonLoader = () => {
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
 
-  const { width: screenWidth } = Dimensions.get('window');
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 555,
+          useNativeDriver: false,
+        }),
+        Animated.timing(shimmerAnim, {
+          toValue: 0,
+          duration: 555,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [shimmerAnim]);
+
+  const animatedStyle = (inputRange) => ({
+    backgroundColor: shimmerAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#e0e0e0', '#f0f0f0'],
+    }),
+  });
 
   return (
-    <View style={styles.card}>
-      <View style={styles.row}>
-        <View style={styles.profileImage} />
+    <View style={styles.skeletonCard}>
+      <View style={styles.skeletonRow}>
+        {/* Profile Image */}
+        <Animated.View style={[styles.profileImage, animatedStyle([0, 1])]} />
+        
+        {/* Info Column with 3 items */}
         <View style={styles.infoContainer}>
-          <View style={styles.name} />
-          <View style={styles.details} />
-          <View style={styles.details} />
-          <View style={styles.details} />
+          <Animated.View style={[styles.skeletonTextLine1, animatedStyle([0, 1])]} />
+          <Animated.View style={[styles.skeletonTextLine3, animatedStyle([0, 1])]} />
+          <Animated.View style={[styles.skeletonTextLine2, animatedStyle([0, 1])]} />
         </View>
       </View>
     </View>
@@ -24,45 +46,58 @@ const SkeletonLoader = () => {
 };
 
 const styles = StyleSheet.create({
-  card: {
+  skeletonCard: {
+    marginLeft: 23,
+    marginRight: 23,
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 12,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
-  row: {
+  skeletonRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center',  
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#e0e0e0',  
+    width: 66,
+    height: 66,
+    borderRadius: 40,  
+    backgroundColor: '#e0e0e0',
     marginRight: 12,
   },
   infoContainer: {
     flex: 1,
+    justifyContent : "center",
+    flexDirection: 'column',
+    justifyContent: 'space-between',  
   },
-  name: {
-    height: 20,
+  skeletonTextLine1: {
+    width: '100%',
+    height: 19,
     backgroundColor: '#e0e0e0',
-    marginBottom: 4,
-    borderRadius: 4,
+    borderRadius: 6,
+    marginBottom: 9,  
   },
-  details: {
-    height: 15,
+
+  skeletonTextLine2: {
+    width: '80%',
+    height: 19,
     backgroundColor: '#e0e0e0',
-    marginBottom: 4,
-    borderRadius: 4,
+    borderRadius: 6,
+    marginBottom: 9,  
+  },
+
+  skeletonTextLine3: {
+    width: '50%',
+    height: 19,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+    marginBottom: 9,  
   },
 });
 
