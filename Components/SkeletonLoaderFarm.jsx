@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
 
-const SkeletonLoader = () => {
+const SkeletonLoaderFarm = () => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 66,
     height: 66,
-    borderRadius: 40,  
+    borderRadius: 9,  
     backgroundColor: '#e0e0e0',
     marginRight: 12,
   },
@@ -102,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SkeletonLoader;
+export default SkeletonLoaderFarm;
