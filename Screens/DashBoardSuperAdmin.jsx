@@ -1,36 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';  
 import { MaterialIcons } from '@expo/vector-icons'; 
+import CardAdmin from '../Components/CardAdmin'
 
-
+const personnelData = [
+    {
+      id: '1',
+      name: 'Jack Rosso',
+      email: 'jack.rosso@greenhouse.com',
+      phone: '+212 673 486 082',
+      farm: 'Ferme : Green House',
+      image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
+    },
+    {
+      id: '2',
+      name: 'Mounir Fettah',
+      email: 'mounir.fettah@greenhouse.com',
+      phone: '+212 673 486 083',
+      farm: 'Ferme : Green House',
+      image: 'https://previews.123rf.com/images/ikalvi/ikalvi1706/ikalvi170600030/79935275-logo-sant%C3%A9-cr%C3%A9ation-de-logo-de-sant%C3%A9-et-de-remise-en-forme.jpg',
+    },
+    {
+      id: '3',
+      name: 'Said Abdou',
+      email: 'said.abdou@greenhouse.com',
+      phone: '+212 673 486 084',
+      farm: 'Ferme : Green House',
+      image: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-business-logo-design-template-cc64433eb5c0cf702a62f07fe40b6b04_screen.jpg?ts=1669313113",
+    },
+  ];
+ 
+  
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function Dashboard() {
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-  const navigation = useNavigation();
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [isXClicked, setisXClicked] = useState(false);
+    const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+    const navigation = useNavigation();
 
-  const [viewType, setViewType] = useState('Year');  
-  const [selectedMonth, setSelectedMonth] = useState('January');
-  const [selectedChart, setSelectedChart] = useState('Mouche');
 
-  const data = {
-    labels: viewType === 'Year' 
-      ? ["Ja", "Fe", "Ma", "Ap", "May", "Jun", 'Jul', 'Au', "Se", "Oc", "No", "Dec"]
-      : ["1", "5", "10", "15", "20", "25", "30"],  
-    datasets: [
-      {
-        data: viewType === 'Year' 
-          ? [20, 45, 28, 80, 99, 43, 20, 121, 76, 12, 80, 10]
-          : [50, 15, 85, 60,37, 100, 45],  
-        color: () => `#487C15`,  
-      }
-    ]
-  };
 
   const toggleMenu = () => {
     if (isMenuVisible) {
@@ -79,88 +90,23 @@ export default function Dashboard() {
           </TouchableOpacity>
         </View>
 
-         <View style={styles.viewTypeContainer}>
-          <TouchableOpacity style={[styles.BtnXXX11, viewType === 'Year' ? styles.activeBtn : null]} onPress={() => setViewType('Year')}>
-            <Text style={[styles.BtnXXXText, viewType === 'Year' ? styles.activeBtnText : null]}>Année</Text>
-          </TouchableOpacity>
-          <TouchableOpacity  style={[styles.BtnXXX11, viewType === 'Month' ? styles.activeBtn : null]} onPress={() => setViewType('Month')}>
-            <Text style={[styles.BtnXXXText, viewType === 'Month' ? styles.activeBtnText : null]}>Mois</Text>
-          </TouchableOpacity>
-        </View>
-
-         {viewType === 'Month' && (
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedMonth}
-              onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="January" value="January" />
-              <Picker.Item label="February" value="February" />
-              <Picker.Item label="March" value="March" />
-              <Picker.Item label="April" value="April" />
-              <Picker.Item label="May" value="May" />
-              <Picker.Item label="June" value="June" />
-              <Picker.Item label="July" value="July" />
-              <Picker.Item label="August" value="August" />
-              <Picker.Item label="Spetember" value="Spetember" />
-              <Picker.Item label="October" value="October" />
-              <Picker.Item label="November" value="November" />
-              <Picker.Item label="December" value="December" />
-             </Picker>
-          </View>
-        )}
-
-         
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={[styles.BtnXXX, selectedChart === 'Mouches' ? styles.activeBtn : null]} 
-              onPress={() => setSelectedChart('Mouches')}>
-              <Text style={[styles.BtnXXXText, selectedChart === 'Mouches' ? styles.activeBtnText : null]}>Mouches</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.BtnXXX, selectedChart === 'Mineuses' ? styles.activeBtn : null]} 
-              onPress={() => setSelectedChart('Mineuses')}>
-              <Text style={[styles.BtnXXXText, selectedChart === 'Mineuses' ? styles.activeBtnText : null]}>Mineuses</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.BtnXXX, selectedChart === 'Thrips' ? styles.activeBtn : null]} 
-              onPress={() => setSelectedChart('Thrips')}>
-              <Text style={[styles.BtnXXXText, selectedChart === 'Thrips' ? styles.activeBtnText : null]}>Thrips</Text>
-            </TouchableOpacity>
-          </View>
-
-
-         <View style={styles.graphicContainer}>
-          <Text style={styles.graphicContainerText}>Moyenne des {selectedChart} par plaque {viewType === 'Year' ? 'par an' : `pour ${selectedMonth}`}</Text>
-          <LineChart
-            data={data}
-            width={screenWidth - 40}  
-            height={300}
-            bezier  
-            chartConfig={{
-              backgroundColor: 'red',
-              backgroundGradientFrom: '#F3FFE8',
-              backgroundGradientTo: '#F3FFE8',
-              decimalPlaces: 2,
-              color: (opacity = 1) => `rgba(72, 124, 21, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-            }}
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
+        <View style={styles.buttonContainer}>
+                <TouchableOpacity  style={isXClicked ? styles.saveButton : styles.activated} onPress={()=>{setisXClicked(!isXClicked)}} >
+                  <Text style={isXClicked ? styles.buttonTextBlack : styles.buttonTextWhite}>Nouvelles Demandes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={isXClicked ? styles.activated : styles.saveButton} onPress={()=>{setisXClicked(!isXClicked)}} >
+                  <Text style={isXClicked ? styles.buttonTextWhite : styles.buttonTextBlack}>Tous les admins</Text>
+                </TouchableOpacity>
         </View>
         
-      </ScrollView>
-      
+        {
+            personnelData && personnelData.map((data, index)=>{
+            return(
+                <CardAdmin item={data}  key={index}/>
+            )})
+        }
 
-      
+      </ScrollView>
       
       {isMenuVisible && (
         <Animated.View
@@ -247,7 +193,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: "relative",
-    marginBottom: 30
   },
   menu: {
     position: "absolute",
@@ -337,6 +282,54 @@ const styles = StyleSheet.create({
   popupContent: {
     padding: 20,
   },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft : 23, 
+    marginRight : 23,
+    marginBottom:  23
+   },
+  cancelButton: {
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  saveButton: {
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  activated : {
+    backgroundColor : "#487C15",
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  buttonTextWhite: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  buttonTextBlack: {
+    color: 'black',
+    fontSize: 16,
+  },
+
+
   logo: {
     marginTop : 70,
     marginLeft : "auto",

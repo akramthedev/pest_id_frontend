@@ -6,6 +6,7 @@ import Login from './Screens/Login';
 import Register from './Screens/Register';
 import Dashboard  from './Screens/DashBoard';
 import Historique  from './Screens/History';
+import AdminSingle from './Screens/AdminSingle';
 import Profile from './Screens/Profile';
 import MesPersonels from './Screens/AllStaffs';
 import MesFermes from './Screens/AllFarms';
@@ -15,12 +16,14 @@ import AjouterUneFerme from './Screens/CreateFarm';
 import AjouterUnPersonel from './Screens/CreateStaff';
 import ModifierSerre from './Screens/ModifierSerre'
 import Calculation from './Screens/Calculation';
-
+import DashBoardSuperAdmin from './Screens/DashBoardSuperAdmin'
 
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+
+  const x = true;
 
   return (
     <NavigationContainer>
@@ -47,7 +50,7 @@ export default function App() {
       />
       <Stack.Screen 
         name="Dashboard" 
-        component={Dashboard} 
+        component={x === true ? DashBoardSuperAdmin : Dashboard} 
         options={{ headerShown: false }}  
       />
       <Stack.Screen 
@@ -83,6 +86,11 @@ export default function App() {
       <Stack.Screen 
         name="MesPersonels" 
         component={MesPersonels} 
+        options={{ headerShown: false }}  
+      />
+      <Stack.Screen 
+        name="AdminSingle" 
+        component={AdminSingle} 
         options={{ headerShown: false }}  
       />
       <Stack.Screen 
