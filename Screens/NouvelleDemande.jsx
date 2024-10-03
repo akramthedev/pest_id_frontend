@@ -11,12 +11,11 @@ import CardFarm from '../Components/CardFarm';
 const { width: screenWidth } = Dimensions.get('window');
 
 
-const AdminSingle = () => {
+const NouvelleDemande = () => {
 
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
 
 
@@ -66,7 +65,7 @@ const AdminSingle = () => {
             
 
                 <View style={styles.titleContainer}>
-                  <Text style={styles.titleText}>Profil Admin</Text>
+                  <Text style={styles.titleText}>Nouvelle Demande</Text>
                   <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
                     <Ionicons name="menu" size={24} color="#3E6715" />
                   </TouchableOpacity>
@@ -359,4 +358,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default AdminSingle;
+export default NouvelleDemande;

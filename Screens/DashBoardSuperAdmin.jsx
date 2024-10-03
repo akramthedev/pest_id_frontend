@@ -6,6 +6,34 @@ import { MaterialIcons } from '@expo/vector-icons';
 import CardAdmin from '../Components/CardAdmin'
 
 const personnelData = [
+  {
+    id: '1',
+    name: 'Jack Rosso',
+    email: 'jack.rosso@greenhouse.com',
+    phone: '+212 673 486 082',
+    farm: 'Ferme : Green House',
+    image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
+  },
+  {
+    id: '2',
+    name: 'Mounir Fettah',
+    email: 'mounir.fettah@greenhouse.com',
+    phone: '+212 673 486 083',
+    farm: 'Ferme : Green House',
+    image: 'https://previews.123rf.com/images/ikalvi/ikalvi1706/ikalvi170600030/79935275-logo-sant%C3%A9-cr%C3%A9ation-de-logo-de-sant%C3%A9-et-de-remise-en-forme.jpg',
+  },
+  {
+    id: '3',
+    name: 'Said Abdou',
+    email: 'said.abdou@greenhouse.com',
+    phone: '+212 673 486 084',
+    farm: 'Ferme : Green House',
+    image: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-business-logo-design-template-cc64433eb5c0cf702a62f07fe40b6b04_screen.jpg?ts=1669313113",
+  },
+];
+
+
+const personnelData2 = [
     {
       id: '1',
       name: 'Jack Rosso',
@@ -21,15 +49,7 @@ const personnelData = [
       phone: '+212 673 486 083',
       farm: 'Ferme : Green House',
       image: 'https://previews.123rf.com/images/ikalvi/ikalvi1706/ikalvi170600030/79935275-logo-sant%C3%A9-cr%C3%A9ation-de-logo-de-sant%C3%A9-et-de-remise-en-forme.jpg',
-    },
-    {
-      id: '3',
-      name: 'Said Abdou',
-      email: 'said.abdou@greenhouse.com',
-      phone: '+212 673 486 084',
-      farm: 'Ferme : Green House',
-      image: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-business-logo-design-template-cc64433eb5c0cf702a62f07fe40b6b04_screen.jpg?ts=1669313113",
-    },
+    }
   ];
  
   
@@ -91,19 +111,33 @@ export default function Dashboard() {
         </View>
 
         <View style={styles.buttonContainer}>
-                <TouchableOpacity  style={isXClicked ? styles.saveButton : styles.activated} onPress={()=>{setisXClicked(!isXClicked)}} >
+                <TouchableOpacity  style={isXClicked ? styles.saveButton : styles.activated} onPress={()=>{setisXClicked(false)}} >
                   <Text style={isXClicked ? styles.buttonTextBlack : styles.buttonTextWhite}>Nouvelles Demandes</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={isXClicked ? styles.activated : styles.saveButton} onPress={()=>{setisXClicked(!isXClicked)}} >
+                <TouchableOpacity style={isXClicked ? styles.activated : styles.saveButton} onPress={()=>{setisXClicked(true)}} >
                   <Text style={isXClicked ? styles.buttonTextWhite : styles.buttonTextBlack}>Tous les admins</Text>
                 </TouchableOpacity>
         </View>
         
         {
+          isXClicked ? 
+          <>
+          {
+            personnelData2 && personnelData2.map((data, index)=>{
+              return(
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+              )})
+          }
+          </>
+          :
+          <>
+          {
             personnelData && personnelData.map((data, index)=>{
-            return(
-                <CardAdmin item={data}  key={index}/>
-            )})
+              return(
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+              )})
+          }
+          </>
         }
 
       </ScrollView>

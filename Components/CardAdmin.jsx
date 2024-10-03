@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 
-export  const CardAdmin = ({ item }) => {
+export  const CardAdmin = ({ item, isXClicked }) => {
   
   
   const nav = useNavigation();
@@ -12,20 +12,34 @@ export  const CardAdmin = ({ item }) => {
 
   return(
 
-    <TouchableOpacity onPress={()=>{nav.navigate('AdminSingle')}}  style={styles.card}>
-    <View style={styles.row}>
-      <Image source={{ uri: item.image }} style={styles.profileImage} />
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.details}>{item.email}</Text>
-        <Text style={styles.details}>{item.phone}</Text>
-        <Text style={styles.details}>{item.farm}</Text>
+    <TouchableOpacity onPress={()=>{
+      if(isXClicked){
+        nav.navigate('AdminProfile')
+      } 
+      else{
+        nav.navigate('NouvelleDemande')
+      }
+    }}  style={styles.card}>
+      <View style={styles.row}>
+        <Image source={{ uri: item.image }} style={styles.profileImage} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.details}>{item.email}</Text>
+          <Text style={styles.details}>{item.phone}</Text>
+          <Text style={styles.details}>{item.farm}</Text>
+        </View>
+        <TouchableOpacity onPress={()=>{
+          if(isXClicked){
+            nav.navigate('AdminProfile')
+          }
+          else{
+            nav.navigate('NouvelleDemande')
+          }
+        }} style={styles.iconContainer}>
+          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={()=>{nav.navigate('AdminSingle')}} style={styles.iconContainer}>
-        <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-      </TouchableOpacity>
-    </View>
-  </TouchableOpacity>
+    </TouchableOpacity>
 
 
   )

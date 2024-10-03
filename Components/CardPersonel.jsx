@@ -1,23 +1,31 @@
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-const CardPersonal = ({ item }) => (
-  <View style={styles.card}>
-    <View style={styles.row}>
-      <Image source={{ uri: item.image }} style={styles.profileImage} />
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.details}>{item.email}</Text>
-        <Text style={styles.details}>{item.phone}</Text>
-        <Text style={styles.details}>{item.farm}</Text>
+
+export const CardPersonal = ({ item }) => {
+
+  const nav = useNavigation();
+
+  return(
+    <TouchableOpacity onPress={()=>{nav.navigate('Profile')}}  style={styles.card}>
+      <View style={styles.row}>
+        <Image source={{ uri: item.image }} style={styles.profileImage} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.details}>{item.email}</Text>
+          <Text style={styles.details}>{item.phone}</Text>
+          <Text style={styles.details}>{item.farm}</Text>
+        </View>
+        <TouchableOpacity style={styles.iconContainer}>
+          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.iconContainer}>
-        <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-      </TouchableOpacity>
-    </View>
-  </View>
-);
+    </TouchableOpacity>
+  );
+
+}
 
 const styles = StyleSheet.create({
   card: {

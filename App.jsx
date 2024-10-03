@@ -6,8 +6,9 @@ import Login from './Screens/Login';
 import Register from './Screens/Register';
 import Dashboard  from './Screens/DashBoard';
 import Historique  from './Screens/History';
-import AdminSingle from './Screens/AdminSingle';
+import NouvelleDemande from './Screens/NouvelleDemande';
 import Profile from './Screens/Profile';
+import AdminProfile from './Screens/AdminProfile'
 import MesPersonels from './Screens/AllStaffs';
 import MesFermes from './Screens/AllFarms';
 import AjouterUnCalcul from './Screens/CreateCalculation';
@@ -46,6 +47,11 @@ export default function App() {
       <Stack.Screen 
         name="Profile" 
         component={Profile} 
+        options={{ headerShown: false }}  
+      /> 
+      <Stack.Screen 
+        name="AdminProfile" 
+        component={AdminProfile} 
         options={{ headerShown: false }}  
       />
       <Stack.Screen 
@@ -89,8 +95,8 @@ export default function App() {
         options={{ headerShown: false }}  
       />
       <Stack.Screen 
-        name="AdminSingle" 
-        component={AdminSingle} 
+        name="NouvelleDemande" 
+        component={NouvelleDemande} 
         options={{ headerShown: false }}  
       />
       <Stack.Screen 
