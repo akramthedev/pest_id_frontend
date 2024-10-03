@@ -377,7 +377,8 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,
+    marginVertical: 15,    marginLeft: 20 ,
+
   },
   menuText: {
     fontSize: 16,

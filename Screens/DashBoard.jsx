@@ -16,7 +16,7 @@ export default function Dashboard() {
 
   const [viewType, setViewType] = useState('Year');  
   const [selectedMonth, setSelectedMonth] = useState('January');
-  const [selectedChart, setSelectedChart] = useState('Mouche');
+  const [selectedChart, setSelectedChart] = useState('Mouches');
 
   const data = {
     labels: viewType === 'Year' 
@@ -27,7 +27,7 @@ export default function Dashboard() {
         data: viewType === 'Year' 
           ? [20, 45, 28, 80, 99, 43, 20, 121, 76, 12, 80, 10]
           : [50, 15, 85, 60,37, 100, 45],  
-        color: () => `#487C15`,  
+        color: () => `#393939`,  
       }
     ]
   };
@@ -79,12 +79,14 @@ export default function Dashboard() {
           </TouchableOpacity>
         </View>
 
+
+        <Text style={styles.joesofwvdc} >Type d'affichage </Text>
          <View style={styles.viewTypeContainer}>
           <TouchableOpacity style={[styles.BtnXXX11, viewType === 'Year' ? styles.activeBtn : null]} onPress={() => setViewType('Year')}>
-            <Text style={[styles.BtnXXXText, viewType === 'Year' ? styles.activeBtnText : null]}>Année</Text>
+            <Text style={[styles.BtnXXXText, viewType === 'Year' ? styles.activeBtnText : null]}>Par Année</Text>
           </TouchableOpacity>
           <TouchableOpacity  style={[styles.BtnXXX11, viewType === 'Month' ? styles.activeBtn : null]} onPress={() => setViewType('Month')}>
-            <Text style={[styles.BtnXXXText, viewType === 'Month' ? styles.activeBtnText : null]}>Mois</Text>
+            <Text style={[styles.BtnXXXText, viewType === 'Month' ? styles.activeBtnText : null]}>Par Mois</Text>
           </TouchableOpacity>
         </View>
 
@@ -95,23 +97,26 @@ export default function Dashboard() {
               onValueChange={(itemValue) => setSelectedMonth(itemValue)}
               style={styles.picker}
             >
-              <Picker.Item label="January" value="January" />
-              <Picker.Item label="February" value="February" />
-              <Picker.Item label="March" value="March" />
-              <Picker.Item label="April" value="April" />
-              <Picker.Item label="May" value="May" />
-              <Picker.Item label="June" value="June" />
-              <Picker.Item label="July" value="July" />
-              <Picker.Item label="August" value="August" />
-              <Picker.Item label="Spetember" value="Spetember" />
-              <Picker.Item label="October" value="October" />
-              <Picker.Item label="November" value="November" />
-              <Picker.Item label="December" value="December" />
+              <Picker.Item label="January" value="January" style={styles.zusdquco} />
+              <Picker.Item label="February" value="February" style={styles.zusdquco} />
+              <Picker.Item label="March" value="March" style={styles.zusdquco}/>
+              <Picker.Item label="April" value="April" style={styles.zusdquco}/>
+              <Picker.Item label="May" value="May" style={styles.zusdquco}/>
+              <Picker.Item label="June" value="June" style={styles.zusdquco}/>
+              <Picker.Item label="July" value="July" style={styles.zusdquco}/>
+              <Picker.Item label="August" value="August" style={styles.zusdquco}/>
+              <Picker.Item label="Spetember" value="Spetember" style={styles.zusdquco}/>
+              <Picker.Item label="October" value="October" style={styles.zusdquco}/>
+              <Picker.Item label="November" value="November" style={styles.zusdquco}/>
+              <Picker.Item label="December" value="December" style={styles.zusdquco}/>
              </Picker>
           </View>
         )}
 
          
+
+        <Text style={styles.joesofwvdcjoesofwvdc} >Espèces à analyser</Text>
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity 
               style={[styles.BtnXXX, selectedChart === 'Mouches' ? styles.activeBtn : null]} 
@@ -141,8 +146,8 @@ export default function Dashboard() {
             height={300}
             bezier  
             chartConfig={{
-              backgroundColor: 'red',
-              backgroundGradientFrom: '#F3FFE8',
+              backgroundColor : "#E5FFCC",
+               backgroundGradientFrom: '#F3FFE8',
               backgroundGradientTo: '#F3FFE8',
               decimalPlaces: 2,
               color: (opacity = 1) => `rgba(72, 124, 21, ${opacity})`,
@@ -273,50 +278,54 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     marginHorizontal: 23,
-    marginBottom: 10,
+    marginBottom: 10,borderColor : "#DCDCDC", 
+    borderWidth : 1,
+    borderRadius : 8,overflow : "hidden"
   },
   picker: {
-    backgroundColor: '#DEF3CB',
+    backgroundColor: '#F3FFE8',
     borderRadius: 10,
-    height: 50,
+    height: 50,     
     justifyContent: 'center',
   },
   graphicContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    paddingTop: 30,
+    borderRadius: 0,
   },
   BtnXXX: {
     height: 41,
-    backgroundColor: "#DEF3CB",
+    backgroundColor: "#F3FFE8",
+    borderColor : "#DCDCDC", 
     alignItems: "center",
-    paddingRight: 20,
-    paddingLeft: 20,
     borderRadius: 10,
+    width : "31.3%",    borderWidth : 1,
     justifyContent: "center",
   },
   BtnXXX11 : {
     height: 41,
-    backgroundColor: "#DEF3CB",
+    backgroundColor: "#F3FFE8",
+    borderColor : "#DCDCDC", 
     alignItems: "center",
-      borderRadius: 10,
-      width : "48.4%",
+    borderWidth : 1,
+    borderRadius: 10,
+    width : "48.4%",
     justifyContent: "center",
   },
   BtnXXXText: {
-    color: "#4F8618",
-    fontWeight: "bold",
+    color: "black",
+    fontSize : 16,
+    fontWeight: "400",
   },
   activeBtn: {
-   backgroundColor : "#487C15", 
+   backgroundColor : "#393939", 
   },
   activeBtnText :{
     color : "white"
   },
   graphicContainerText: {
-    color: "#487C15",
+    color: "#AEAEAE",
     fontSize: 14,
   },
   //pop Up Menu 
@@ -337,6 +346,10 @@ const styles = StyleSheet.create({
   popupContent: {
     padding: 20,
   },
+  zusdquco : {
+    color : "black", 
+    fontSize : 16
+  },
   logo: {
     marginTop : 70,
     marginLeft : "auto",
@@ -352,7 +365,8 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,
+    marginVertical: 15,    marginLeft: 20 ,
+
   },
   menuText: {
     fontSize: 16,
@@ -410,4 +424,19 @@ const styles = StyleSheet.create({
   carouselContainer: {
     position: 'relative',
   },
+  joesofwvdc : {
+    color : "black", 
+    marginLeft : 24, 
+    marginBottom : 10, 
+    fontSize : 16, 
+    fontWeight : '400', 
+   },
+   joesofwvdcjoesofwvdc : {
+     color : "black", 
+     marginLeft : 24, 
+     marginBottom : 10, 
+     fontSize : 16, 
+     fontWeight : '400', 
+     marginTop : 10
+    }
 });

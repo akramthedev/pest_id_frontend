@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const x = true;
+  const x = false;
 
   return (
     <NavigationContainer>

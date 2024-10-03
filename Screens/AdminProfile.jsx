@@ -18,39 +18,7 @@ const personnelData = [
       phone: '+212 673 486 082',
       farm: 'Ferme : Green House',
       image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-    },
-    {
-      id: '2',
-      name: 'Mounir Fettah',
-      email: 'mounir.fettah@greenhouse.com',
-      phone: '+212 673 486 083',
-      farm: 'Ferme : Green House',
-      image: 'https://cdn.pixabay.com/photo/2022/03/11/06/14/indian-man-7061278_1280.jpg',
-    },
-    {
-      id: '3',
-      name: 'Said Abdou',
-      email: 'said.abdou@greenhouse.com',
-      phone: '+212 673 486 084',
-      farm: 'Ferme : Green House',
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Outdoors-man-portrait_%28cropped%29.jpg/800px-Outdoors-man-portrait_%28cropped%29.jpg",
-    },
-    {
-        id: '4',
-        name: 'Jack Rosso',
-        email: 'jack.rosso@greenhouse.com',
-        phone: '+212 673 486 082',
-        farm: 'Ferme : Green House',
-        image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-      },
-      {
-        id: '5',
-        name: 'Mounir Fettah',
-        email: 'mounir.fettah@greenhouse.com',
-        phone: '+212 673 486 083',
-        farm: 'Ferme : Green House',
-        image: 'https://cdn.pixabay.com/photo/2022/03/11/06/14/indian-man-7061278_1280.jpg',
-      },
+    }, 
       {
         id: '6',
         name: 'Said Abdou',
@@ -152,10 +120,7 @@ const AdminProfile = () => {
               </View>
               
 
-              <View style={styles.modifierVotreX} >
-                  <Text style={styles.modifierVotreXText}>Modifier ses informations</Text>
-                  <Ionicons name="arrow-forward" size={24} color="gray" />
-              </View>
+           
 
 
               <View style={styles.modifierVotreX} >
@@ -168,7 +133,14 @@ const AdminProfile = () => {
                     <CardPersonal item={data}  key={index}/>
                     )
                 })
-                }
+              }
+
+              <TouchableOpacity style={styles.modifierVotreXZUOQEFD} >
+                <Text style={styles.modifierVotreXTextesfvd}>Modifier ses informations&nbsp;&nbsp;</Text>
+                <Ionicons name="arrow-forward" size={20} color="white" />
+              </TouchableOpacity>
+
+
 
 
           </ScrollView>
@@ -367,6 +339,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 15,
+    marginLeft: 20 ,
   },
   menuText: {
     fontSize: 16,
@@ -407,6 +380,23 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     marginLeft : 25, 
     marginRight : 25    
+  },
+  modifierVotreXZUOQEFD :{
+    height: 21,
+    marginTop : 4,
+    width : "auto",
+     marginBottom: 10,
+    flexDirection: 'row',      
+    marginLeft : 23, 
+    marginRight : 23,  
+    backgroundColor : '#599123', 
+    borderRadius : 7,
+    height : 41,
+    alignItems : "center", 
+    justifyContent: "center"
+  },modifierVotreXTextesfvd : {
+    color: "white",
+    fontSize : 16
   },
   modifierVotreXText : {
     color: "#6D6D6D",

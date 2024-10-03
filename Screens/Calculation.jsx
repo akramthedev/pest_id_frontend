@@ -9,7 +9,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 const { width: screenWidth } = Dimensions.get('window');
 
 
-
 const Carousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -27,6 +26,7 @@ const Carousel = ({ images }) => {
 
   return (
     <View style={{ alignItems: 'center' }}>
+
       <FlatList
         data={[images[currentIndex]]}
         horizontal
@@ -38,29 +38,43 @@ const Carousel = ({ images }) => {
         showsHorizontalScrollIndicator={false}
       />
 
-       <View style={{ flexDirection: 'row', marginTop: 20 }}>
-         <TouchableOpacity
+      <View style={{ flexDirection: 'row', marginTop: 5 }}>
+        {images.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              index === currentIndex ? styles.activeDot : styles.inactiveDot,
+            ]}
+          />
+        ))}
+      </View>
+
+       <View style={{ flexDirection: 'row', marginTop: 10 }}>
+        <TouchableOpacity
           onPress={goPrevious}
-          disabled={currentIndex === 0}  
+          disabled={currentIndex === 0}
           style={[
             styles.carouselButton,
-            currentIndex === 0 && { backgroundColor: '#ccc' } 
+            currentIndex === 0 && { backgroundColor: '#ccc' },
           ]}
         >
           <Ionicons name="chevron-back-outline" size={24} color="white" />
         </TouchableOpacity>
 
-         <TouchableOpacity
+        <TouchableOpacity
           onPress={goNext}
-          disabled={currentIndex === images.length - 1}  
+          disabled={currentIndex === images.length - 1}
           style={[
             styles.carouselButton,
-            currentIndex === images.length - 1 && { backgroundColor: '#ccc' } 
+            currentIndex === images.length - 1 && { backgroundColor: '#ccc' },
           ]}
         >
           <Ionicons name="chevron-forward-outline" size={24} color="white" />
         </TouchableOpacity>
       </View>
+
+ 
     </View>
   );
 };
@@ -103,6 +117,7 @@ const Calculation = () => {
   };
 
 
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -119,8 +134,6 @@ const Calculation = () => {
       },
     })
   ).current;
-
-
 
 
   return (
@@ -458,7 +471,8 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,
+    marginLeft: 20 ,
+    marginVertical: 16,
   },
   menuText: {
     fontSize: 16,
@@ -541,9 +555,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   carouselButton: {
-    backgroundColor: '#487C15',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
+    backgroundColor: '#8DC94B',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     borderRadius: 500,
     marginLeft : 7,
     marginRight : 7,
@@ -551,7 +565,20 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-  }
+  },
+  dot: {
+    height: 8.5,
+    width: 8.5,
+    borderRadius: 5,
+    marginTop : 10,
+    marginHorizontal: 5,
+  },
+  activeDot: {
+    backgroundColor: '#8DC94B',
+  },
+  inactiveDot: {
+    backgroundColor: '#D5D5D5',
+  },
 });
 export default Calculation;
 
