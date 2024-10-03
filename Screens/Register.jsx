@@ -22,7 +22,7 @@ const Register = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <View style={styles.btnRond}>
           <Ionicons name="arrow-back" size={24} color="#3E6715" />
         </View>

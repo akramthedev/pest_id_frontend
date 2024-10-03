@@ -135,7 +135,7 @@ const CreateStaff = () => {
       </ScrollView>
 
       <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.navigate('Historique')}} style={styles.cancelButton}>
+        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB} >Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton}>

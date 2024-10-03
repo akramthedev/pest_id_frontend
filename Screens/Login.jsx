@@ -28,7 +28,7 @@ const Login = () => {
         style={styles.backgroundImage} 
       />
       <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <View style={styles.btnRond}>
             <BlurView intensity={33} tint="light" style={styles.backgroundBlur}>
               <Ionicons name="arrow-back" size={24} color="#78B142" />
