@@ -290,10 +290,9 @@ const styles = StyleSheet.create({
     paddingTop: 23,
   },
   titleContainer: {
-    height: 80,
-    justifyContent: 'center',
+    marginBottom : 23,
     alignItems: 'center',
-    position: "relative",
+    position : "relative"
   },
   menu: {
     position: "absolute",

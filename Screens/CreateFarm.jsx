@@ -306,17 +306,15 @@ const CreateFarm = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-     backgroundColor: '#fff',
+    backgroundColor: 'white',
+    paddingTop: 23,
   },
   titleContainer: {
-    height: 80,
-    justifyContent: 'center',
+    marginBottom : 23,
     alignItems: 'center',
     position : "relative",
     marginLeft : 23, 
-    marginTop : 23,
     marginRight : 23
-
   },
   menu :{
     position : "absolute",

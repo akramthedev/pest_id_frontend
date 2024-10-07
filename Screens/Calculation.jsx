@@ -347,12 +347,11 @@ const Calculation = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
     padding: 23,
-    backgroundColor: '#fff',
   },
   titleContainer: {
-    height: 80,
-    justifyContent: 'center',
+    marginBottom : 23,
     alignItems: 'center',
     position : "relative"
   },
