@@ -6,6 +6,10 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
+
+
+
 
 const CustomDatePicker = ({ selectedDate, onDateChange }) => {
   const [showPicker, setShowPicker] = useState(false);
@@ -57,10 +61,9 @@ const CustomDatePicker = ({ selectedDate, onDateChange }) => {
     }
   };
 
-  // Format the date as JJ/MM/AAAA
-  const formatDate = (date) => {
+   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
@@ -76,14 +79,14 @@ const CustomDatePicker = ({ selectedDate, onDateChange }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <View style={styles.header}>
-                <TouchableOpacity onPress={() => changeMonth('prev')}>
-                  <Text style={styles.changeMonthText}>{"<"}</Text>
+                <TouchableOpacity style={styles.uçzrshuwdoc}  onPress={() => changeMonth('prev')}>
+                  <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.monthYearText}>
                   {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
                 </Text>
-                <TouchableOpacity onPress={() => changeMonth('next')}>
-                  <Text style={styles.changeMonthText}>{">"}</Text>
+                <TouchableOpacity style={styles.uçzrshuwdoc} onPress={() => changeMonth('next')}>
+                  <Ionicons name="arrow-forward" size={24} color="white" />
                 </TouchableOpacity>
               </View>
               <View style={styles.daysContainer}>
@@ -110,6 +113,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'center',
   },
+  uçzrshuwdoc : {
+    backgroundColor : "#487C15", 
+    width : 45,
+    height : 45,
+    borderRadius : 30,
+    justifyContent : "center",
+    alignItems : "center"
+  },
   dateText: {
     color: 'black',
     fontSize: 16,
@@ -135,8 +146,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   changeMonthText: {
-    fontSize: 24,
-    color: '#487C15',
+    fontSize: 27,
+    color: 'white',
   },
   daysContainer: {
     flexDirection: 'row',

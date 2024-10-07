@@ -182,7 +182,8 @@ export default function AllFarms() {
       }
 
 
-      {isMenuVisible && (
+
+{isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
@@ -195,14 +196,16 @@ export default function AllFarms() {
                 resizeMode="cover"
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="person-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mon Profile</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
               <Text style={styles.menuText}>Tableau de bord</Text>
             </TouchableOpacity>
+            
+            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="person-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mon Profile</Text>
+            </TouchableOpacity>
+            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
@@ -212,7 +215,7 @@ export default function AllFarms() {
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="business" size={24} color="black" />
+              <Ionicons name="business-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mes fermes</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
@@ -227,14 +230,18 @@ export default function AllFarms() {
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un personnel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="help-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Lorem ipsum</Text>
+            
+            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="mail-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Demandes Clients</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="call-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Lorem ipsum</Text>
+
+            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes Clients</Text>
             </TouchableOpacity>
+
+            
             <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
@@ -251,6 +258,8 @@ export default function AllFarms() {
           </TouchableOpacity>
         </Animated.View>
       )}
+
+      
     </View>
   );
 }

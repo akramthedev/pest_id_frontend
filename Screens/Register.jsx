@@ -1,16 +1,23 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
+import axios from 'axios';
+ import AsyncStorage from '@react-native-async-storage/async-storage';
+ 
 
 
 const Register = () => {
-
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, seterror] = useState('');
+  const [showerror, setshowerror] = useState(false);
 
- 
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
   });
@@ -18,6 +25,83 @@ const Register = () => {
   if (!fontsLoaded) {
     return null;  
   }
+
+  
+
+
+  const register = async () => {
+    if (password.length < 1 || email.length < 5 || fullName.length < 2) {
+      Alert.alert('Erreur', 'Veuillez saisir des valeurs correctes');
+      return;  
+    } else {
+      setLoading(true);
+      const data = {
+        fullName: fullName, 
+        email: email, 
+        password: password
+      };
+      const data1 = {
+        email: email, 
+        password: password
+      };
+  
+      try {
+        setLoading(true);
+        setshowerror(false);
+        seterror('');
+        
+        const response = await axios.post('http://10.0.2.2:8000/api/register', data);
+      
+        if (response.status === 201) {
+          const response2 = await axios.post('http://10.0.2.2:8000/api/login', data1);
+          if (response2.status === 200) {
+            const token = response2.data.token;
+            
+            console.log("User Object: ", response2.data.user); 
+
+            setEmail(''); 
+            setPassword(''); 
+            setFullName(''); 
+            saveToken(token);
+            
+            navigation.navigate('Dashboard');
+            
+           } else {
+            Alert.alert("Échec de l'authentification");
+            seterror(response2.data.message);
+            setshowerror(true);
+          }
+        } else {
+           const errors = response.data.errors;
+          const errorMessage = Object.values(errors).flat().join(', ');  
+          Alert.alert("Échec de l'inscription", errorMessage);
+          seterror(errorMessage);
+          setshowerror(true);
+        }
+  
+        console.log(response.data);
+  
+      } catch (error) {
+        setshowerror(true);
+        
+         const errors = error.response?.data?.errors || error.response?.data || 'Une erreur inconnue est survenue';
+        
+         const errorMessage = typeof errors === 'object' && !Array.isArray(errors)
+          ? Object.values(errors).flat().join(', ')   
+          : typeof errors === 'string'
+            ? errors
+            : 'Erreur inconnue';  
+        
+        seterror(errorMessage);
+        console.log(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  
+
+
 
 
   return (
@@ -39,6 +123,8 @@ const Register = () => {
         <View style={styles.inputWrapper}>
           <Ionicons style={styles.iconX} name="person" size={20} color="#325A0A" />
           <TextInput 
+            value={fullName}
+            onChangeText={setFullName}  
             style={styles.input} 
             placeholder="Nom et Prénom" 
             placeholderTextColor="#325A0A" 
@@ -47,7 +133,11 @@ const Register = () => {
         <View style={styles.inputWrapper}>
           <Ionicons style={styles.iconX} name="mail" size={20} color="#325A0A" />
           <TextInput 
+            value={email}
             style={styles.input} 
+            autoCapitalize="none"
+            onChangeText={setEmail}
+            keyboardType="email-address"
             placeholder="Adresse email" 
             placeholderTextColor="#325A0A" 
           />
@@ -55,12 +145,22 @@ const Register = () => {
         <View style={styles.inputWrapper}>
           <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
           <TextInput 
+            value={password}
             style={styles.input} 
+            onChangeText={setPassword}
+            autoCapitalize="none"
             placeholder="Mot de passe" 
             placeholderTextColor="#325A0A" 
             secureTextEntry 
           />
         </View>
+        {
+          showerror ? 
+          <Text style={{ textAlign : "center" , color : "red", fontWeight : "bold", fontSize : 17 }} >
+            {error}
+          </Text>
+          : null
+        }
       </View>
 
       <View style={styles.hrContainer}>
@@ -90,24 +190,26 @@ const Register = () => {
         </TouchableOpacity>
       </View>
 
-      {/* This part stays at the bottom */}
       <View style={styles.flexibleContainer}> 
-        <TouchableOpacity style={styles.registerButton}>
-          <Text style={styles.registerButtonText}>S'inscrire</Text>
+        <TouchableOpacity onPress={register} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+          <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
+            {loading ? "Authentification en cours..." : "S'inscrire"}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() =>{ setEmail('');setFullName('');setPassword('');seterror('');setshowerror(false);navigation.navigate('Login')}}>
           <Text style={styles.alreadyRegisteredText}>
-            Déja inscrit ?{' '}{' '}   
-            <Text style={styles.loginText} >
-              Connectez vous
+            Déjà inscrit ?{' '}
+            <Text style={styles.loginText}>
+              Connectez-vous
             </Text>
           </Text>
         </TouchableOpacity>
       </View>
-
     </ScrollView>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -168,12 +270,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDFFBD',
   },
   input: {
-    flex: 1,
+    height: 55,
+    width : '100%',
     marginLeft: 10,
     fontSize: 16,
     color: '#325A0A',
-    
-
   },
   hrContainer: {
     flexDirection: 'row',
@@ -221,6 +322,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 10,
+  },
+  registerButtonDisabled : {
+    backgroundColor: '#DAFFB5',
+    height : 55,
+    alignItems : "center", 
+    justifyContent : "center",
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },registerButtonDisabledText : {
+    color : "black", 
+    fontWeight : "500", 
+    fontSize : 17 ,
   },
   registerButtonText: {
     color: '#fff',

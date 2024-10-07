@@ -1,23 +1,60 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
+import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
+import CardAdmin from '../Components/CardAdmin'
+
+const personnelData = [
+  {
+    id: '1',
+    name: 'Jack Rosso',
+    email: 'jack.rosso@greenhouse.com',
+    phone: '+212 673 486 082',
+    farm: 'Ferme : Green House',
+    image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
+  },
+  {
+    id: '2',
+    name: 'Mounir Fettah',
+    email: 'mounir.fettah@greenhouse.com',
+    phone: '+212 673 486 083',
+    farm: 'Ferme : Green House',
+    image: 'https://previews.123rf.com/images/ikalvi/ikalvi1706/ikalvi170600030/79935275-logo-sant%C3%A9-cr%C3%A9ation-de-logo-de-sant%C3%A9-et-de-remise-en-forme.jpg',
+  },
+  {
+    id: '3',
+    name: 'Said Abdou',
+    email: 'said.abdou@greenhouse.com',
+    phone: '+212 673 486 084',
+    farm: 'Ferme : Green House',
+    image: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-business-logo-design-template-cc64433eb5c0cf702a62f07fe40b6b04_screen.jpg?ts=1669313113",
+  },
+];
+
+
+const personnelData2 = [
+    {
+      id: '1',
+      name: 'Jack Rosso',
+      email: 'jack.rosso@greenhouse.com',
+      phone: '+212 673 486 082',
+      farm: 'Ferme : Green House',
+      image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
+    } 
+  ];
+ 
+  
 const { width: screenWidth } = Dimensions.get('window');
-import CustomDatePicker from "../Components/CustomDatePicker";
 
 
 
-const CreateCalculation = () => {
+export default function MesAdmins() {
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const isXClicked = true;
+    const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+    const navigation = useNavigation();
 
-  const navigation = useNavigation();
-  const [plaqueId, setPlaqueId] = useState('');
-  const [serre, setSerre] = useState('');
-  const [ferme, setFerme] = useState('');
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
 
   const toggleMenu = () => {
@@ -39,13 +76,12 @@ const CreateCalculation = () => {
     }
   };
 
-
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (evt, gestureState) => {
         if (gestureState.dx > 0) {
-           Animated.timing(slideAnim, {
+          Animated.timing(slideAnim, {
             toValue: screenWidth,
             duration: 300,
             useNativeDriver: false,
@@ -57,87 +93,41 @@ const CreateCalculation = () => {
     })
   ).current;
 
-
-
-
   return (
-    <>
     <View style={styles.container}>
+      <ScrollView>
 
-        <ScrollView>
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Nouveau Calcul</Text>
-            <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
-              <Ionicons name="menu" size={24} color="#3E6715" />
-            </TouchableOpacity>
-          </View>
-       
-          <Text style={styles.label}>Plaque</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Veuillez saisir l’ ID de la plaque..."
-            value={plaqueId}
-            onChangeText={setPlaqueId}
-          />
-
-          <Text style={styles.label}>Serre</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={serre}
-              style={styles.picker}
-              onValueChange={(itemValue) => setSerre(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
-            </Picker>
-          </View>
-
-          <Text style={styles.label}>Ferme</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={ferme}
-              style={styles.picker}
-              onValueChange={(itemValue) => setFerme(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
-            </Picker>
-          </View>
-
-          <Text style={styles.label}>Date de réalisation</Text>
-          <CustomDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
-
-            
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.buttonOutline}>
-              <Text style={styles.buttonTextB}>Prendre une photo</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonOutline}>
-              <Text style={styles.buttonTextB}>Choisir une image</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>Mes Clients</Text>
+          <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+            <Ionicons name="menu" size={24} color="#3E6715" />
+          </TouchableOpacity>
+        </View>
+ 
+        {
+          isXClicked ? 
+          <>
+          {
+            personnelData2 && personnelData2.map((data, index)=>{
+              return(
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+              )})
+          }
+          </>
+          :
+          <>
+          {
+            personnelData && personnelData.map((data, index)=>{
+              return(
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+              )})
+          }
+          </>
+        }
 
       </ScrollView>
-
-
-      <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
-          <Text style={styles.buttonTextB}   >Annuler</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.buttonTextW}>Enregistrer le calcul</Text>
-        </TouchableOpacity>
-      </View>
-
-
-
-    </View>
-
-
-
-    {isMenuVisible && (
+      
+      {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
@@ -214,107 +204,92 @@ const CreateCalculation = () => {
       )}
 
       
-
-    </>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 23,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
+    paddingTop: 23,
   },
   titleContainer: {
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    position : "relative"
+    position: "relative",
   },
-  menu :{
-    position : "absolute",
-    right : 0,
-    zIndex: 10, 
-  }, 
+  menu: {
+    position: "absolute",
+    right: 23,
+    zIndex: 10,
+  },
   titleText: {
     color: 'black',
     fontSize: 19,
     fontWeight: 'bold',
   },
-   
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
+  viewTypeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 23,
+    marginBottom: 10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    fontSize : 16,
-    paddingLeft: 20,
-    paddingRight: 20,
-    marginBottom: 16,
-    height: 48
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    marginHorizontal: 23,
   },
-  pickerWrapper: {  
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    marginBottom: 16,
-    justifyContent : "center"
+  pickerContainer: {
+    marginHorizontal: 23,
+    marginBottom: 10,
   },
   picker: {
-    borderWidth: 1,
-     borderRadius: 10,
-    fontSize : 16,
-     height: 48, 
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 16,
-    fontSize : 16,
-  },
-  buttonRow1: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  buttonOutline: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#DEF3CB',
     borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 16,
-    width: '48%',    fontSize : 16,
-
-    alignItems: 'center',
+    height: 50,
+    justifyContent: 'center',
   },
-  cancelButton: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+  graphicContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    padding: 20,
     borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 16,
-    width: '32%',
-    alignItems: 'center',
   },
-  saveButton: {
-    backgroundColor: '#487C15',
+  BtnXXX: {
+    height: 41,
+    backgroundColor: "#DEF3CB",
+    alignItems: "center",
+    paddingRight: 20,
+    paddingLeft: 20,
     borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 16,
-    width: '64%',
-    alignItems: 'center',
+    justifyContent: "center",
   },
-  buttonTextW: {
-    color: 'white',
-    fontSize: 16,
+  BtnXXX11 : {
+    height: 41,
+    backgroundColor: "#DEF3CB",
+    alignItems: "center",
+      borderRadius: 10,
+      width : "48.4%",
+    justifyContent: "center",
   },
-  buttonTextB: {
-    color: 'black',
-    fontSize: 16,
+  BtnXXXText: {
+    color: "#4F8618",
+    fontWeight: "bold",
   },
-
+  activeBtn: {
+   backgroundColor : "#487C15", 
+  },
+  activeBtnText :{
+    color : "white"
+  },
+  graphicContainerText: {
+    color: "#487C15",
+    fontSize: 14,
+  },
   //pop Up Menu 
   popup: {
     position: 'absolute',
@@ -333,6 +308,54 @@ const styles = StyleSheet.create({
   popupContent: {
     padding: 20,
   },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft : 23, 
+    marginRight : 23,
+    marginBottom:  23
+   },
+  cancelButton: {
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  saveButton: {
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  activated : {
+    backgroundColor : "#487C15",
+    flex: 1,
+    marginRight: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#C8C8C8"
+  },
+  buttonTextWhite: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  buttonTextBlack: {
+    color: 'black',
+    fontSize: 16,
+  },
+
+
   logo: {
     marginTop : 70,
     marginLeft : "auto",
@@ -379,9 +402,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
   },
-
-
+  
+  infoContainer: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom : 11
+  },
+  titleXX: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: '#000000',
+    color : "black",
+    marginBottom : 11
+  },
+  info: {
+    fontSize: 16,
+    color: '#000000',
+    marginBottom: 6
+  },
+  resultsContainer: {
+    marginBottom: 20,
+  },
+  carouselContainer: {
+    position: 'relative',
+  },
 });
-export default CreateCalculation;
-
-

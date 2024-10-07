@@ -1,0 +1,4 @@
+php artisan serve --host=0.0.0.0 --port=8000
+
+const response = await axios....('http://10.0.2.2:8000/api/...', {...}, {...});
+ 

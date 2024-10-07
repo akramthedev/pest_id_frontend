@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
+import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';  
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function Dashboard() {
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
+export default function Dashboard({ route }) {
+
+  const { settriggerIt, triggerIt } = route.params;
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
 
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [viewType, setViewType] = useState('Year');  
   const [selectedMonth, setSelectedMonth] = useState('January');
   const [selectedChart, setSelectedChart] = useState('Mouches');
@@ -27,7 +30,7 @@ export default function Dashboard() {
         data: viewType === 'Year' 
           ? [20, 45, 28, 80, 99, 43, 20, 121, 76, 12, 80, 10]
           : [50, 15, 85, 60,37, 100, 45],  
-        color: () => `#393939`,  
+        color: () => `#487C15`,  
       }
     ]
   };
@@ -147,7 +150,7 @@ export default function Dashboard() {
             bezier  
             chartConfig={{
               backgroundColor : "#E5FFCC",
-               backgroundGradientFrom: '#F3FFE8',
+              backgroundGradientFrom: '#F3FFE8',
               backgroundGradientTo: '#F3FFE8',
               decimalPlaces: 2,
               color: (opacity = 1) => `rgba(72, 124, 21, ${opacity})`,
@@ -167,27 +170,41 @@ export default function Dashboard() {
 
       
       
+      
+      
       {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
         >
           <ScrollView style={styles.popupContent}>
-            <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.logo}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.logo}>
               <Image
                 source={require('../images/logo.png')}
                 style={styles.imageLogo}
                 resizeMode="cover"
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="person-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mon Profile</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
               <Text style={styles.menuText}>Tableau de bord</Text>
             </TouchableOpacity>
+            
+            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="person-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mon Profile</Text>
+            </TouchableOpacity>
+           
+            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes Clients</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="mail-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Demandes Clients</Text>
+            </TouchableOpacity>
+           
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
@@ -197,7 +214,7 @@ export default function Dashboard() {
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="business" size={24} color="black" />
+              <Ionicons name="business-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mes fermes</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
@@ -212,15 +229,16 @@ export default function Dashboard() {
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un personnel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="help-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Lorem ipsum</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="call-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Lorem ipsum</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
+            
+            
+            <TouchableOpacity onPress={async ()=>{
+              deleteToken();
+              settriggerIt(!triggerIt);
+              setTimeout(()=>{
+                navigation.navigate('Home');
+              }, 500);
+
+              }} style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
@@ -237,6 +255,8 @@ export default function Dashboard() {
         </Animated.View>
       )}
 
+      
+
     </View>
   );
 }
@@ -252,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: "relative",
-    marginBottom: 30
+    marginBottom: 0
   },
   menu: {
     position: "absolute",
@@ -319,7 +339,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   activeBtn: {
-   backgroundColor : "#393939", 
+   backgroundColor : "#487C15", 
   },
   activeBtnText :{
     color : "white"

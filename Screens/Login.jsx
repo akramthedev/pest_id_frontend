@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Alert,View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
- import * as Font from 'expo-font';
+import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios"; 
 
 
-const Login = () => {
+const Login = ({ route }) => {
+  const { settriggerIt, triggerIt } = route.params;
   const navigation = useNavigation();
- 
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
  
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
@@ -18,6 +24,44 @@ const Login = () => {
   if (!fontsLoaded) {
     return null;  
   }
+
+
+  const login = async () => {
+    if (password.length < 1 || email.length < 5) {
+      Alert.alert('Erreur', 'Veuillez saisir des valeurs correctes');
+      return;
+    } else {
+      setLoading(true);
+  
+      try {
+        let dataX = {
+          email: email,
+          password: password,
+        };
+        const response = await axios.post('http://10.0.2.2:8000/api/login', dataX);
+        
+        if (response.status === 200) {
+          const token = response.data.token;
+          const user = response.data.user;
+          saveToken(token); 
+          setEmail('');setPassword('');
+          settriggerIt(!triggerIt);
+          setTimeout(()=>{
+            navigation.navigate('Dashboard');
+          }, 500);
+          
+        } else {
+          Alert.alert("Échec de l'authentification");
+        }
+        
+      } catch (error) {
+        Alert.alert("Erreur", JSON.stringify(error.message));
+        console.log(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
 
 
@@ -47,7 +91,11 @@ const Login = () => {
           <View style={styles.inputWrapper}>
             <Ionicons style={styles.iconX} name="mail" size={20} color="#325A0A" />
             <TextInput 
+              value={email}
               style={styles.input} 
+              autoCapitalize="none"
+              onChangeText={setEmail}
+              keyboardType="email-address"
               placeholder="Adresse email" 
               placeholderTextColor="#325A0A" 
             />
@@ -55,7 +103,10 @@ const Login = () => {
           <View style={styles.inputWrapper}>
             <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
             <TextInput 
+              value={password}
               style={styles.input} 
+              onChangeText={setPassword}
+              autoCapitalize="none"
               placeholder="Mot de passe" 
               placeholderTextColor="#325A0A" 
               secureTextEntry 
@@ -91,9 +142,11 @@ const Login = () => {
         </View>
 
         <View style={styles.flexibleContainer}> 
-          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Historique')}>
-            <Text style={styles.registerButtonText}>Se connecter</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={login} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+          <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
+            {loading ? "Authentification en cours..." : "Se connecter"}
+          </Text>
+        </TouchableOpacity>
           <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
             <Text style={styles.alreadyRegisteredText}>
               Non inscrit ?{' '}{' '}   
@@ -178,7 +231,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDFFBD',
   },
   input: {
-    flex: 1,
+    height: 55,
+    width : '100%',
     marginLeft: 10,
     fontSize: 16,
     color: '#325A0A',
@@ -235,6 +289,29 @@ const styles = StyleSheet.create({
   alreadyRegisteredContainer: {
     alignItems: 'center',
   },
+
+  registerButtonDisabled : {
+    backgroundColor: '#DAFFB5',
+    height : 55,
+    alignItems : "center", 
+    justifyContent : "center",
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },registerButtonDisabledText : {
+    color : "black", 
+    fontWeight : "500", 
+    fontSize : 17 ,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize : 17,
+    
+
+  },
+
+
   alreadyRegisteredText: {
     fontSize: 15,
     color: '#8A8A8A',
