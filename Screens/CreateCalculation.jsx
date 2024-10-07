@@ -1,3 +1,4 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
@@ -7,10 +8,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 const { width: screenWidth } = Dimensions.get('window');
 import CustomDatePicker from "../Components/CustomDatePicker";
 
+import { useAuth } from '../Helpers/AuthContext';
 
 
-const CreateCalculation = () => {
-
+const CreateCalculation = ({route}) => {
+ 
   const navigation = useNavigation();
   const [plaqueId, setPlaqueId] = useState('');
   const [serre, setSerre] = useState('');
@@ -18,6 +20,7 @@ const CreateCalculation = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const { settriggerIt, triggerIt } = useAuth();
 
 
   const toggleMenu = () => {
@@ -137,13 +140,17 @@ const CreateCalculation = () => {
 
 
 
+      
+      
+      
+      
     {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
         >
           <ScrollView style={styles.popupContent}>
-            <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.logo}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.logo}>
               <Image
                 source={require('../images/logo.png')}
                 style={styles.imageLogo}
@@ -159,7 +166,17 @@ const CreateCalculation = () => {
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
-            
+           
+            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes Clients</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="mail-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Demandes Clients</Text>
+            </TouchableOpacity>
+           
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
@@ -185,18 +202,17 @@ const CreateCalculation = () => {
               <Text style={styles.menuText}>Ajouter un personnel</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
-
             
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
+            <TouchableOpacity 
+                onPress={async ()=>{
+                    deleteToken();
+                    settriggerIt((prev) => !prev);
+                    setTimeout(()=>{
+                      navigation.navigate('Home');
+                    }, 400);
+                  }
+                } 
+                style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
@@ -214,6 +230,7 @@ const CreateCalculation = () => {
       )}
 
       
+
 
     </>
   );

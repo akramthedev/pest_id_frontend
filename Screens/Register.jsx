@@ -1,22 +1,27 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import axios from 'axios';
- import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../Helpers/AuthContext';
  
 
 
-const Register = () => {
-  const navigation = useNavigation();
+const Register = ({route}) => {
+
+   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, seterror] = useState('');
   const [showerror, setshowerror] = useState(false);
+  const { settriggerIt, triggerIt } = useAuth();
+
+
 
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
@@ -63,8 +68,10 @@ const Register = () => {
             setPassword(''); 
             setFullName(''); 
             saveToken(token);
-            
-            navigation.navigate('Dashboard');
+            settriggerIt((prev) => !prev);
+            setTimeout(()=>{
+              navigation.navigate('Dashboard');
+            }, 400);
             
            } else {
             Alert.alert("Échec de l'authentification");

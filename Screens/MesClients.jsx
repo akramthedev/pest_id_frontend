@@ -1,3 +1,4 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -46,14 +47,16 @@ const personnelData2 = [
  
   
 const { width: screenWidth } = Dimensions.get('window');
+import { useAuth } from '../Helpers/AuthContext';
 
 
 
-export default function MesAdmins() {
+export default function MesClients({route}) {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const isXClicked = true;
     const slideAnim = useRef(new Animated.Value(screenWidth)).current;
     const navigation = useNavigation();
+    const { settriggerIt, triggerIt } = useAuth();
 
 
 
@@ -96,14 +99,12 @@ export default function MesAdmins() {
   return (
     <View style={styles.container}>
       <ScrollView>
-
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}>Mes Clients</Text>
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
           </TouchableOpacity>
         </View>
- 
         {
           isXClicked ? 
           <>
@@ -127,13 +128,14 @@ export default function MesAdmins() {
 
       </ScrollView>
       
+      
       {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
         >
           <ScrollView style={styles.popupContent}>
-            <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.logo}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.logo}>
               <Image
                 source={require('../images/logo.png')}
                 style={styles.imageLogo}
@@ -149,7 +151,17 @@ export default function MesAdmins() {
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
-            
+           
+            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes Clients</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="mail-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Demandes Clients</Text>
+            </TouchableOpacity>
+           
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
@@ -175,18 +187,17 @@ export default function MesAdmins() {
               <Text style={styles.menuText}>Ajouter un personnel</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
-
             
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
+            <TouchableOpacity 
+                onPress={async ()=>{
+                    deleteToken();
+                    settriggerIt((prev) => !prev);
+                    setTimeout(()=>{
+                      navigation.navigate('Home');
+                    }, 400);
+                  }
+                } 
+                style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
@@ -202,6 +213,9 @@ export default function MesAdmins() {
           </TouchableOpacity>
         </Animated.View>
       )}
+
+      
+
 
       
     </View>

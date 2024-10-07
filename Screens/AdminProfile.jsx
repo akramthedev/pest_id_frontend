@@ -1,3 +1,4 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { Image,TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -29,12 +30,12 @@ const personnelData = [
       },
   ];
  
-  
+  import { useAuth } from '../Helpers/AuthContext';
 
 
 const AdminProfile = () => {
 
-
+  const { settriggerIt, triggerIt } = useAuth();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
@@ -148,13 +149,18 @@ const AdminProfile = () => {
 
 
 
+      
+      
+      
+      
+      
       {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
           {...panResponder.panHandlers}
         >
           <ScrollView style={styles.popupContent}>
-            <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.logo}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.logo}>
               <Image
                 source={require('../images/logo.png')}
                 style={styles.imageLogo}
@@ -170,7 +176,17 @@ const AdminProfile = () => {
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
-            
+           
+            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="people-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Mes Clients</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+              <Ionicons name="mail-outline" size={24} color="black" />
+              <Text style={styles.menuText}>Demandes Clients</Text>
+            </TouchableOpacity>
+           
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
@@ -196,18 +212,17 @@ const AdminProfile = () => {
               <Text style={styles.menuText}>Ajouter un personnel</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
-
             
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
+            <TouchableOpacity 
+                onPress={async ()=>{
+                    deleteToken();
+                    settriggerIt((prev) => !prev);
+                    setTimeout(()=>{
+                      navigation.navigate('Home');
+                    }, 400);
+                  }
+                } 
+                style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
@@ -223,6 +238,8 @@ const AdminProfile = () => {
           </TouchableOpacity>
         </Animated.View>
       )}
+
+      
 
       
     </>

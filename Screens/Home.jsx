@@ -1,15 +1,18 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ImageBackground, Image } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import * as Font from 'expo-font';
 
+import { useAuth } from '../Helpers/AuthContext';
 
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
 
 
-  
+  const { settriggerIt, triggerIt } = useAuth();
+
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
   });

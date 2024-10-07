@@ -7,19 +7,20 @@ import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 
+import { useAuth } from '../Helpers/AuthContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function Dashboard({ route }) {
 
-  const { settriggerIt, triggerIt } = route.params;
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [viewType, setViewType] = useState('Year');  
   const [selectedMonth, setSelectedMonth] = useState('January');
   const [selectedChart, setSelectedChart] = useState('Mouches');
+  const { settriggerIt, triggerIt } = useAuth();
 
   const data = {
     labels: viewType === 'Year' 
@@ -231,14 +232,16 @@ export default function Dashboard({ route }) {
             </TouchableOpacity>
             
             
-            <TouchableOpacity onPress={async ()=>{
-              deleteToken();
-              settriggerIt(!triggerIt);
-              setTimeout(()=>{
-                navigation.navigate('Home');
-              }, 500);
-
-              }} style={styles.menuItem}>
+            <TouchableOpacity 
+                onPress={async ()=>{
+                    deleteToken();
+                    settriggerIt((prev) => !prev);
+                    setTimeout(()=>{
+                      navigation.navigate('Home');
+                    }, 400);
+                  }
+                } 
+                style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>

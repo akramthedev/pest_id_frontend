@@ -16,17 +16,27 @@ import MesFermes from './Screens/AllFarms';
 import AjouterUnCalcul from './Screens/CreateCalculation';
 import AjouterUneFerme from './Screens/CreateFarm';
 import AjouterUneSerre from './Screens/CreateSerre';
+import AjouterUnPersonel from './Screens/CreateStaff'
 import ModifierSerre from './Screens/ModifierSerre';
 import Calculation from './Screens/Calculation';
 import SuperAdminDemande from './Screens/SuperAdminDemande';
 import { getToken } from './Helpers/tokenStorage';
+import { AuthProvider, useAuth } from './Helpers/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [triggerIt, settriggerIt] = useState(false);
 
+  return (
+    <AuthProvider>
+      <MainNavigator isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+    </AuthProvider>
+  );
+}
+
+const MainNavigator = ({ isAuthenticated, setIsAuthenticated }) => {
+  const { triggerIt } = useAuth();
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -44,14 +54,8 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         {isAuthenticated ? (
-          // Authenticated user screens
           <>
-            <Stack.Screen
-              name="Dashboard"
-              initialParams={{ triggerIt, settriggerIt }}
-              component={Dashboard}
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
             <Stack.Group screenOptions={{ headerShown: false }}>
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="AdminProfile" component={AdminProfile} />
@@ -62,6 +66,7 @@ export default function App() {
               <Stack.Screen name="MesFermes" component={MesFermes} />
               <Stack.Screen name="AjouterUnCalcul" component={AjouterUnCalcul} />
               <Stack.Screen name="AjouterUneFerme" component={AjouterUneFerme} />
+              <Stack.Screen name="AjouterUnPersonel" component={AjouterUnPersonel} />
               <Stack.Screen name="AjouterUneSerre" component={AjouterUneSerre} />
               <Stack.Screen name="ModifierSerre" component={ModifierSerre} />
               <Stack.Screen name="Calculation" component={Calculation} />
@@ -69,26 +74,13 @@ export default function App() {
             </Stack.Group>
           </>
         ) : (
-          // Unauthenticated user screens
           <Stack.Group screenOptions={{ headerShown: false }}>
-            <Stack.Screen           
-              initialParams={{ triggerIt, settriggerIt }}
-              name="Home" 
-              component={Home} 
-            />
-            <Stack.Screen           
-              initialParams={{ triggerIt, settriggerIt }}
-              name="Login" 
-              component={Login} 
-            />
-            <Stack.Screen           
-              initialParams={{ triggerIt, settriggerIt }}
-              name="Register" 
-              component={Register} 
-            />
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Register" component={Register} />
           </Stack.Group>
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};

@@ -1,13 +1,17 @@
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, {useState} from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import axios from "axios";
+import { useAuth } from '../Helpers/AuthContextl';
 
 
 
-const Test = ({ navigation }) => {
+const Test = ({ navigation, route }) => {
 
     const [isLoading, setIsLoading] = useState(false);
-    
+    const { settriggerIt, triggerIt } = useAuth();
+
+
     const handlePress = async () => {
         try {
             setIsLoading(true);

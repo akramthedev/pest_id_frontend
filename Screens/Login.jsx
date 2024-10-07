@@ -9,9 +9,11 @@ import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios"; 
 
+import { useAuth } from '../Helpers/AuthContext';
 
 const Login = ({ route }) => {
-  const { settriggerIt, triggerIt } = route.params;
+  const { settriggerIt, triggerIt } = useAuth();
+
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -45,10 +47,10 @@ const Login = ({ route }) => {
           const user = response.data.user;
           saveToken(token); 
           setEmail('');setPassword('');
-          settriggerIt(!triggerIt);
+          settriggerIt((prev) => !prev);
           setTimeout(()=>{
             navigation.navigate('Dashboard');
-          }, 500);
+          }, 400);
           
         } else {
           Alert.alert("Échec de l'authentification");
