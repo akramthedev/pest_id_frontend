@@ -49,7 +49,7 @@ const Test = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
       flexGrow: 1,
-      paddingTop: 100,
+      paddingTop: 110,
       backgroundColor: '#fff',
     }
 })
