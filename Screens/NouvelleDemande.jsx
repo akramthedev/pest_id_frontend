@@ -124,10 +124,20 @@ const NouvelleDemande = () => {
         });
         
         if (response.status === 200) {
-          navigation.goBack();
-          Alert.alert('Succès : Utilisateur a obtenu les privilèges.');
+          const response2 = await axios.get(`http://10.0.2.2:8000/api/admin/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(response2){
+            navigation.goBack();
+            Alert.alert('Succès : Utilisateur a obtenu les privilèges.');
+          }
+          else {
+            Alert.alert('Erreur');
+          }
          } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+          Alert.alert('Erreur');
         }
       } catch (error) {
         console.error('Erreur :', error.message);

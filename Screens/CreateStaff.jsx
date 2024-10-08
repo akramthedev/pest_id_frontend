@@ -1,5 +1,6 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
+import axios from 'axios';
 
 
 const CreateStaff = ({route}) => {
@@ -14,7 +16,6 @@ const CreateStaff = ({route}) => {
   const navigation = useNavigation();
   const [typeEmploiyement, setTypeEmployement] = useState('');
   const [password, setPassword] = useState('');
-  const [position, setPosition] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
   const [fullname, setFullName] = useState('');
@@ -62,6 +63,60 @@ const CreateStaff = ({route}) => {
   ).current;
 
 
+  const [loading, setloading] = useState(false);
+  const CreatePersonel= async () => {
+    try{
+      setloading(true);
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+
+      const resp0 = await axios.get(`http://10.0.2.2:8000/api/getAdminIdFromUserId/${userIdNum}`);
+      if(resp0.status === 200){
+        let idAdmin = resp0.data.id;
+        let data = {
+          fullName : fullname, 
+          email : email, 
+          password : password, 
+          mobile : mobile, 
+          typeEmploiyement : typeEmploiyement, 
+          admin_id :idAdmin ,
+          position : "hired",
+          typeS : "Staff"
+        }
+        console.log("Data : ");
+        console.log(data);
+  
+        const token = await getToken(); 
+  
+        const resp = await axios.post('http://10.0.2.2:8000/api/staff', data, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp.status === 201){
+          setFullName('');
+          setEmail('');
+          setPassword('');
+          setMobile('');
+          setTypeEmployement('');
+          navigation.navigate('MesPersonels');
+        }
+        else{
+          console.log("Error");
+        }
+      }
+      else{
+        console.log('Not fetched the ID admin')
+      }
+    }
+    catch(e){
+      console.log(e.message);
+    } finally{
+      setloading(false);
+    }
+  }
+
+
 
 
   return (
@@ -98,7 +153,6 @@ const CreateStaff = ({route}) => {
             style={styles.input}
             placeholder="Veuillez saisir le numéro..."
             value={mobile}
-            secureTextEntry
             onChangeText={setMobile}
           />
           <Text style={styles.label}>Mot de passe</Text>
@@ -106,22 +160,8 @@ const CreateStaff = ({route}) => {
             style={styles.input}
             placeholder="Veuillez saisir le mot de passe..."
             value={password}
-            secureTextEntry
             onChangeText={setPassword}
           />
-
-          <Text style={styles.label}>Position</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={position}
-              style={styles.picker}
-              onValueChange={(itemValue) => setPosition(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
-            </Picker>
-          </View>
 
           <Text style={styles.label}>Type d'employement</Text>
           <View style={styles.pickerWrapper}>
@@ -131,8 +171,10 @@ const CreateStaff = ({route}) => {
               onValueChange={(itemValue) => setTypeEmployement(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
+              <Picker.Item label="CDI" value="CDI" />
+              <Picker.Item label="CDD" value="CDD" />
+              <Picker.Item label="Stage" value="Stage" />
+              <Picker.Item label="Freelance" value="Freelance" />
             </Picker>
           </View>
       </ScrollView>
@@ -141,7 +183,11 @@ const CreateStaff = ({route}) => {
         <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB} >Annuler</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity  disabled={loading}  style={[
+            styles.saveButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]} onPress={CreatePersonel} 
+        >
           <Text style={styles.buttonTextW}>Enregistrer le personel</Text>
         </TouchableOpacity>
       </View>

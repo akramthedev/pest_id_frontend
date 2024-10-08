@@ -1,28 +1,74 @@
-import React from 'react';
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
+import React, {useState, useEffect} from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
+import { formatDate } from './fct';
+import axios from 'axios';
 
 export const CardPersonal = ({ item }) => {
 
   const nav = useNavigation();
 
+
+  const [data, setData] = useState(null);
+  const [loading,setLoading] = useState(true);
+
+
+  const fetchData = async () => {
+    if(item.user_id !== null && item.user_id !== undefined){
+      try {
+        setLoading(true);
+         const token = await getToken(); 
+        const response = await axios.get(`http://10.0.2.2:8000/api/user/${item.user_id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setData(response.data);
+          console.log(response.data)
+         } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+ 
+
+  useEffect(()=>{
+    fetchData();
+  },[item.id]);
+
+
+
   return(
-    <TouchableOpacity onPress={()=>{nav.navigate('Profile')}}  style={styles.card}>
-      <View style={styles.row}>
-        <Image source={{ uri: item.image }} style={styles.profileImage} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.details}>{item.email}</Text>
-          <Text style={styles.details}>{item.phone}</Text>
-          <Text style={styles.details}>{item.farm}</Text>
+    <>
+    {
+     ( item && !loading && data) && 
+      <TouchableOpacity onPress={()=>{nav.navigate('Profile')}}  style={styles.card}>
+        <View style={styles.row}>
+          <Image source={{ uri: data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
+          <View style={styles.infoContainer}>
+            <Text style={styles.name}>{data.fullName}</Text>
+            <Text style={styles.details}>{data.email}</Text>
+            <Text style={styles.details}>Téléphone: {data.mobile ? data.mobile : "--"}</Text>
+            <Text style={styles.details}>Status: {item.position ? item.position : "--"}</Text>
+            <Text style={styles.details}>Date de création: {formatDate(item.created_at)}</Text>
+          </View>
+          <TouchableOpacity   style={styles.iconContainer}>
+            <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.iconContainer}>
-          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    }
+    </>
   );
 
 }
@@ -55,8 +101,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileImage: {
-    width: 85,
-    height: 85,
+    width: 72,
+    height: 72,
     borderRadius: 200,
     marginRight: 16,
   },

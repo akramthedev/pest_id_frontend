@@ -165,12 +165,12 @@ export default function SuperAdminDemande({route}) {
                       isXClicked ? 
                         <>
                           {
-                            AllUsers.map((data, index) => {
+                            AllUsers.slice().reverse().map((data, index) => {
                               return (
                                 <>
                                   {
                                     data.canAccess === 1 &&
-                                    <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                    <CardAdmin key={data.id} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>
                               )
@@ -180,7 +180,7 @@ export default function SuperAdminDemande({route}) {
                         :
                         <>
                           {
-                            AllUsers.map((data, index) => {
+                            AllUsers.slice().reverse().map((data, index) => {
                               return (
                                 <>
                                   {

@@ -142,7 +142,9 @@ const History = ({route}) => {
             allPredictions !== null && 
             <>
             {
-              allPredictions.length === 0 ? "No data..."
+              allPredictions.length === 0 ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
+              <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
+            </View>
               :
               <>
               {

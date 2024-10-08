@@ -12,6 +12,7 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';  
 import { useFocusEffect } from '@react-navigation/native';
+import SkeletonLoaderFarm from '../Components/SkeletonLoaderFarm';
 
 
 
@@ -62,8 +63,7 @@ export default function AllStaffs() {
   const navigation = useNavigation();
 
 
-
-  /*
+ 
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
@@ -73,17 +73,26 @@ export default function AllStaffs() {
           const token = await getToken(); 
           const userId = await AsyncStorage.getItem('userId');
           const userIdNum = parseInt(userId);
+         
+          const resp0 = await axios.get(`http://10.0.2.2:8000/api/getAdminIdFromUserId/${userIdNum}`);
 
-          const response = await axios.get(`http://10.0.2.2:8000/api/farms/${userIdNum}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
+          if(resp0.status === 200){
+            const response = await axios.get(`http://10.0.2.2:8000/api/staffs/${resp0.data.id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            if (response.status === 200) {
+              setAllStaffs(response.data);
+              console.log(response.data);
+            } else {
+              Alert.alert('Erreur lors de la récupération de données.');
             }
-          });
-          if (response.status === 200) {
-            setAllStaffs(response.data);
-          } else {
-            Alert.alert('Erreur lors de la récupération de données.');
           }
+          else{
+            navigation.navigate('Dashboard');
+          }
+           
         } catch (error) {
           console.error('Erreur :', error.message);
         } finally {
@@ -98,9 +107,7 @@ export default function AllStaffs() {
     }, [navigation])
   );
 
-  
-  */
- 
+   
   const toggleMenu = () => {
     if (isMenuVisible) {
       Animated.timing(slideAnim, {
@@ -159,11 +166,20 @@ export default function AllStaffs() {
           ) : (
             <>
             {
-              personnelData && personnelData.map((data, index)=>{
-                return(
-                  <CardPersonal item={data}  key={index}/>
-                )
-              })
+              AllStaffs && 
+              <>
+              {
+                AllStaffs.length === 0 ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
+                <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
+              </View>
+                :
+                AllStaffs.slice().reverse().map((data, index)=>{
+                  return(
+                    <CardPersonal item={data}  key={data.id} />
+                  )
+                })
+              }
+              </>
             }
             </>
           )

@@ -161,9 +161,11 @@ export default function AllFarms() {
               AllFarms && 
               <>
               {
-                AllFarms.length === 0 ? <Text>Pas de donnée</Text>
+                AllFarms.length === 0 ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
+                <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
+              </View>
                 :
-                AllFarms.map((data, index)=>{
+                AllFarms.slice().reverse().map((data, index)=>{
                   return(
                     <CardFarm item={data}  key={data.id} />
                   )
