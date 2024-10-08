@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    marginTop : 70,
+    marginTop : 40,
     marginLeft : "auto",
     marginRight : "auto",
     marginBottom: 20,
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
+    top: 20,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,
