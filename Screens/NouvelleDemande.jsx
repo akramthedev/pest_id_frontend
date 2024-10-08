@@ -1,26 +1,67 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import { Image,TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
+import { Image,TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoaderFarm from "../Components/SkeletonLoaderFarm"
 import CardFarm from '../Components/CardFarm';
 import { useAuth } from '../Helpers/AuthContext';
+import { useRoute } from '@react-navigation/native';
+import axios from "axios"
 
 
 
 const { width: screenWidth } = Dimensions.get('window');
 
 
-const NouvelleDemande = ({route}) => {
+const NouvelleDemande = () => {
 
+
+  const route = useRoute();
+  const { id } = route.params;
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
   const { settriggerIt, triggerIt } = useAuth();
+  const [loading,setLoading] = useState(true);
+  const [loading2,setLoading2] = useState(true);
+  const [data, setData] = useState(null);
 
+
+
+
+  const fetchDataUser = async () => {
+    if(id !== null && id !== undefined){
+      try {
+        setLoading(true);
+       
+        const token = await getToken(); 
+        const response = await axios.get(`http://10.0.2.2:8000/api/user/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setData(response.data);
+         } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+
+
+  useEffect(()=>{
+    fetchDataUser();
+  },[id]);
 
 
   const toggleMenu = () => {
@@ -60,70 +101,117 @@ const NouvelleDemande = ({route}) => {
   ).current;
 
 
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const year = date.getFullYear();  
+    return `${day}/${month}/${year}`; 
+  };
+
+
+  const accepterDemande = async()=>{
+    if(id !== null && id !== undefined){
+      try {
+        setLoading2(true);
+       
+        const token = await getToken(); 
+        const response = await axios.post(`http://10.0.2.2:8000/api/accept/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          navigation.goBack();
+          Alert.alert('Succès : Utilisateur a obtenu les privilèges.');
+         } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading2(false);
+      }
+    }
+  }
+
+  const refuserDemande = async()=>{
+    if(id !== null && id !== undefined){
+      try {
+        setLoading2(true);
+       
+        const token = await getToken(); 
+        const response = await axios.post(`http://10.0.2.2:8000/api/refuse/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          navigation.goBack();
+          Alert.alert('La demande a été refusée avec succès.');
+         } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading2(false);
+      }
+    }
+  }
+  
+
+
   return (
     <>
-      <View style={styles.container}>
+      
 
-
+      {
+        loading ? 
+        <>
+          <Text>
+            Loading ...
+          </Text>
+        </>
+        :
+        <View style={styles.container}>
           <View>
-            
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>Nouvelle Demande</Text>
+              <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+                <Ionicons name="menu" size={24} color="#3E6715" />
+              </TouchableOpacity>
+            </View>
 
-                <View style={styles.titleContainer}>
-                  <Text style={styles.titleText}>Nouvelle Demande</Text>
-                  <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
-                    <Ionicons name="menu" size={24} color="#3E6715" />
-                  </TouchableOpacity>
-                </View>
-                
-              <View style={styles.profileContainer}>
-                <Image
-                  style={styles.profileImage}
-                  source={{ uri: 'https://d4l6e04z43qjx.cloudfront.net/img/agriculture/agriculture-logo-6.png' }}  
-                />
-                <Text style={styles.roleText}>Administrateur</Text>
-              </View>
+            <View style={styles.profileContainer}>
+              <Image
+                style={styles.profileImage}
+                source={{ uri: data && data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }}
+              />
+              <Text style={styles.roleText}>Administrateur</Text>
+            </View>
 
-              <TextInput
-                style={styles.input}
-                placeholder="Nom et prénom"
-                value="Yassine Bouwza" 
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Adresse email"
-                value="yassine@greenhouse.com"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Company"
-                value="Green House SARL"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Phone Number"
-                value="+212 645 975 213"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Phone Number"
-                value="+212 645 975 213"
-              />
-               
+            <Text style={styles.input}>Nom et Prénom: {data && data.fullName}</Text>
+            <Text style={styles.input}>Addresse email: {data && data.email}</Text>
+            <Text style={styles.input}>Société: --</Text>
+            <Text style={styles.input}>Numéro de téléphone: --</Text>
+            <Text style={styles.input}>
+              Date de création du compte: {formatDate(data && data.created_at)}
+            </Text>
           </View>
           <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={()=>{navigation.navigate('Dashboard')}}  style={styles.cancelButton}>
+                <TouchableOpacity onPress={()=>{refuserDemande();}}  style={styles.cancelButton}>
                   <Text style={styles.buttonTextBlack}>Refuser</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.saveButton}>
+                <TouchableOpacity style={styles.saveButton} onPress={accepterDemande} >
                   <Text style={styles.buttonTextWhite}>Accepter</Text>
                 </TouchableOpacity>
               </View>
-      </View>
-
-
-
-     
-      
+          </View>
+      }
       
       
       
@@ -241,11 +329,12 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 42,
+    marginTop : 40
   },
   profileImage: {
-    width: 180,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 15,
   },
   roleText: {
@@ -255,15 +344,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    paddingLeft : 22,
-    borderRadius: 8,
-    marginBottom: 16,
-    paddingRight: 22,
-    marginLeft : 23, 
-    marginRight : 23,
+    height: 40,
+    marginBottom: 3,
+    marginLeft : 25, 
+    marginRight : 25,
     fontSize : 16
   },
   buttonContainer: {

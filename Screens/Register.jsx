@@ -58,26 +58,14 @@ const Register = ({route}) => {
         const response = await axios.post('http://10.0.2.2:8000/api/register', data);
       
         if (response.status === 201) {
-          const response2 = await axios.post('http://10.0.2.2:8000/api/login', data1);
-          if (response2.status === 200) {
-            const token = response2.data.token;
-            
-            console.log("User Object: ", response2.data.user); 
 
-            setEmail(''); 
-            setPassword(''); 
-            setFullName(''); 
-            saveToken(token);
-            settriggerIt((prev) => !prev);
-            setTimeout(()=>{
-              navigation.navigate('Dashboard');
-            }, 400);
+          
+          setEmail(''); 
+          setPassword(''); 
+          setFullName(''); 
+          Alert.alert("Inscription réussie: On vous contactera par email d'ici 24h");
+           
             
-           } else {
-            Alert.alert("Échec de l'authentification");
-            seterror(response2.data.message);
-            setshowerror(true);
-          }
         } else {
            const errors = response.data.errors;
           const errorMessage = Object.values(errors).flat().join(', ');  

@@ -5,46 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import CardAdmin from '../Components/CardAdmin'
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
-const personnelData = [
-  {
-    id: '1',
-    name: 'Jack Rosso',
-    email: 'jack.rosso@greenhouse.com',
-    phone: '+212 673 486 082',
-    farm: 'Ferme : Green House',
-    image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
-  },
-  {
-    id: '2',
-    name: 'Mounir Fettah',
-    email: 'mounir.fettah@greenhouse.com',
-    phone: '+212 673 486 083',
-    farm: 'Ferme : Green House',
-    image: 'https://previews.123rf.com/images/ikalvi/ikalvi1706/ikalvi170600030/79935275-logo-sant%C3%A9-cr%C3%A9ation-de-logo-de-sant%C3%A9-et-de-remise-en-forme.jpg',
-  },
-  {
-    id: '3',
-    name: 'Said Abdou',
-    email: 'said.abdou@greenhouse.com',
-    phone: '+212 673 486 084',
-    farm: 'Ferme : Green House',
-    image: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-business-logo-design-template-cc64433eb5c0cf702a62f07fe40b6b04_screen.jpg?ts=1669313113",
-  },
-];
-
-
-const personnelData2 = [
-    {
-      id: '1',
-      name: 'Jack Rosso',
-      email: 'jack.rosso@greenhouse.com',
-      phone: '+212 673 486 082',
-      farm: 'Ferme : Green House',
-      image: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/agriculture-farm-logo-design-template-75a195de78a596ef33bb54e52f771c9a_screen.jpg?ts=1669442434',
-    } 
-  ];
- 
   
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
@@ -52,14 +17,80 @@ import { useAuth } from '../Helpers/AuthContext';
 
 
 export default function SuperAdminDemande({route}) {
-    const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const isXClicked = false;
-    const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-    const navigation = useNavigation();
-    const { settriggerIt, triggerIt } = useAuth();
+   
+  
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const isXClicked = false;
+  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+  const navigation = useNavigation();
+  const { settriggerIt, triggerIt } = useAuth();
+  const [AllUsers,setAllUsers] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [Number, setNumber] = useState(null);
 
 
- 
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+  
+          const token = await getToken(); 
+          
+          const response = await axios.get(`http://10.0.2.2:8000/api/users`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.status === 200) {
+            setAllUsers(response.data.users);
+            let x = 0;
+            for(let i=0;i<response.data.users.length;i++){
+              if(response.data.users[i].canAccess === 0){
+                x++
+              }
+            }
+            setNumber(x);
+          } else {
+            Alert.alert('Erreur lors de la récupération de données.');
+          }
+        } catch (error) {
+          console.error('Erreur :', error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+      
+      return () => setLoading(false);  
+  
+    }, [navigation])
+  );
+
+
+
+
+  
+
+  const [ID, SETID] = useState(null);
+
+  useEffect(()=>{
+    const x =async  ()=>{
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+      SETID(userIdNum);
+    }
+    x();
+  }, []);
+
+
+
+
+
+
 
   const toggleMenu = () => {
     if (isMenuVisible) {
@@ -97,6 +128,9 @@ export default function SuperAdminDemande({route}) {
     })
   ).current;
 
+
+
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -108,26 +142,58 @@ export default function SuperAdminDemande({route}) {
           </TouchableOpacity>
         </View>
  
+        
+        
         {
-          isXClicked ? 
-          <>
-          {
-            personnelData2 && personnelData2.map((data, index)=>{
-              return(
-                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
-              )})
+             loading ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
+             <Text style={{ fontSize : 15,color : "black", textAlign : "center" }} >Chargement...</Text>
+           </View> :
+            <>
+              {
+                AllUsers && Number === 0 ? (
+                  <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
+                    <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
+                  </View>
+                ) : (
+                  <>
+                    {
+                      isXClicked ? 
+                        <>
+                          {
+                            AllUsers.map((data, index) => {
+                              return (
+                                <>
+                                  {
+                                    data.canAccess === 1 &&
+                                    <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                  }
+                                </>
+                              )
+                            })
+                          }
+                        </>
+                        :
+                        <>
+                          {
+                            AllUsers.map((data, index) => {
+                              return (
+                                <>
+                                  {
+                                    data.canAccess === 0 &&
+                                    <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                  }
+                                </>
+                              )
+                            })
+                          }
+                        </>
+                    }
+                  </>
+                )
+              }
+            </>
           }
-          </>
-          :
-          <>
-          {
-            personnelData && personnelData.map((data, index)=>{
-              return(
-                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
-              )})
-          }
-          </>
-        }
+
 
       </ScrollView>
     

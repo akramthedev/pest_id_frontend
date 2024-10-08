@@ -1,15 +1,16 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
+import {Image ,Alert,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
 import CustomDatePicker from "../Components/CustomDatePicker";
-
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../Helpers/AuthContext';
-
+import axios from "axios";
 
 const CreateCalculation = ({route}) => {
  
@@ -21,6 +22,13 @@ const CreateCalculation = ({route}) => {
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { settriggerIt, triggerIt } = useAuth();
+  const [image, setImage] = useState(null);  
+  const [URi, setURi] = useState(null);  
+  const [imageName, setImageName] = useState('');
+
+  const getFileNameFromUri = (uri) => {
+    return uri.split('/').pop();  // Extracts the last part of the URI which is the file name
+  };
 
 
   const toggleMenu = () => {
@@ -61,6 +69,83 @@ const CreateCalculation = ({route}) => {
   ).current;
 
 
+const pickImage = async () => {
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    const imageUri = result.assets[0].uri;
+    setImage(imageUri);
+
+    setURi(imageUri);
+    setImageName(getFileNameFromUri(imageUri)); 
+     
+  }
+};
+
+const takePhoto = async () => {
+  let result = await ImagePicker.launchCameraAsync({
+    allowsEditing: true,
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    const imageUri = result.assets[0].uri;
+    setImage(imageUri);
+    setURi(imageUri);
+    setImageName(getFileNameFromUri(imageUri));  
+  }
+};
+ 
+ 
+  const calculate = async () => {
+ 
+    const userId = await AsyncStorage.getItem('userId');
+    const userIdNum = parseInt(userId);
+    console.log(URi, serre, ferme);
+    console.log("User Id : "+userIdNum);
+    let formData = new FormData();
+    
+    formData.append('image', {
+      uri: URi,   
+      name: 'photo.jpg',   
+      type: 'image/jpeg'   
+    });
+    
+    
+    formData.append('serre_id', serre);  
+    formData.append('farm_id', ferme);
+    formData.append('user_id', userIdNum);  
+ 
+    try {
+      const token = await getToken();   
+      const response = await axios.post('http://10.0.2.2:8000/api/create_prediction', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if(response.status === 201){
+        setSelectedDate(new Date());
+        setFerme("");
+        setImage("");
+        setImageName("");
+        setURi('');
+        setSerre("");
+        setPlaqueId("");
+        navigation.navigate("Historique")
+      }
+      else{
+        Alert.alert('Erreur...')
+      }
+    } catch (error) {
+      console.error('Erreur :',error.message);
+    }
+  };
+
 
 
   return (
@@ -91,8 +176,9 @@ const CreateCalculation = ({route}) => {
               onValueChange={(itemValue) => setSerre(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
+              <Picker.Item label="Option 1" value={1} />
+              <Picker.Item label="Option 2" value={2} />
+              <Picker.Item label="Option 3" value={3} />
             </Picker>
           </View>
 
@@ -104,8 +190,7 @@ const CreateCalculation = ({route}) => {
               onValueChange={(itemValue) => setFerme(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
+              <Picker.Item label="Option 1" value={1} />
             </Picker>
           </View>
 
@@ -114,13 +199,22 @@ const CreateCalculation = ({route}) => {
 
             
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.buttonOutline}>
+            <TouchableOpacity style={styles.buttonOutline} onPress={takePhoto}>
               <Text style={styles.buttonTextB}>Prendre une photo</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonOutline}>
+            <TouchableOpacity style={styles.buttonOutline} onPress={pickImage}>
               <Text style={styles.buttonTextB}>Choisir une image</Text>
             </TouchableOpacity>
           </View>
+
+          {image && (
+              <View style={styles.imagePreview}>
+                <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+                <Text style={styles.imageName}>{imageName}</Text> 
+              </View>
+            )}
+
+
 
       </ScrollView>
 
@@ -129,7 +223,7 @@ const CreateCalculation = ({route}) => {
         <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB}   >Annuler</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity style={styles.saveButton} onPress={calculate} >
           <Text style={styles.buttonTextW}>Enregistrer le calcul</Text>
         </TouchableOpacity>
       </View>
@@ -285,6 +379,16 @@ const styles = StyleSheet.create({
     fontSize : 16,
      height: 48, 
   },
+  imagePreview: {
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  imageName: {
+    marginTop: 8,
+    fontSize: 16,
+    color: 'gray',
+  },
+
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

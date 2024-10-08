@@ -1,11 +1,14 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
+import { useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useEffect, useRef } from 'react';
 import {Image ,ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Card from '../Components/CardCalculation'; 
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
-
+import axios from "axios"
 
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
@@ -14,17 +17,11 @@ import { useAuth } from '../Helpers/AuthContext';
 const History = ({route}) => {
  
   const { settriggerIt, triggerIt } = useAuth();
-
+  const [allPredictions,setAllPredictions] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [navigation]);
+  
 
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -71,6 +68,57 @@ const History = ({route}) => {
 
 
 
+  
+  
+  
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+  
+          const token = await getToken(); 
+          
+          const response = await axios.get(`http://10.0.2.2:8000/api/users/${userIdNum}/predictions`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.status === 200) {
+            setAllPredictions(response.data);
+          } else {
+            Alert.alert('Erreur lors de la récupération de données.');
+          }
+        } catch (error) {
+          console.error('Erreur :', error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+      
+      return () => setLoading(false);  
+  
+    }, [navigation])
+  );
+
+
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const year = date.getFullYear();  
+    return `${day}/${month}/${year}`; 
+  };
+
+  
+
   return (
     <View style={styles.container}>
 
@@ -90,26 +138,33 @@ const History = ({route}) => {
           </>
         ) : (
           <>
-            <Card
-              idFarm="Harvest House"
-              idSerre="GreenPod 51"
-              mineuse="0"
-              mouche="24"
-              thrips="8"
-              date="09/12/2024"
-              percentage="72.6%"
-              chrImpact="+5.4%"
-            />
-            <Card
-              idFarm="Harvest House"
-              idSerre="GreenPod 51"
-              mineuse="0"
-              mouche="24"
-              thrips="8"
-              date="12/04/2024"
-              percentage="92.5%"
-              chrImpact="+7.2%"
-            />
+          {
+            allPredictions !== null && 
+            <>
+            {
+              allPredictions.length === 0 ? "No data..."
+              :
+              <>
+              {
+                 allPredictions.slice().reverse().map((predic, key)=>{
+                  return(
+                    <Card
+                      id={predic.id}
+                      key={key}
+                      idPlaque={predic.plaque_id}
+                      idFarm={predic.farm_id}
+                      idSerre={predic.serre_id}
+                      date={formatDate(predic.created_at)}
+                      percentage={predic.result}
+                      chrImpact="+7.2%"
+                    />
+                  )
+                })
+              }
+              </>
+            }
+            </>
+          }
           </>
         )}
       </ScrollView>

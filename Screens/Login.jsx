@@ -46,14 +46,18 @@ const Login = ({ route }) => {
           const token = response.data.token;
           const user = response.data.user;
           saveToken(token); 
+          await AsyncStorage.setItem('userId', JSON.stringify(user.id));
           setEmail('');setPassword('');
           settriggerIt((prev) => !prev);
           setTimeout(()=>{
             navigation.navigate('Dashboard');
           }, 400);
           
-        } else {
-          Alert.alert("Échec de l'authentification");
+        } else if (response.status === 202)  {
+          Alert.alert("Invalid Credentials");
+        }
+        else if(response.status === 203){
+          Alert.alert("Veuillez attendre l'approuvation d'un admin.");
         }
         
       } catch (error) {

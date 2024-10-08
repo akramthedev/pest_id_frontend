@@ -4,41 +4,51 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 
-export  const CardAdmin = ({ item, isXClicked }) => {
+export  const CardAdmin = ({ item,index, isXClicked }) => {
   
   
   const nav = useNavigation();
 
 
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const year = date.getFullYear();  
+    return `${day}/${month}/${year}`; 
+  };
+
+
   return(
 
-    <TouchableOpacity onPress={()=>{
+    <TouchableOpacity  key={index}    style={styles.card}>
+      <TouchableOpacity onPress={()=>{
       if(isXClicked){
-        nav.navigate('AdminProfile')
+        nav.navigate('AdminProfile', { id: item.id });
       } 
       else{
-        nav.navigate('NouvelleDemande')
+        nav.navigate('NouvelleDemande', { id: item.id });
       }
-    }}  style={styles.card}>
-      <View style={styles.row}>
-        <Image source={{ uri: item.image }} style={styles.profileImage} />
+    }}  style={styles.row}>
+        <Image source={{ uri: item.image ? item.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>{item.fullName}</Text>
           <Text style={styles.details}>{item.email}</Text>
-          <Text style={styles.details}>{item.phone}</Text>
-          <Text style={styles.details}>{item.farm}</Text>
-        </View>
+          <Text style={styles.details}>{formatDate(item.created_at)}</Text>
+         </View>
         <TouchableOpacity onPress={()=>{
           if(isXClicked){
-            nav.navigate('AdminProfile')
+            nav.navigate('AdminProfile', { id: item.id });
           }
           else{
-            nav.navigate('NouvelleDemande')
+            nav.navigate('NouvelleDemande', { id: item.id });
           }
         }} style={styles.iconContainer}>
           <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     </TouchableOpacity>
 
 

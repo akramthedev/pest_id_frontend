@@ -5,6 +5,9 @@ import {Image ,ScrollView, TextInput,StyleSheet,FlatList, TouchableOpacity, Text
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { useRoute } from '@react-navigation/native';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -80,17 +83,17 @@ const Carousel = ({ images }) => {
   );
 };
 
-const images = [
-  { uri: 'https://www.maag-garden.ch/de/produktsuche/nach-schaden/assets/weblication/wThumbnails/maag_Senf_Minierfliege_Blatt_PA229580-b3ebfa05-924f645a@708ll.jpg' },
-  { uri: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Stigmella_aurella_%28Nepticulidae%29_-_%28leaf_mine%29%2C_Elst_%28Gld%29%2C_the_Netherlands_-_2.jpg' },
-  { uri: 'https://www.biobestgroup.com/_next/image?url=https%3A%2F%2Fapi.cmz4g8wno1-biobestgr1-p1-public.model-t.cc.commerce.ondemand.com%2Fmedias%2Fleafminer-larva-7-WS.jpg%3Fcontext%3DbWFzdGVyfGltYWdlc3w3MjI4Mjl8aW1hZ2UvanBlZ3xhREk1TDJnNE1TODRPVEl6TVRBd01URTVNRGN3TDJ4bFlXWnRhVzVsY2kxc1lYSjJZUzAzTFZkVExtcHdad3w5MTMyMTgwMDkxMjNjMDFjZWY3YWRlZTA2ZWYyYWM2OThiNmI3MGM1MTQ5OTAyYzkxNzg4Nzc1NTkxNWJmNDhi&w=384&q=75' },
-];
+
 
 
 import { useAuth } from '../Helpers/AuthContext';
 
-const Calculation = ({route}) => {
- 
+const Calculation = () => {
+  const [loading, setLoading] = useState(true);
+  const route = useRoute();
+  const { id } = route.params;
+  const [predictionData,setpredictionData] = useState(null);
+  const [DataImages, setDataImages] = useState(null);
   const [isModifyClicked, setisModifyClicked] = useState(false)
   const navigation = useNavigation();
   const [plaqueId, setPlaqueId] = useState('');
@@ -99,6 +102,9 @@ const Calculation = ({route}) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const { settriggerIt, triggerIt } = useAuth();
+  const [images, setImages] = useState([]);
+
+
 
   const toggleMenu = () => {
     if (isMenuVisible) {
@@ -137,6 +143,77 @@ const Calculation = ({route}) => {
       },
     })
   ).current;
+
+
+
+
+
+
+  const fetchData = async () => {
+    if(id){
+      try {
+        setLoading(true);
+        /*
+        
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+
+        */
+        const token = await getToken();         
+        const response = await axios.get(`http://10.0.2.2:8000/api/singlePrediction/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setpredictionData(response.data[0]);
+          const response2 = await axios.get(`http://10.0.2.2:8000/api/predictions/${id}/images`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response2.status === 200) {
+            console.log("Fetched images:", response2.data); 
+            setDataImages(response2.data[0]);
+            if (response2.data.length > 1) {
+              const imageArray = response2.data.map((img) => {
+                const imageUrl = `http://your-server.com/path/to/images/${img.name}`;  
+                return { uri: imageUrl };
+              });
+              setImages(imageArray);
+              console.log("Fetched images:", imageArray); 
+            } else {
+              setImages([{ uri: 'https://img.freepik.com/photos-gratuite/image-fond-ecran-aquarelle-bleu-acier-clair_53876-94665.jpg' }]);
+              console.log("Using default image:", 'https://img.freepik.com/photos-gratuite/image-fond-ecran-aquarelle-bleu-acier-clair_53876-94665.jpg'); 
+            }
+           } 
+        } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(()=>{
+    fetchData();
+  },[id]);
+
+
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const year = date.getFullYear();  
+    return `${day}/${month}/${year}`; 
+  };
+
+  
 
 
   return (
@@ -202,22 +279,26 @@ const Calculation = ({route}) => {
             <>
               <View style={styles.infoContainer}>
                 <Text style={styles.title}>Informations du Calcul</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de ferme: S73ND</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de serre: A7924NF2</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Date du calcul: 19/09/2024</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de ferme: {loading ? "--" : predictionData.farm_id} </Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
               </View>
 
               <View style={styles.resultsContainer}>
                 <Text style={styles.title}>Résultats du Calcul</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Pourcentage: 72.9%</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mouches: 24</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mineuses: 17</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de Thrips: 5</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Pourcentage: {loading ? "--" : <>{predictionData.result}%</>}</Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mouches:  {loading ? "--" : <>{DataImages && DataImages.class_A}</>} </Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mineuses:  {loading ? "--" : <>{DataImages && DataImages.class_B}</>} </Text>
+                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de Thrips:  {loading ? "--" : <>{DataImages && DataImages.class_C}</>} </Text>
               </View>
 
               <View style={styles.carouselContainer}>
                 <Text style={styles.titleXX}>Images du Calcul</Text>
-                <Carousel images={images} />
+                {
+                  <Carousel images={images} />
+                }
               </View> 
             </>
           }
@@ -542,7 +623,7 @@ const styles = StyleSheet.create({
 
   carouselImage: {
     width: screenWidth * 0.8,   
-    height: 250,  
+    height: 233,  
     marginHorizontal: 10,
     resizeMode: 'cover',
     borderRadius: 10,

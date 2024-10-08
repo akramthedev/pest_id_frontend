@@ -1,32 +1,78 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity , Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 
 
-const CardCalculation = ({ idFarm, idSerre, mineuse, mouche, thrips, date, percentage, chrImpact }) => {
+
+
+const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, chrImpact }) => {
 
   const { width: screenWidth } = Dimensions.get('window');
   const navigation = useNavigation();
-  
+  const [data, setData] = useState(null);
+  const [loading,setLoading] = useState(true);
+
+
+  const fetchData = async () => {
+    if(id !== null && id !== undefined){
+      try {
+        setLoading(true);
+        const IdOfPredi = id;
+        const token = await getToken(); 
+        const response = await axios.get(`http://10.0.2.2:8000/api/predictions/${IdOfPredi}/images`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setData(response.data[0]);
+         } else {
+          Alert.alert('Erreur lors de la récupération de données.');
+        }
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+ 
+
+  useEffect(()=>{
+    fetchData();
+  },[id]);
+
+
   return (
-    <View style={styles.card}>
+    <View style={styles.card} key={key} >
       <View style={styles.row}>
         <Text style={styles.idText}>ID Ferme : {idFarm}</Text>
-        <Text style={styles.loremText}>Lorem ipsum</Text>
+        <Text style={styles.loremText}>Plaque : {idPlaque}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.idText}>ID Serre : {idSerre}</Text>
         <Text style={styles.percentageText}>{percentage}</Text>
       </View>
       <Text style={styles.detailsText}>
-        Mineuse : {mineuse} • Mouche : {mouche} • Thrips : {thrips}
+        Mineuse : {!data ? "--" : data.class_A} • Mouche : {!data ? "--" : data.class_B} • Thrips : {!data ? "--" : data.class_C}
       </Text>
       <Text style={styles.dateText}>{date}</Text>
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.modifyButton} onPress={()=>{navigation.navigate('Calculation')}}  >
+        <TouchableOpacity style={styles.modifyButton} onPress={() => {
+            navigation.navigate('Calculation', { id: id });
+          }}  
+        >
           <Text style={styles.buttonText1}>Modifier</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.detailsButton} onPress={()=>{navigation.navigate('Calculation')}}  >
+        <TouchableOpacity style={styles.detailsButton} onPress={() => {
+            navigation.navigate('Calculation', { id: id });
+          }}  
+        >
           <Text style={styles.buttonText}>Voir détails</Text>
         </TouchableOpacity>
       </View>
