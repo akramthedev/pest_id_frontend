@@ -2,11 +2,16 @@ import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { Image,TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import CardPersonal from '../Components/CardPersonel';
 import { MaterialIcons } from '@expo/vector-icons';
-import SkeletonLoaderFarm from "../Components/SkeletonLoaderFarm"
 import CardFarm from '../Components/CardFarm';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -37,9 +42,52 @@ const AdminProfile = () => {
 
   const { settriggerIt, triggerIt } = useAuth();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [userData,setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
+
+  const route = useRoute();
+  const { id } = route.params;
+
+
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        if(id !== null && id !== undefined){
+          try {
+            setLoading(true);
+    
+            const token = await getToken(); 
+            
+            const response = await axios.get(`http://10.0.2.2:8000/api/user/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            if (response.status === 200) {
+              setUserData(response.data);
+            } else {
+              Alert.alert('Erreur lors de la récupération de données.');
+            }
+          } catch (error) {
+            console.error('Erreur :', error.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+  
+      fetchData();
+      
+      return () => setLoading(false);  
+  
+    }, [navigation])
+  );
 
 
   const toggleMenu = () => {
@@ -78,6 +126,15 @@ const AdminProfile = () => {
     })
   ).current;
 
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const year = date.getFullYear();  
+    return `${day}/${month}/${year}`; 
+  };
+
 
   return (
     <>
@@ -85,39 +142,47 @@ const AdminProfile = () => {
 
 
           <ScrollView>
-            
-
-                <View style={styles.titleContainer}>
+          
+            <View style={styles.titleContainer}>
                   <Text style={styles.titleText}>Profil Admin</Text>
                   <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
                     <Ionicons name="menu" size={24} color="#3E6715" />
                   </TouchableOpacity>
                 </View>
                 
+
+                {
+            userData ? 
+            <>
               <View style={styles.profileContainer}>
                 <Image
                   style={styles.profileImage}
-                  source={{ uri: 'https://d4l6e04z43qjx.cloudfront.net/img/agriculture/agriculture-logo-6.png' }}  
+                  source={{ uri: userData && userData.image ? userData.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png"  }}  
                 />
               </View>
 
               <View style={styles.modifierVotreX} >
                   <Text style={styles.modifierVotreXText}>Nom et Prénom</Text>
-                  <Text>Akram El Basri</Text>
+                  <Text>{userData.fullName ? userData.fullName : "--"}</Text>
               </View>
               <View style={styles.modifierVotreX} >
                   <Text style={styles.modifierVotreXText}>Adresse email</Text>
-                  <Text>akram@greenhouse.com</Text>
+                  <Text>{userData.email}</Text>
               </View>
 
               <View style={styles.modifierVotreX} >
                   <Text style={styles.modifierVotreXText}>Société</Text>
-                  <Text>Green House SARL</Text>
+                  <Text>--</Text>
               </View>
 
               <View style={styles.modifierVotreX} >
                   <Text style={styles.modifierVotreXText}>Téléphone</Text>
-                  <Text>064275728</Text>
+                  <Text>{userData.mobile ? userData.mobile : "--"}</Text>
+              </View>
+
+              <View style={styles.modifierVotreX} >
+                  <Text style={styles.modifierVotreXText}>Date de création</Text>
+                  <Text>{formatDate(userData.created_at)}</Text>
               </View>
               
 
@@ -143,7 +208,14 @@ const AdminProfile = () => {
 
 
 
-
+            </>
+            :
+            <>
+            <View style={{ height : 600, alignItems : "center", justifyContent : "center" }} >           
+              <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
+            </View>
+            </>
+          }
           </ScrollView>
       </View>
 
@@ -272,8 +344,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   profileImage: {
-    width: 180,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 15,
   },
   roleText: {

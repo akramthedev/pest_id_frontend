@@ -7,8 +7,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import CardAdmin from '../Components/CardAdmin'
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback } from 'react';
+import { useCallback } from 'react';  
 import { useFocusEffect } from '@react-navigation/native';
+import SkeletonLoader from "../Components/SkeletonLoader"
 
 
  
@@ -143,9 +144,14 @@ export default function MesClients({route}) {
         
 
         {
-            loading ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
-            <Text style={{ fontSize : 15,color : "black", textAlign : "center" }} >Chargement...</Text>
-          </View> :
+            loading ? 
+            <>
+            <SkeletonLoader/>
+            <SkeletonLoader/>
+            <SkeletonLoader/>
+
+            </>
+            :
             <>
               {
                 AllUsers && Number === 0 ? (

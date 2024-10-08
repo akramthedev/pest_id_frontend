@@ -9,6 +9,7 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import SkeletonLoader from "../Components/SkeletonLoader"
 
   
 const { width: screenWidth } = Dimensions.get('window');
@@ -145,9 +146,13 @@ export default function SuperAdminDemande({route}) {
         
         
         {
-             loading ? <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
-             <Text style={{ fontSize : 15,color : "black", textAlign : "center" }} >Chargement...</Text>
-           </View> :
+             loading ? 
+             <>
+             <SkeletonLoader/>
+             <SkeletonLoader/>
+             <SkeletonLoader/>
+ 
+             </> :
             <>
               {
                 AllUsers && Number === 0 ? (

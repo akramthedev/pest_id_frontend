@@ -7,7 +7,7 @@ const LoadingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.loadingText}>Loading...</Text>
+      <Text style={styles.loadingText}>Chargement...</Text>
     </View>
   );
 };
