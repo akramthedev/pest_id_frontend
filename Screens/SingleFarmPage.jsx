@@ -1,126 +1,46 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import { useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Image,TextInput, ScrollView,Alert, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { Image,TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import SkeletonLoaderFarm from "../Components/SkeletonLoaderFarm"
 import CardFarm from '../Components/CardFarm';
 import { useAuth } from '../Helpers/AuthContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { formatLocation } from '../Helpers/locationTransf';
-import { formatDate } from '../Components/fct';
-
-
 const { width: screenWidth } = Dimensions.get('window');
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { formatDate } from '../Components/fct';
+import { formatLocation } from '../Helpers/locationTransf';
+ 
 
 
-const Profile = () => {
 
-  const route = useRoute();
-  const { id } = route.params; 
-  
-  // id === 666 : Mon Profile     
-  //otherwise : profil d une autre personne
+const SingleFarmPage = () => {
 
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [isModify, setisModify] = useState(false);
-  const [isCurrent, setisCurrent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [dataProfile, setdataProfile] = useState(null);
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-  const navigation = useNavigation();
-  const { settriggerIt, triggerIt } = useAuth();
+
   const [role, setRole] = useState(null);
 
-  
-  useFocusEffect(
-    useCallback(() => {
-
+  useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
       setRole(rolex);
-      const userId = await AsyncStorage.getItem('userId');
-      const userIdNum = parseInt(userId);
-      if(id!== null && id !== undefined){
-        if(id === 666 || id === "666" || userIdNum === id){
-          setisCurrent(true);
-        }
-        else{
-          setisCurrent(false);
-        }
-      }
      }
-    x(); 
-  
-  }, [navigation, id])
-);
+    x();
+  },[ ]);
 
-
- 
-  useFocusEffect(
-    useCallback(() => {
-    const fetchProfileData = async ()=>{
-      setLoading(true);
-      if(id!== null && id !== undefined){
-        console.log("----------------------------");
-        console.log("ID : "+id);
-        try{
-          const userId = await AsyncStorage.getItem('userId');
-          const token = await getToken(); 
-          const userIdNum = parseInt(userId);
-
-          if(id === 666 || id === "666" || userIdNum === id){
-            //fetch my infos
-            const response = await axios.get(`http://10.0.2.2:8000/api/user/${userIdNum}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-
-            if(response.status === 200){
-              setdataProfile(response.data)
-            }
-            else{
-              console.log("Not Fetched...")
-            }
-          }
-          else{
-            //fetch other infos
-            setdataProfile(null);
-            const response = await axios.get(`http://10.0.2.2:8000/api/user/${id}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-
-            if(response.status === 200){
-              console.log("----------------------------");
-              setdataProfile(response.data)
-            }
-            else{
-              console.log("Not Fetched...")
-            }
-          }
-        } 
-        catch(e){
-          console.log(e.message);
-          if(e.message === "Request failed with status code 404"){
-            Alert.alert("Utilisateur non trouvé");            
-          }
-        } finally{
-          setLoading(false);
-        }
-      } 
-    }
-    fetchProfileData();
-    return () => setLoading(false);  
-  
-  }, [id])
-);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const slideAnim = useRef(new Animated.Value(screenWidth)).current;
+    const navigation = useNavigation();
+    const { settriggerIt, triggerIt } = useAuth();
+    const [dataFarm,setdataFarm] = useState(null);
+    const [dataSerre,setdataSerre] = useState(null);
+    const route = useRoute();
+    const { id } = route.params;
+    const [isModifyClicked, setIsModifyClick] = useState(false)
 
 
   const toggleMenu = () => {
@@ -159,125 +79,188 @@ const Profile = () => {
     })
   ).current;
 
+  
+
+  useFocusEffect(
+    useCallback(() => {
+
+      const fetchData = async () => {
+        if(id !== null && id !== undefined){
+          try {
+            setLoading(true);  
+            const token = await getToken(); 
+            const response = await axios.get(`http://10.0.2.2:8000/api/farms/getSingleFarm/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            if (response.status === 200) {
+              setdataFarm(response.data[0]);
+              const response2 = await axios.get(`http://10.0.2.2:8000/api/serres-per-farm/${id}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              if (response2.status === 200) {
+                setdataSerre(response2.data);
+                console.log(response2.data);
+              }
+              else{
+                setdataSerre([]);
+              }
+            } else {
+              Alert.alert('Erreur lors de la récupération de données.');
+            }
+          } catch (error) {
+            console.error('Erreur :', error.message);
+          } finally {
+            setLoading(false);
+          }
+        }    
+      };
+      
+
+      fetchData();
+
+      return () => setLoading(false);  
+  
+    }, [navigation, id])
+  );
+
+
+  
+  
+
 
   return (
     <>
       <View style={styles.container}>
-
-
-          <View>
-            
+          <ScrollView>
 
                 <View style={styles.titleContainer}>
-                  <Text style={styles.titleText}>
-                    {
-                      isCurrent !== null &&
-                      <>
-                      {isCurrent ? "Mon " : ""}
-                      </>
-                    }  
-                    Profil
-                  </Text>
+                  <Text style={styles.titleText}>Ma Ferme</Text>
                   <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
                     <Ionicons name="menu" size={24} color="#3E6715" />
                   </TouchableOpacity>
                 </View>
                 
-              <View style={styles.profileContainer}>
-                <Image
-                  style={styles.profileImage}
-                  source={{ uri: dataProfile &&  dataProfile.image ? dataProfile.image : "https://cdn-icons-png.flaticon.com/256/149/149071.png" }}  
-                />
-                <Text style={styles.roleText}>Role: {dataProfile && <>{dataProfile.type.toLowerCase() === "admin" ? "Administrateur" : dataProfile.type.toLowerCase() === "superadmin" ? "Super-Administrateur" : "Staff" }</>}</Text>
-              </View>
-
-             {
-              dataProfile ? 
-              <>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Nom et prénom :</Text>
-                <Text style={styles.value}>{dataProfile.fullName}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Addresse email :</Text>
-                <Text style={styles.value}>{dataProfile.email}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Téléphone :</Text>
-                <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : "--"}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Date de création</Text>
-                <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
-              </View>
               {
-                (isCurrent !== null) &&
+                loading?
+                <View style={{ height : 600, alignItems : "center", justifyContent : "center" }} >           
+                  <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
+                </View>
+                :
                 <>
-                {
-                  (isCurrent === true || (role && role === "superadmin"))&& 
-                  <>
-                  <View style={styles.hr} />
-                  <View style={styles.modifierVotreX} >
-                      <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
-                      <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
-                  <View style={styles.modifierVotreX} >
-                      <Text style={styles.modifierVotreXText}>Réglages de payements</Text>
-                      <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
-                  </>
-                }
+                  {
+                      
+                      dataFarm && 
+                      <>
+                        <View style={styles.profileContainer}>
+                          <Image
+                            style={styles.profileImage}
+                            source={{ uri: 'https://i.pinimg.com/736x/3b/e3/97/3be397f7474db66d2b1f0f61fde856b7.jpg' }}  
+                          />
+                        </View>
+
+
+                        <Text style={{marginLeft: 23, marginBottom : 20, fontSize : 17, fontWeight : "800"}}>Informations</Text>
+
+
+                        <View style={styles.rowXXX}>
+                          <Text style={styles.label}>Appellation :</Text>
+                          <Text style={styles.value}>{dataFarm.name}</Text>
+                        </View>
+
+                        <View style={styles.rowXXX}>
+                          <Text style={styles.label}>Localisation :</Text>
+                          <Text style={styles.value}>{formatLocation(dataFarm.location)}</Text>
+                        </View>
+
+                        <View style={styles.rowXXX}>
+                          <Text style={styles.label}>Superficie en m² :</Text>
+                          <Text style={styles.value}>{dataFarm.size}</Text>
+                        </View>
+
+                        <View style={styles.rowXXX}>
+                          <Text style={styles.label}>Date de création :</Text>
+                          <Text style={styles.value}>{formatDate(dataFarm.created_at)}</Text>
+                        </View>
+
+                        <View style={styles.hr} />
+
+                        <Text style={{marginLeft: 23, marginBottom : 20, fontSize : 17, fontWeight : "800"}}>Serres associées</Text>
+                        {
+                          dataSerre && 
+                          <>
+                          {
+                            dataSerre.length === 0 ? 
+                            <View style={{ height : 80, alignItems : "center", justifyContent : "center" }} >           
+                              <Text style={{ color : "gray",fontSize : 15, textAlign : "center" }}>Aucune donnée</Text>
+                            </View>
+                            :
+                            dataSerre.map((serre, index)=>{
+                              return(
+                                <TouchableOpacity
+                                    key={index}
+                                    style={{
+                                      height: 50,
+                                      flexDirection: 'row',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      paddingHorizontal: 10,
+                                      backgroundColor: '#f0f0f0', 
+                                      marginBottom: 10,
+                                      borderRadius: 10,
+                                      marginRight : 23, 
+                                      marginLeft : 23
+                                    }}
+                                  >
+                                    <Text>{serre.name}</Text>   
+                                    
+                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                      <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+                                    </TouchableOpacity>
+                                  </TouchableOpacity>
+                              )
+                            })
+                          }
+                            <TouchableOpacity onPress={()=>{ navigation.navigate('AjouterUneSerre', { id: id });}}  style={styles.saveButtonUZUQSOEFD}>
+                              <Text style={styles.text487C15}>+ Ajouter une Serre</Text>
+                            </TouchableOpacity>
+                          </>
+                        }
+
+                      </>
+                    }
                 </>
               }
-              </>
-              :
-              <View style={{ height : 250, alignItems : "center", justifyContent : "center" }} >           
-                <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
-              </View>
-             }
+          </ScrollView>
 
-            
-              
-                
-          </View>
-          <View style={styles.buttonContainer}>
+
           {
-            role && (isCurrent !== null) &&
-            <>
-            {
-              (role === "superadmin" || isCurrent=== true  ) ?
-              <>
-                {
-                  !isModify ? 
-
-                  <>
-                  <TouchableOpacity style={styles.saveButton}onPress={()=>{setisModify(!isModify)}}  >
-                    <Text style={styles.buttonTextWhite}>Modifier le profile</Text>
-                  </TouchableOpacity>
-                 
-                  </>:
-                  <>
-                  <TouchableOpacity style={styles.cancelButton} onPress={()=>{setisModify(!isModify)}}>
-                    <Text style={styles.buttonTextBlack}>Annuler</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.saveButton} >
-                    <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
-                  </TouchableOpacity>
-                  </>
-                }
-              </>
-              :
-              <>
-                <TouchableOpacity style={styles.supprimerLepersonel} >
-                  <Text style={styles.buttonTextWhite}>Supprimer le personel</Text>
-                </TouchableOpacity>
-              </>
-            }
-            </>
+            !isModifyClicked ? 
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity onPress={()=>{setIsModifyClick(!isModifyClicked)}}  style={styles.saveButton}>
+                <Text style={styles.buttonTextWhite}>Modifier la ferme</Text>
+              </TouchableOpacity>
+            </View>
+            :
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.cancelButton}  onPress={()=>{setIsModifyClick(!isModifyClicked)}} >
+                <Text style={styles.buttonTextBlack}>Annuler</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton}  onPress={()=>{}} >
+                <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
+              </TouchableOpacity>
+            </View> 
           }
-          </View>
+
+
       </View>
 
+
+      
       
       {isMenuVisible && (
         <Animated.View
@@ -292,7 +275,6 @@ const Profile = () => {
                 resizeMode="cover"
               />
             </TouchableOpacity>
-            
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
               <Text style={styles.menuText}>Tableau de bord</Text>
@@ -332,7 +314,7 @@ const Profile = () => {
             
             
             {
-              ((role !== null && role !== undefined) && (role.toLowerCase() === "superadmin" || role.toLowerCase() === "admin") ) &&
+              (role && (role.toLowerCase() === "superadmin" || role.toLowerCase() === "admin") ) &&
                 <>
                   <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="business-outline" size={24} color="black" />
@@ -380,7 +362,6 @@ const Profile = () => {
         </Animated.View>
       )}
 
-      
 
     </>
   );
@@ -397,8 +378,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position : "relative"
   },
+  menu: {
+    position: "absolute",
+    right: 23,
+    zIndex: 10,
+  },
+  titleText: {
+    color: 'black',
+    fontSize: 19,
+    fontWeight: 'bold',
+  },
+  profileContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  profileImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 15,
+  },
 
-  
   rowXXX: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -423,44 +422,18 @@ const styles = StyleSheet.create({
     fontSize : 16
   },
 
-
-
-  menu: {
-    position: "absolute",
-    right: 23,
-    zIndex: 10,
-  },
-  titleText: {
-    color: 'black',
-    fontSize: 19,
-    fontWeight: 'bold',
-  },
-  profileContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  profileImage: {
-    width: 110,
-    height: 110,
-    borderRadius: 15,
-  },
   roleText: {
-    marginTop: 10,
+    marginTop: 1,
     fontSize: 14,
     color : "#B8B8B8",
     fontWeight: '500',
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    paddingLeft : 22,
-    borderRadius: 8,
-    marginBottom: 16,
+    height: 40,
     paddingRight: 22,
     marginLeft : 23, 
     marginRight : 23,
-    fontSize : 16
+    fontSize : 17
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -490,13 +463,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
-  supprimerLepersonel : {
+  saveButtonUZUQSOEFD : {
     flex: 1,
-    marginLeft: 8,
-    paddingVertical: 12,
-    backgroundColor: '#B40000',
+    width : 200,
+    margin : "auto",
+    paddingVertical:9,
+    backgroundColor: '#DAFFB7',
     alignItems: 'center',
     borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : 'white'
+  },
+  text487C15 : {
+    color : "#487C15",
+    fontSize : 16,
+    fontWeight : "500"
   },
   buttonTextWhite: {
     color: '#fff',
@@ -589,4 +570,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Profile;
+export default SingleFarmPage;

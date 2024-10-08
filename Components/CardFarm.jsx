@@ -1,30 +1,55 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {formatDate} from './fct';
+import { formatLocation } from '../Helpers/locationTransf';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const CardFarm = ({ item }) => {
 
 
-const CardFarm = ({ item }) => (
-  <>
-  {
-    item && 
-    <View style={styles.card}>
-      <View style={styles.row}>
-        <Image source={{ uri: item.image ? item.image : "https://i.pinimg.com/736x/3b/e3/97/3be397f7474db66d2b1f0f61fde856b7.jpg"}} style={styles.profileImage} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.details}>Localisation : {item.location}</Text>
-          <Text style={styles.details}>Size : {item.size}</Text>
-          <Text style={styles.details}>Date de création : {formatDate(item.created_at)}</Text>
+  const navigation = useNavigation();
+  const [role, setRole] = useState(null);
+
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
+
+  return(
+    <>
+    {
+      item && 
+      <TouchableOpacity style={styles.card} onPress={ 
+        ()=>{
+          navigation.navigate('SingleFarmPage', { id: item.id });
+        }
+      } >
+        <View style={styles.row}>
+          <Image source={{ uri: item.image ? item.image : "https://i.pinimg.com/736x/3b/e3/97/3be397f7474db66d2b1f0f61fde856b7.jpg"}} style={styles.profileImage} />
+          <View style={styles.infoContainer}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.details}>Localisation : {formatLocation(item.location)}</Text>
+            <Text style={styles.details}>Size : {item.size ? item.size : "--"}&nbsp;m²</Text>
+            <Text style={styles.details}>Date de création : {formatDate(item.created_at)}</Text>
+          </View>
+          <TouchableOpacity onPress={ 
+            ()=>{
+              navigation.navigate('SingleFarmPage', { id: item.id });
+            }
+          }  style={styles.iconContainer}>
+            <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.iconContainer}>
-          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  }
-  </>
-);
+      </TouchableOpacity>
+    }
+    </>
+  );
+}
 
 const styles = StyleSheet.create({
   card: {

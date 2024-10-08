@@ -6,20 +6,41 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
-
+import { useRoute } from '@react-navigation/native';
 import { useAuth } from '../Helpers/AuthContext';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CreateSerre = ({route}) => {
+
+
+
+
+const CreateSerre = () => {
  
+
+
+  const [role, setRole] = useState(null);
+
+ 
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
+
+  const route = useRoute();
+  const { id } = route.params; //id farm qui on veut lui ajouter une Serre 
   const navigation = useNavigation();
-  const [fermeAssocie, setFermeAssocie] = useState('');
+  const [fermeAssocie, setFermeAssocie] = useState(id);
   const [typedeSerre, settypedeSerre] = useState('');
   const [Mesure, setMesure] = useState('');
   const [Appelation, setAppelation] = useState('');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const { settriggerIt, triggerIt } = useAuth();
-
+  const[loading,setloading] = useState(false)
 
 
   const toggleMenu = () => {
@@ -60,6 +81,51 @@ const CreateSerre = ({route}) => {
   ).current;
 
 
+ 
+
+
+
+  const createSerrePourFermeID = async () => {
+    if(id !== null && id !== undefined){
+      setFermeAssocie(id);
+      try{
+        setloading(true);
+        /*
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+        */
+        const token = await getToken(); 
+  
+        let dataX = {
+          farm_id : id,
+          name : Appelation, 
+          size : Mesure,
+          type : typedeSerre
+        }
+        const resp0 = await axios.post(`http://10.0.2.2:8000/api/serres`, dataX, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp0.status === 201){
+          setAppelation('');
+          settypedeSerre("");
+          setMesure('');
+          navigation.navigate('SingleFarmPage', { id: id });
+        }
+        else{
+          console.log('not created')
+        }
+      }
+  
+      catch(e){
+        console.log(e.message);
+      } finally{
+        setloading(false);
+      }
+    }
+  }
+
 
 
   return (
@@ -86,7 +152,7 @@ const CreateSerre = ({route}) => {
           <Text style={styles.label}>Mesure (en Mètre)</Text>
           <TextInput
             style={styles.input}
-            placeholder="Veuillez saisir la mesure..."
+            placeholder="Veuillez saisir la mesure en m²..."
             value={Mesure}
             onChangeText={setMesure}
           />
@@ -100,31 +166,23 @@ const CreateSerre = ({route}) => {
               onValueChange={(itemValue) => settypedeSerre(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
+              <Picker.Item label="Fruit" value="Fruit" />
+              <Picker.Item label="Légume" value="Légume" />
+              <Picker.Item label="Fleur" value="Fleur" />
+              <Picker.Item label="Autre" value="Autre" />
             </Picker>
           </View>
-
-
-         <Text style={styles.label}>Ferme associée</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={fermeAssocie}
-              style={styles.picker} 
-              onValueChange={(itemValue) => setFermeAssocie(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
-            </Picker>
-          </View>
+            
       </ScrollView>
 
       <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
+        <TouchableOpacity onPress={()=>{navigation.navigate('SingleFarmPage', { id: id });}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB} >Annuler</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity  disabled={loading}  style={[
+            styles.saveButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]} onPress={createSerrePourFermeID} >
           <Text style={styles.buttonTextW}>Enregistrer la serre</Text>
         </TouchableOpacity>
       </View>
@@ -133,8 +191,6 @@ const CreateSerre = ({route}) => {
     </View>
 
 
-      
-      
       
       
     {isMenuVisible && (
@@ -155,20 +211,28 @@ const CreateSerre = ({route}) => {
               <Text style={styles.menuText}>Tableau de bord</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Profile', { id: 666 }); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
            
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
+            {
+              (role && (role.toLowerCase() === "superadmin") )&&
+              <>
+              <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="people-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Mes Clients</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="mail-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Demandes Clients</Text>
+              </TouchableOpacity>
+              
+              </>
+            }
+
+           
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
@@ -178,22 +242,29 @@ const CreateSerre = ({route}) => {
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="business-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes fermes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter une ferme</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes personnels</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter un personnel</Text>
-            </TouchableOpacity>
+            
+            
+            {
+              (role && (role.toLowerCase() === "superadmin" || role.toLowerCase() === "admin") ) &&
+                <>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="business-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes fermes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter une ferme</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="people-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes personnels</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter un personnel</Text>
+                  </TouchableOpacity>
+                </>
+            }
             
             
             <TouchableOpacity 

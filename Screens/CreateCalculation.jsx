@@ -14,10 +14,24 @@ import axios from "axios";
 
 const CreateCalculation = ({route}) => {
  
+
+
+  const [role, setRole] = useState(null);
+
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
+
+
   const navigation = useNavigation();
   const [plaqueId, setPlaqueId] = useState('');
   const [serre, setSerre] = useState('');
   const [ferme, setFerme] = useState('');
+  const [loading, setloading] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -102,7 +116,7 @@ const takePhoto = async () => {
  
  
   const calculate = async () => {
- 
+    setloading(true);
     const userId = await AsyncStorage.getItem('userId');
     const userIdNum = parseInt(userId);
     console.log(URi, serre, ferme);
@@ -143,6 +157,8 @@ const takePhoto = async () => {
       }
     } catch (error) {
       console.error('Erreur :',error.message);
+    } finally{
+      setloading(false);
     }
   };
 
@@ -223,8 +239,11 @@ const takePhoto = async () => {
         <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
           <Text style={styles.buttonTextB}   >Annuler</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton} onPress={calculate} >
-          <Text style={styles.buttonTextW}>Enregistrer le calcul</Text>
+        <TouchableOpacity disabled={loading} style={[
+            styles.saveButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]} onPress={calculate} >
+          <Text style={styles.buttonTextW}>{ loading ? "Création du calcul..." : "Enregistrer le calcul" }</Text>
         </TouchableOpacity>
       </View>
 
@@ -234,7 +253,6 @@ const takePhoto = async () => {
 
 
 
-      
       
       
       
@@ -256,20 +274,28 @@ const takePhoto = async () => {
               <Text style={styles.menuText}>Tableau de bord</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Profile', { id: 666 }); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
            
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
+            {
+              (role && (role.toLowerCase() === "superadmin") )&&
+              <>
+              <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="people-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Mes Clients</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="mail-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Demandes Clients</Text>
+              </TouchableOpacity>
+              
+              </>
+            }
+
+           
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
@@ -279,22 +305,29 @@ const takePhoto = async () => {
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="business-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes fermes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter une ferme</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes personnels</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter un personnel</Text>
-            </TouchableOpacity>
+            
+            
+            {
+              (role && (role.toLowerCase() === "superadmin" || role.toLowerCase() === "admin") ) &&
+                <>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="business-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes fermes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter une ferme</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="people-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes personnels</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter un personnel</Text>
+                  </TouchableOpacity>
+                </>
+            }
             
             
             <TouchableOpacity 
@@ -323,7 +356,6 @@ const takePhoto = async () => {
         </Animated.View>
       )}
 
-      
 
 
     </>

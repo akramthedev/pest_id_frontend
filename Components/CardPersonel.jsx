@@ -5,11 +5,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { formatDate } from './fct';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SkeletonLoader from "./SkeletonLoader"
+
+
 
 export const CardPersonal = ({ item }) => {
 
   const nav = useNavigation();
 
+  const [role, setRole] = useState(null);
+
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
 
   const [data, setData] = useState(null);
   const [loading,setLoading] = useState(true);
@@ -51,8 +64,8 @@ export const CardPersonal = ({ item }) => {
   return(
     <>
     {
-     ( item && !loading && data) && 
-      <TouchableOpacity onPress={()=>{nav.navigate('Profile')}}  style={styles.card}>
+     ( item && !loading && data) ? 
+      <TouchableOpacity onPress={()=>{nav.navigate('Profile', { id: item.user_id });}}  style={styles.card}>
         <View style={styles.row}>
           <Image source={{ uri: data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
           <View style={styles.infoContainer}>
@@ -67,6 +80,8 @@ export const CardPersonal = ({ item }) => {
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
+      :
+      <SkeletonLoader />
     }
     </>
   );

@@ -47,6 +47,7 @@ const Login = ({ route }) => {
           const user = response.data.user;
           saveToken(token); 
           await AsyncStorage.setItem('userId', JSON.stringify(user.id));
+          await AsyncStorage.setItem('type', JSON.stringify(user.type));
           setEmail('');setPassword('');
           settriggerIt((prev) => !prev);
           setTimeout(()=>{

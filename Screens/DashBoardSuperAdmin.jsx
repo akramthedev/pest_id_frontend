@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import CardAdmin from '../Components/CardAdmin'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const personnelData = [
   {
@@ -64,6 +66,17 @@ export default function Dashboard({route}) {
     const navigation = useNavigation();
     const { settriggerIt, triggerIt } = useAuth();
 
+
+    const [role, setRole] = useState(null);
+
+ 
+    useEffect(()=>{
+      const x = async ()=>{
+        const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+        setRole(rolex);
+       }
+      x();
+    },[ ]);
 
 
   const toggleMenu = () => {
@@ -149,7 +162,6 @@ export default function Dashboard({route}) {
       
       
       
-      
       {isMenuVisible && (
         <Animated.View
           style={[styles.popup, { transform: [{ translateX: slideAnim }] }]}
@@ -168,20 +180,28 @@ export default function Dashboard({route}) {
               <Text style={styles.menuText}>Tableau de bord</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => { navigation.navigate('Profile'); toggleMenu(); }} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Profile', { id: 666 }); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
               <Text style={styles.menuText}>Mon Profile</Text>
             </TouchableOpacity>
            
-            <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes Clients</Text>
-            </TouchableOpacity>
+            {
+              (role && (role.toLowerCase() === "superadmin") )&&
+              <>
+              <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="people-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Mes Clients</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="mail-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Demandes Clients</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
+                <Ionicons name="mail-outline" size={24} color="black" />
+                <Text style={styles.menuText}>Demandes Clients</Text>
+              </TouchableOpacity>
+              
+              </>
+            }
+
+           
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
               <MaterialIcons name="history" size={24} color="black" />
@@ -191,22 +211,29 @@ export default function Dashboard({route}) {
               <Ionicons name="add-circle-outline" size={24} color="black" />
               <Text style={styles.menuText}>Ajouter un calcul</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="business-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes fermes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter une ferme</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="people-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mes personnels</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter un personnel</Text>
-            </TouchableOpacity>
+            
+            
+            {
+              (role && (role.toLowerCase() === "superadmin" || role.toLowerCase() === "admin") ) &&
+                <>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="business-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes fermes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter une ferme</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="people-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Mes personnels</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
+                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Text style={styles.menuText}>Ajouter un personnel</Text>
+                  </TouchableOpacity>
+                </>
+            }
             
             
             <TouchableOpacity 

@@ -18,6 +18,7 @@ import AjouterUneFerme from './Screens/CreateFarm';
 import AjouterUneSerre from './Screens/CreateSerre';
 import AjouterUnPersonel from './Screens/CreateStaff'
 import ModifierSerre from './Screens/ModifierSerre';
+import SingleFarmPage from './Screens/SingleFarmPage'
 import Calculation from './Screens/Calculation';
 import SuperAdminDemande from './Screens/SuperAdminDemande';
 import { getToken } from './Helpers/tokenStorage';
@@ -69,7 +70,8 @@ const MainNavigator = ({ isAuthenticated, setIsAuthenticated }) => {
               <Stack.Screen name="AjouterUnPersonel" component={AjouterUnPersonel} />
               <Stack.Screen name="AjouterUneSerre" component={AjouterUneSerre} />
               <Stack.Screen name="ModifierSerre" component={ModifierSerre} />
-              <Stack.Screen name="Calculation" component={Calculation} />
+              <Stack.Screen name="Calculation" component={Calculation} /> 
+              <Stack.Screen name="SingleFarmPage" component={SingleFarmPage} /> 
               <Stack.Screen name="SuperAdminDemande" component={SuperAdminDemande} />
             </Stack.Group>
           </>

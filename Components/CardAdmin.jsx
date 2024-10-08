@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {
@@ -10,7 +11,15 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
   const nav = useNavigation();
 
 
+  const [role, setRole] = useState(null);
 
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);  
@@ -26,7 +35,7 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
     <TouchableOpacity  key={index}    style={styles.card}>
       <TouchableOpacity onPress={()=>{
       if(isXClicked){
-        nav.navigate('AdminProfile', { id: item.id });
+        nav.navigate('Profile', { id: item.id });
       } 
       else{
         nav.navigate('NouvelleDemande', { id: item.id });
@@ -36,6 +45,7 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{item.fullName}</Text>
           <Text style={styles.details}>{item.email}</Text>
+          <Text style={styles.details}>{item.type}</Text>
           <Text style={styles.details}>{formatDate(item.created_at)}</Text>
          </View>
         <TouchableOpacity onPress={()=>{

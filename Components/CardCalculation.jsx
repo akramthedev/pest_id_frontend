@@ -14,7 +14,15 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, c
   const navigation = useNavigation();
   const [data, setData] = useState(null);
   const [loading,setLoading] = useState(true);
+  const [role, setRole] = useState(null);
 
+  useEffect(()=>{
+    const x = async ()=>{
+      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+      setRole(rolex);
+     }
+    x();
+  },[ ]);
 
   const fetchData = async () => {
     if(id !== null && id !== undefined){
