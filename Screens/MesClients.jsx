@@ -169,7 +169,7 @@ export default function MesClients({route}) {
                                 <>
                                   {
                                     data.canAccess === 1 && data.id !== ID && (
-                                      <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                      <CardAdmin key={data.id}  index={index} item={data} isXClicked={isXClicked} />
                                     )
                                   }
                                 </>
@@ -185,7 +185,7 @@ export default function MesClients({route}) {
                                 <>
                                   {
                                     data.canAccess === 0 && (
-                                      <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                      <CardAdmin key={data.id}  index={index} item={data} isXClicked={isXClicked} />
                                     )
                                   }
                                 </>

@@ -6,45 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoaderFarm from "../Components/SkeletonLoaderFarm"
 import CardFarm from '../Components/CardFarm';
-
-
-
-const { width: screenWidth } = Dimensions.get('window');
-
-
-const farmData = [
-  {
-    id: '1',
-    Nom : "Green House Kadour",
-    Région: 'Souss Massa',
-    Localisation: 'JVZSN+CNZ7',
-    Personels: '9',
-    DateCreattion: '27/07/2020',
-    image : "https://energy.wisc.edu/sites/default/files/styles/max_1300x1300/public/news/img/wisconsin-1845241_1920.jpg?itok=Yj1vcqYl"
-  },
-  {
-    id: '2',
-    Nom : "Green House Sbaai",
-    Région: 'Sakia Hamraa',
-    Localisation: "UOZ8C+F8NXS",
-    Personels: '17',
-    DateCreattion: '18/06/2018',
-    image : "https://cdn.nycitynewsservice.com/blogs.dir/423/files/2019/05/farm-1024x675.jpg"
-  },
-  {
-    id: '3',
-    Nom : "Glass Plants Bouchaib",
-    Région: "Souss Massa",
-    Localisation: 'CCJA9+XOC7',
-    Personels: '21',
-    DateCreattion: '20/12/2017',
-    image : "https://static.farmtario.com/wp-content/uploads/2019/02/25113359/farm-sunset-1015089708-benedek-iStock-GettyImages.jpg"
-  },
-];
- 
-
-
 import { useAuth } from '../Helpers/AuthContext';
+const { width: screenWidth } = Dimensions.get('window');
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback } from 'react';  
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 const SkeletonButtonLoader = () => {
@@ -82,26 +50,54 @@ const SkeletonButtonLoader = () => {
   );
 };
 
+ 
 
 export default function AllFarms() {
 
 
   const { settriggerIt, triggerIt } = useAuth();
-
+  
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [AllFarms,setAllFarms] = useState(null);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
 
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+  
+          const token = await getToken(); 
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
 
+          const response = await axios.get(`http://10.0.2.2:8000/api/farms/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            setAllFarms(response.data);
+          } else {
+            Alert.alert('Erreur lors de la récupération de données.');
+          }
+        } catch (error) {
+          console.error('Erreur :', error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+      
+      return () => setLoading(false);  
+  
+    }, [navigation])
+  );
 
  
   const toggleMenu = () => {
@@ -162,11 +158,18 @@ export default function AllFarms() {
           ) : (
             <>
             {
-              farmData && farmData.map((data, index)=>{
-                return(
-                  <CardFarm item={data}  key={index}/>
-                )
-              })
+              AllFarms && 
+              <>
+              {
+                AllFarms.length === 0 ? <Text>Pas de donnée</Text>
+                :
+                AllFarms.map((data, index)=>{
+                  return(
+                    <CardFarm item={data}  key={data.id} />
+                  )
+                })
+              }
+              </>
             }
             </>
           )

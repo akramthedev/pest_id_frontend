@@ -1,23 +1,29 @@
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {formatDate} from './fct';
+
 
 const CardFarm = ({ item }) => (
-  <View style={styles.card}>
-    <View style={styles.row}>
-      <Image source={{ uri: item.image }} style={styles.profileImage} />
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{item.Nom}</Text>
-        <Text style={styles.details}>Région : {item.Région}</Text>
-        <Text style={styles.details}>Localisation : {item.Localisation}</Text>
-        <Text style={styles.details}>Nombre de personels : {item.Personels}</Text>
-        <Text style={styles.details}>Date de création : {item.DateCreattion}</Text>
+  <>
+  {
+    item && 
+    <View style={styles.card}>
+      <View style={styles.row}>
+        <Image source={{ uri: item.image ? item.image : "https://i.pinimg.com/736x/3b/e3/97/3be397f7474db66d2b1f0f61fde856b7.jpg"}} style={styles.profileImage} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.details}>Localisation : {item.location}</Text>
+          <Text style={styles.details}>Size : {item.size}</Text>
+          <Text style={styles.details}>Date de création : {formatDate(item.created_at)}</Text>
+        </View>
+        <TouchableOpacity style={styles.iconContainer}>
+          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.iconContainer}>
-        <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-      </TouchableOpacity>
     </View>
-  </View>
+  }
+  </>
 );
 
 const styles = StyleSheet.create({

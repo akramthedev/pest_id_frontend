@@ -150,7 +150,7 @@ const History = ({route}) => {
                   return(
                     <Card
                       id={predic.id}
-                      key={key}
+                      key={predic.id} 
                       idPlaque={predic.plaque_id}
                       idFarm={predic.farm_id}
                       idSerre={predic.serre_id}

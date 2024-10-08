@@ -6,41 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import CardPersonal from '../Components/CardPersonel';
 import SkeletonLoader from "../Components/SkeletonLoader"
-
-
-
 const { width: screenWidth } = Dimensions.get('window');
-
-
-const personnelData = [
-  {
-    id: '1',
-    name: 'Jack Rosso',
-    email: 'jack.rosso@greenhouse.com',
-    phone: '+212 673 486 082',
-    farm: 'Ferme : Green House',
-    image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-  },
-  {
-    id: '2',
-    name: 'Mounir Fettah',
-    email: 'mounir.fettah@greenhouse.com',
-    phone: '+212 673 486 083',
-    farm: 'Ferme : Green House',
-    image: 'https://cdn.pixabay.com/photo/2022/03/11/06/14/indian-man-7061278_1280.jpg',
-  },
-  {
-    id: '3',
-    name: 'Said Abdou',
-    email: 'said.abdou@greenhouse.com',
-    phone: '+212 673 486 084',
-    farm: 'Ferme : Green House',
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Outdoors-man-portrait_%28cropped%29.jpg/800px-Outdoors-man-portrait_%28cropped%29.jpg",
-  },
-];
- 
-
 import { useAuth } from '../Helpers/AuthContext';
+import axios from "axios"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback } from 'react';  
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -86,19 +57,49 @@ export default function AllStaffs() {
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [AllStaffs,setAllStaffs] = useState(null);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
 
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
+  /*
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+  
+          const token = await getToken(); 
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
 
+          const response = await axios.get(`http://10.0.2.2:8000/api/farms/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            setAllStaffs(response.data);
+          } else {
+            Alert.alert('Erreur lors de la récupération de données.');
+          }
+        } catch (error) {
+          console.error('Erreur :', error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+      
+      return () => setLoading(false);  
+  
+    }, [navigation])
+  );
 
+  
+  */
  
   const toggleMenu = () => {
     if (isMenuVisible) {
