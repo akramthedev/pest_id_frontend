@@ -4,22 +4,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
-
+ 
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {
   
-  
+
   const nav = useNavigation();
   const [diffInDays, setDiffInDays] = useState(null);
+  
 
   useEffect(()=>{
-    const x = ()=>{
+    const x =   ()=>{
       if(item){
         const dateAjourfhui = new Date();
         const createdAtDate = new Date(item.created_at);
         const diffInTime = dateAjourfhui.getTime() - createdAtDate.getTime();
         const calculatedDiffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
         setDiffInDays(calculatedDiffInDays);
+ 
       }
     }
     x();
