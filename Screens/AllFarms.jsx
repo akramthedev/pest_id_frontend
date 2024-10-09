@@ -12,7 +12,8 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';  
 import { useFocusEffect } from '@react-navigation/native';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 const SkeletonButtonLoader = () => {
@@ -55,6 +56,9 @@ const SkeletonButtonLoader = () => {
 export default function AllFarms() {
 
 
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const { settriggerIt, triggerIt } = useAuth();
   
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -83,7 +87,7 @@ export default function AllFarms() {
           const userId = await AsyncStorage.getItem('userId');
           const userIdNum = parseInt(userId);
 
-          const response = await axios.get(`http://10.0.2.2:8000/api/farms/${userIdNum}`, {
+          const response = await axios.get(`${ENDPOINT_API}farms/${userIdNum}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

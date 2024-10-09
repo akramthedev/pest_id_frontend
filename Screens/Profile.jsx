@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { useCallback } from 'react';
+import { Picker } from '@react-native-picker/picker'; 
 import { useFocusEffect } from '@react-navigation/native';
 import { Image,TextInput, ScrollView,Alert, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -14,47 +15,62 @@ import axios from 'axios';
 import { formatLocation } from '../Helpers/locationTransf';
 import { formatDate } from '../Components/fct';
 import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
 
-
-const { width: screenWidth } = Dimensions.get('window');
 
 
 const Profile = () => {
+
+  const [showError, setShowError] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [TriggerTheFucker, setTriggerTheFucker] = useState(false);
+  const [loader1, setLoader1]=useState(false)
+  const [loader2, setLoader2]=useState(false)
   const [image, setImage] = useState(null);  
   const [URi, setURi] = useState(null);  
   const [imageName, setImageName] = useState('');
   const route = useRoute();
   const { id } = route.params; 
-  
-  // id === 666 : Mon Profile     
-  //otherwise : profil d une autre personne
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isModify, setisModify] = useState(false);
   const [isCurrent, setisCurrent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dataProfile, setdataProfile] = useState(null);
+  const [dataOfVisitor, setdataOfVisitor] = useState(null);
   const [dataProfileOfChangement, setdataProfileOfChangement] = useState(null);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
   const { settriggerIt, triggerIt } = useAuth();
   const [role, setRole] = useState(null);
+  const [canHeAccess, setCanHeAccess] = useState(null);
+  const [voirPersonelClicked, setvoirPersonelClicked] = useState(null);
+  const [changePasswordClicked, setchangePasswordClicked] = useState(null);
+  const [PayemenetClicked, setPayemenetClicked] = useState(null);
 
-  
+
   useFocusEffect(
     useCallback(() => {
 
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
-      setRole(rolex);
-      const userId = await AsyncStorage.getItem('userId');
-      const userIdNum = parseInt(userId);
-      if(id!== null && id !== undefined){
-        if(id === 666 || id === "666" || userIdNum === id){
-          setisCurrent(true);
+      if(rolex !== null && rolex !== undefined ){
+        setRole(rolex);
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        if(id!== null && id !== undefined){
+          if(id === 666 || id === "666" || userIdNum === id){
+            setisCurrent(true);
+          }
+          else{
+            setisCurrent(false);
+          }
         }
-        else{
-          setisCurrent(false);
-        }
+      }
+      else{
+        console.log('Rolex Undefined... WTF');
       }
      }
     x(); 
@@ -69,9 +85,7 @@ const Profile = () => {
     const fetchProfileData = async ()=>{
       setLoading(true);
       if(id!== null && id !== undefined){
-        console.log("----------------------------");
-        console.log("ID : "+id);
-        try{
+         try{
           const userId = await AsyncStorage.getItem('userId');
           const token = await getToken(); 
           const userIdNum = parseInt(userId);
@@ -86,16 +100,27 @@ const Profile = () => {
 
             if(response.status === 200){
               setdataProfile(response.data);
+              
               setdataProfileOfChangement(response.data);
+               
+
               if(response.data.image === null || response.data.image === ""){
                 setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
               }
               else{
-                setImage(response.data.image)
+                setImage(response.data.image);
               }
+               
             }
             else{
-              console.log("Not Fetched...")
+              setmessageError("Oops, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
             }
           }
           else{
@@ -109,7 +134,22 @@ const Profile = () => {
             });
 
             if(response.status === 200){
-              console.log("----------------------------");
+
+              const responseVisitor = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+
+              if(responseVisitor.status === 200){
+                setdataOfVisitor(responseVisitor.data);
+              }
+              if(response.data.canAccess ===  0 || response.data.canAccess === "0"){
+                setCanHeAccess(false);
+              }
+              else{
+                setCanHeAccess(true);
+              }
               setdataProfile(response.data);
               setdataProfileOfChangement(response.data);
               if(response.data.image === null || response.data.image === ""){
@@ -120,14 +160,38 @@ const Profile = () => {
               }
             }
             else{
-              console.log("Not Fetched...")
+              setmessageError("Oops, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
             }
           }
         } 
         catch(e){
           console.log(e.message);
           if(e.message === "Request failed with status code 404"){
-            Alert.alert("Utilisateur non trouvé");            
+            setmessageError("Oops, utilisateur introuvable!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);           
+          }
+          else{
+            setmessageError("Oops, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
         } finally{
           setLoading(false);
@@ -137,7 +201,7 @@ const Profile = () => {
     fetchProfileData();
     return () => setLoading(false);  
   
-  }, [id])
+  }, [id, TriggerTheFucker])
 );
 
 
@@ -203,19 +267,36 @@ const Profile = () => {
 
 
   const handleSaveData = async()=>{
-    if(dataProfileOfChangement.fullName.length <= 1 || dataProfileOfChangement.email.length < 6){
-      Alert.alert('Erreur : Donnée(s) Incorrecte(s)');
+
+    if( dataProfileOfChangement.fullName.length <= 1 || dataProfileOfChangement.email.length < 6){
+              setmessageError("Vos informations ne sont pas conformes aux exigences.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
     }
     else{
-      const userId = await AsyncStorage.getItem('userId');
+      setLoader1(true);
+          const userId = await AsyncStorage.getItem('userId');
           const token = await getToken(); 
-          const userIdNum = parseInt(userId);
+          let userIdNum;
+          if(id  === 666 || id === "666"){
+            userIdNum =  parseInt(userId);
+          }
+          else{
+            userIdNum = id;
+          }
+           
       try{
         let data = {
           fullName : dataProfileOfChangement.fullName, 
           email : dataProfileOfChangement.email, 
           mobile : dataProfileOfChangement.mobile, 
-          image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
+          image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png", 
+          type : dataProfileOfChangement.type
         }
         const resp = await axios.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
           headers: {
@@ -223,18 +304,252 @@ const Profile = () => {
           }
         });
         if(resp.status === 200){
-          setdataProfile({ ...dataProfile, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image })
-          setdataProfileOfChangement({ ...dataProfileOfChangement, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image })
+          setdataProfile({ ...dataProfile, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image, type : data.type })
+          setdataProfileOfChangement({ ...dataProfileOfChangement, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image, type : data.type })
           setisModify(false);
+          setmessageSuccess("Succès : Vos informations ont été mis à jour.");
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageSuccess("");
+          }, 4000);
         }
         else{
-          Alert.alert('Not Modified')
+          setmessageError("Oops, un incident est survenu pendant l'enregistrement.");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         }
       }
       catch(e){
-        Alert.alert('Error')
-
         console.log(e.message);
+        console.log(e);
+        setmessageError("Oops, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+      } finally{
+        setLoader1(false);
+      }
+    }
+  }
+
+
+  const restreindreCompte = async()=>{
+    if(id!== null && id !== undefined && dataProfile!== null){
+      try{
+        setLoader2(true);
+        const token = await getToken(); 
+
+          let access;
+
+          if(dataProfile.canAccess === 1){
+            access = "canAccess"; 
+          }
+          else{
+            access = "canNotAccess";
+          }
+
+          const resp = await axios.get(`${ENDPOINT_API}updateUserRestriction/${id}/${access}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(resp.status === 200){
+
+            if(dataProfile.canAccess === 1){
+              setdataProfile({ ...dataProfile, canAccess: 0 });
+            }
+            else{
+              setdataProfile({ ...dataProfile, canAccess: 1 })
+            }
+            setTriggerTheFucker(!TriggerTheFucker);
+           
+            setmessageSuccess("Succès : le status du client a été mis à jour.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 4000);
+
+          }
+          else{
+            setmessageError("Oops, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+          }
+
+      }
+      catch(e){
+        setmessageError("Oops, problème interne du serveur!");
+        setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+        console.log(e.message);
+      } finally{
+        setLoader2(false);
+      }
+    }
+  }
+
+  const [ancienMotDepasse, setancienMotDepasse] = useState("");
+  const [nouveauMotDePasse, setnouveauMotDePasse] = useState("");
+  const [confirmNvmotedepasse, setconfirmNvmotedepasse] = useState("");
+  const [loadingPassword, setloadingPassword] = useState(false);
+
+
+ 
+  const handleClick = (number)=>{
+    if(isModify){
+      if(dataProfile){
+        //annuler la modification du profil si elle est debuté 
+        if(dataProfile.image === null || dataProfile.image === ""){
+          setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
+        }
+        else{
+          setImage(dataProfile.image);
+        }
+        setURi(null);setImageName('');setdataProfileOfChangement(dataProfile);setisModify(!isModify);
+      }
+    }
+    if(number === 1){
+      //voir personnels
+      setvoirPersonelClicked(true);
+    }
+    else if (number === 2){
+      //change password
+      setchangePasswordClicked(true);
+    }
+    else if (number === 3){
+      //reglages payement
+      setPayemenetClicked(true);
+    }
+  }
+
+
+
+  const handleConfirmPassword = async()=>{
+    if(ancienMotDepasse.length<5 || nouveauMotDePasse.length <5 || confirmNvmotedepasse.length < 5){
+      setmessageError("Erreur : Votre mot de passe doit comporter au moins 5 caractères.");
+      setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+    }
+    else if((nouveauMotDePasse !== confirmNvmotedepasse) && (nouveauMotDePasse.length !== confirmNvmotedepasse.length)){
+      setmessageError("Erreur : le mot de passe et la confirmation ne sont pas identiques.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+    }
+    else{
+      try{
+        setloadingPassword(true);
+        const userId = await AsyncStorage.getItem('userId');
+        const token = await getToken(); 
+        const userIdNum = parseInt(userId);
+        let dataPss = {
+          ancien : ancienMotDepasse, 
+          nouveau : nouveauMotDePasse, 
+          confirmnouveau : confirmNvmotedepasse
+        }
+        let userIdX;
+        if(id === 666 || id === "666"){
+          userIdX = userIdNum;
+        }
+        else{
+          userIdX = id;
+        }
+        const resp = await axios.post(`${ENDPOINT_API}updatePassword/${userIdX}`,dataPss, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp.status === 200){
+          setancienMotDepasse('');
+          setnouveauMotDePasse("");
+          setconfirmNvmotedepasse('');
+          setchangePasswordClicked(false);
+          setmessageSuccess("Succès : Votre mot de passe a été mis à jour.");
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageSuccess("");
+          }, 4000);
+        }
+        else if (resp.status === 287){
+          setmessageError("Erreur : l'ancien mot de passe est invalide.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+        }
+        else if (resp.status === 301){
+          setmessageError("Erreur : un problème technique est survenu. Veuillez réessayer plus tard.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+        }
+        else if(resp.status === 399){
+          setmessageError("Erreur : Votre mot de passe doit comporter au moins 5 caractères.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+        }
+      }
+      catch(e){
+        console.log(e.message);
+        setmessageError("Erreur : une erreur interne du serveur s'est produite.");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+        setTimeout(() => {
+          setmessageError("");
+        }, 4000);
+      } finally{
+        setloadingPassword(false);
       }
     }
   }
@@ -243,14 +558,59 @@ const Profile = () => {
   return (
     <>
      
-     <View style={styles.container}>
+    {
+      changePasswordClicked  &&
+        <View  style={[styles.popUpSecond, { height: screenHeight - 100  }]} >
+
+              <Text style={styles.titlePP}>
+                <Ionicons name="arrow-forward" size={18} color="black" />&nbsp;
+                Modification du mot de passe
+              </Text>
+
+              <View style={styles.inputRowPP}>
+                <TextInput
+                  value={ancienMotDepasse}
+                  onChangeText={(text) => setancienMotDepasse(text)}
+                  style={styles.inputPP}
+                  placeholder="Ancien mot de passe"
+                  
+                />
+                <TextInput
+                  style={styles.inputPP}
+                  placeholder="Nouveau mot de passe"
+                  value={nouveauMotDePasse}
+                  onChangeText={(text) => setnouveauMotDePasse(text)}
+                />
+                <TextInput
+                  style={styles.inputPP}
+                  placeholder="Confirmer mot de passe"
+                  value={confirmNvmotedepasse}
+                  onChangeText={(text) => setconfirmNvmotedepasse(text)}
+                />
+              </View>
+
+              <View style={styles.buttonRowPP}>
+                <TouchableOpacity disabled={loadingPassword} onPress={()=>{setchangePasswordClicked(false);setnouveauMotDePasse('');setancienMotDepasse('');setconfirmNvmotedepasse('');}}  style={styles.buttonPPA}>
+                  <Text style={styles.buttonTextPPA}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity disabled={loadingPassword}  
+                  style={[
+                    styles.buttonPPC,
+                    { opacity: loadingPassword ? 0.3 : 1 }
+                  ]} 
+                  onPress={handleConfirmPassword} 
+                >
+                  <Text style={styles.buttonTextPPC}>Confirmer</Text>
+                </TouchableOpacity>
+              </View>
+             
+        </View>
+    }
 
 
-
-
-
-  
-  
+    <View style={styles.container}>
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
      <View>
       {loading === false && (
         <>
@@ -303,13 +663,23 @@ const Profile = () => {
               )}
             </Text>
 
+            
+            {
+              dataProfile && 
+              (
+                dataProfile.canAccess === 0 &&
+                <Text  style={styles.zisfudowcuosdw} >
+                Accès restreint
+                </Text>
+              )
+            }
+
 
             {isModify && (
               <TouchableOpacity 
                 style={styles.modifyButton} 
                 onPress={pickImage}  
               >
-                <Ionicons name="pencil" size={24} color="white" />
                 <Text style={styles.modifyButtonText}>Modifier l'image</Text>
               </TouchableOpacity>
             )}
@@ -365,6 +735,32 @@ const Profile = () => {
               <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : '--'}</Text>
             )}
           </View>
+
+          <>
+          {
+            ((!isCurrent && dataOfVisitor!== null) && isModify) &&
+            <>
+          {
+            dataProfileOfChangement &&  
+            <View style={styles.rowXXX}>
+            <Text style={styles.label}>Role : </Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={dataProfileOfChangement.type}
+                style={styles.picker}
+                onValueChange={(itemValue) => setdataProfileOfChangement({ ...dataProfileOfChangement, type: itemValue })}
+              >
+                <Picker.Item label="Administrateur" value="admin" />
+                <Picker.Item label="Staff" value="staff" />
+              </Picker>
+            </View>
+          </View>
+          }
+
+            </>
+          }
+          </>
+          
           <View style={styles.rowXXX}>
             <Text style={styles.label}>Date de création</Text>
             <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
@@ -372,21 +768,44 @@ const Profile = () => {
 
           {isCurrent !== null && (
             <>
+              <View style={styles.hr} />
               {(isCurrent === true || (role && role === "superadmin")) && (
                 <>
-                  <View style={styles.hr} />
-                  <View style={styles.modifierVotreX}>
+
+                  {dataProfile && (
+                    <>
+                      {dataProfile.type.toLowerCase() === "admin"
+                        ? 
+                        <TouchableOpacity onPress={()=>{handleClick(1)}} style={styles.modifierVotreX}>
+                          <Text style={styles.modifierVotreXText}>Voir {isCurrent ? "mes" : "ses"} personnels</Text>
+                          <Ionicons name="arrow-forward" size={24} color="gray" />
+                        </TouchableOpacity> 
+                        : dataProfile.type.toLowerCase() === "superadmin"
+                          ?
+                          <TouchableOpacity  onPress={()=>{handleClick(1)}} style={styles.modifierVotreX}>
+                            <Text style={styles.modifierVotreXText}>Voir {isCurrent ? "mes" : "ses"} personnels</Text>
+                            <Ionicons name="arrow-forward" size={24} color="gray" />
+                          </TouchableOpacity> 
+                          :
+                        null  
+                        }
+                    </>
+                  )}
+                   
+                  <TouchableOpacity  onPress={()=>{handleClick(2)}} style={styles.modifierVotreX}>
                     <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
                     <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
-                  <View style={styles.modifierVotreX}>
+                  </TouchableOpacity>
+                  <TouchableOpacity  onPress={()=>{handleClick(3)}} style={styles.modifierVotreX}>
                     <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
                     <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
+                  </TouchableOpacity >
                 </>
               )}
             </>
           )}
+
+          
         </>
       )}
     </View>
@@ -403,21 +822,58 @@ const Profile = () => {
                 <>
                   {!isModify ? (
                     <>
-                      <TouchableOpacity
-                        disabled={loading || !dataProfile}
-                        style={[
-                          styles.saveButton, 
-                          { opacity: loading ? 0.3 : 1 } 
-                        ]} 
-                        onPress={() => { setisModify(!isModify); }}
-                      >
-                        <Text style={styles.buttonTextWhite}>Modifier le profile</Text>
-                      </TouchableOpacity>
+
+                      {
+                        isCurrent ? 
+                        <>
+                          <TouchableOpacity
+                            disabled={loading || !dataProfile || loader1 }
+                            style={[
+                              styles.saveButton, 
+                              { opacity: loading || !dataProfile || loader1  ? 0.3 : 1 } 
+                            ]} 
+                            onPress={() => { setisModify(!isModify); }}
+                          >
+                            <Text style={styles.buttonTextWhite}>Modifier le profil</Text>
+                          </TouchableOpacity>
+                        </>
+                        :
+                        <>
+                          
+                          {
+                            canHeAccess!== null && 
+                            (
+                              <TouchableOpacity
+                                disabled={loading || !dataProfile || loader2}
+                                style={[
+                                  canHeAccess ? styles.canHeAccess : styles.canHeAccessNot,
+                                  { opacity: loading || !dataProfile || loader2 || loader1 ? 0.3 : 1 }
+                                ]}
+                                onPress={() => {restreindreCompte()}}
+                              >
+                                <Text style={styles.buttonTextWhite}>{canHeAccess ? "Restreindre l'accès" : "Accorder l'accès"}</Text>
+                              </TouchableOpacity>
+                            )
+                          }
+
+                          <TouchableOpacity
+                            disabled={loading || !dataProfile || loader1 || loader2}
+                            style={[
+                              styles.saveButton, 
+                              { opacity: loading || !dataProfile || loader1 || loader2 ? 0.3 : 1 } 
+                            ]} 
+                            onPress={() => { setisModify(!isModify); }}
+                          >
+                            <Text style={styles.buttonTextWhite}>Modifier le profil</Text>
+                          </TouchableOpacity>
+                        </>
+                      }
+                      
                     </>
                   ) : (
                     <>
                       <TouchableOpacity
-                        disabled={loading || !dataProfile}
+                       disabled={loading || !dataProfile || loader1}
                         style={styles.cancelButton}
                         onPress={() => { 
                           if(dataProfile.image === null || dataProfile.image === ""){
@@ -431,8 +887,12 @@ const Profile = () => {
                         <Text style={styles.buttonTextBlack}>Annuler</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        disabled={loading || !dataProfile}
-                        style={styles.saveButton}
+                        disabled={loading || !dataProfile || loader1}
+                        style={[
+                          styles.saveButton, 
+                          { opacity: loading|| !dataProfile || loader1 ? 0.3 : 1 } 
+                        ]}
+                        
                         onPress={handleSaveData}
                       >
                         <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
@@ -640,6 +1100,21 @@ const styles = StyleSheet.create({
     color : "#B8B8B8",
     fontWeight: '500',
   },
+  pickerWrapper: {  
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    marginBottom: 16,
+    height : 30,
+    width : 190,
+    justifyContent : "center"
+  },
+  picker: {
+    borderWidth: 1,
+     borderRadius: 10,
+    fontSize : 16,
+     height: 48, 
+  },
   input: {
     height: 50,
     borderColor: '#ccc',
@@ -662,14 +1137,23 @@ const styles = StyleSheet.create({
      paddingRight : 10
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 23, 
+    flexDirection: "row",
+    marginLeft: 23,
+    justifyContent : "space-between", 
     position: 'absolute',  
     bottom: 20,           
     left: 0,
     right: 0,
     marginRight: 23,
+   },
+   zisfudowcuosdw : {
+    backgroundColor : "#AF0000", 
+    padding : 3, 
+    paddingLeft : 10, 
+    paddingRight : 10,
+    marginTop : 6, 
+    borderRadius : 30,
+    color : "white",
    },
    newImageContainer: {
     marginTop: 10,
@@ -692,12 +1176,29 @@ const styles = StyleSheet.create({
     borderColor : "#C8C8C8"
   },
   saveButton: {
-    flex: 1,
     marginLeft: 8,
     paddingVertical: 12,
     backgroundColor: '#487C15',
     alignItems: 'center',
     borderRadius: 8,
+    flex : 1
+  },
+  
+  canHeAccess : {
+    marginLeft: 8,
+    paddingVertical: 12,
+    backgroundColor: '#AF0000',
+    alignItems: 'center',
+    borderRadius: 8,
+    flex : 1
+  },
+  canHeAccessNot : {
+    marginLeft: 8,
+    paddingVertical: 12,
+    backgroundColor: '#C66C02',
+    alignItems: 'center',
+    borderRadius: 8,
+    flex : 1
   },
   supprimerLepersonel : {
     flex: 1,
@@ -707,17 +1208,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
+
   modifyButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3E6715', // Button color
+    backgroundColor : 'white', // Button color
     padding: 10,
-    borderRadius: 5,
+    paddingLeft : 15,
+    paddingRight : 15,
+    borderRadius: 40,
     marginTop: 10,
+    borderWidth : 1, 
+    borderColor : "#487C15",
   },
   modifyButtonText: {
-    color: 'white', // Text color
-    marginLeft: 5, // Space between icon and text
+    color: '#487C15', // Text color
+    marginLeft: 5,
+    fontWeight : "500", 
   },
   buttonTextWhite: {
     color: '#fff',
@@ -727,8 +1234,97 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
   },
+  buttonTextBlack2 : {
+    color: '#457515',
+    fontSize: 16,
+    fontWeight : "500"
+  },
+  popUpSecond: {
+    position: 'absolute',
+    top: 71,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 300,
+    backgroundColor: 'white',  
+    alignItems: 'center',
+    width: '100%', 
+    padding : 23
+  },
 
-  //pop Up Menu 
+
+
+  titlePP: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 50,
+  },
+  inputRowPP: {
+    flexDirection: 'column',
+    width: '100%',
+    height : 333,
+    justifyContent : "flex-end",
+  },
+  inputPP: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    width: '100%',
+    borderRadius: 8,
+    fontSize : 15,
+    textAlign : "center",
+    marginTop : 14,
+    backgroundColor: '#fff',
+  },
+  buttonRowPP: {
+    flexDirection: "row",
+    marginLeft: 23,
+    justifyContent : "space-between", 
+    position: 'absolute',  
+    bottom: 20,           
+    left: 0,
+    right: 0,
+    marginRight: 23,
+  },
+  buttonPPC: {
+    backgroundColor: '#487C15',
+    paddingVertical: 12,
+    alignItems : "center",
+    justifyContent : "center",
+    borderRadius: 8,
+    width : "61%"
+  },
+  buttonPPA: {
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    alignItems : "center",
+    justifyContent : "center",
+    borderRadius: 8,
+    borderWidth : 1, 
+    borderColor : "#487C15",
+    width : "35%",
+  },
+  buttonTextPPA: {
+    color: '#487C15',
+    fontSize: 16,
+    fontWeight : "500",
+    textAlign: 'center',
+  },
+
+  buttonTextPPC: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
+
+
+
+  popupText: {
+    color: '#fff',
+    fontSize: 20,
+  },
   popup: {
     position: 'absolute',
     top: 0,
@@ -811,8 +1407,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',      
     justifyContent: 'space-between',
     alignItems: 'center', 
-    marginLeft : 50, 
-    marginRight : 50
+    marginLeft : 23, 
+    marginRight : 23
   },
   modifierVotreXText : {
     color: "#6D6D6D",

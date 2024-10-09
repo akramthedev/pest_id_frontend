@@ -3,23 +3,29 @@ import { Image, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ENDPOINT_API } from '../Screens/endpoint';
 
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {
   
   
   const nav = useNavigation();
-
-
-  const [role, setRole] = useState(null);
+  const [diffInDays, setDiffInDays] = useState(null);
 
   useEffect(()=>{
-    const x = async ()=>{
-      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
-      setRole(rolex);
-     }
+    const x = ()=>{
+      if(item){
+        const dateAjourfhui = new Date();
+        const createdAtDate = new Date(item.created_at);
+        const diffInTime = dateAjourfhui.getTime() - createdAtDate.getTime();
+        const calculatedDiffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+        setDiffInDays(calculatedDiffInDays);
+      }
+    }
     x();
-  },[ ]);
+  },[item]);
+
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);  
@@ -30,40 +36,93 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
   };
 
 
-  return(
-
-    <TouchableOpacity  key={index}    style={styles.card}>
-      <TouchableOpacity onPress={()=>{
-      if(isXClicked){
-        nav.navigate('Profile', { id: item.id });
-      } 
-      else{
-        nav.navigate('NouvelleDemande', { id: item.id });
-      }
-    }}  style={styles.row}>
-        <Image source={{ uri: item.image ? item.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.fullName}</Text>
-          <Text style={styles.details}>{item.email}</Text>
-          <Text style={styles.details}>{item.type}</Text>
-          <Text style={styles.details}>{formatDate(item.created_at)}</Text>
-         </View>
-        <TouchableOpacity onPress={()=>{
-          if(isXClicked){
-            nav.navigate('AdminProfile', { id: item.id });
-          }
-          else{
+  return (
+    <TouchableOpacity key={index} style={styles.card}>
+      <TouchableOpacity
+        onPress={() => {
+          if (isXClicked) {
+            nav.navigate('Profile', { id: item.id });
+          } else {
             nav.navigate('NouvelleDemande', { id: item.id });
           }
-        }} style={styles.iconContainer}>
-          <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
+        }}
+        style={styles.row}
+      >
+        <Image
+          source={{
+            uri: item.image
+              ? item.image
+              : 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+          }}
+          style={styles.profileImage}
+        />
+        <View style={styles.infoContainer}>
+          
+      
+          
+          <View style={styles.rowHHHH}>
+            <Text style={styles.nameX}>
+              {item.fullName + '  '}
+            </Text>
+            {
+            diffInDays !== null && 
+              <>
+              {diffInDays <= 5 && (
+                <Text style={styles.detailsKKKNew}>Nouveau</Text>
+              )}
+              </>
+            }
+          </View>
+        
+  
+          <View style={styles.rowHHHH}>
+            <Text
+              style={
+                item.type === 'admin'
+                  ? styles.detailsKKKK1
+                  : item.type === 'superadmin'
+                  ? styles.detailsKKKKSP
+                  : styles.detailsKKKKStaff
+              }
+            >
+              {item.type === 'admin'
+                ? 'Administrateur'
+                : item.type === 'staff'
+                ? 'Personnel'
+                : 'Super-Administrateur'}
+            </Text>
+  
+            {item.canAccess === 0 && (
+              <Text style={styles.detailsKKKK2}>Accès restreint</Text>
+            )}
+          </View>
+  
+          <Text style={styles.details}>{item.email}</Text>
+          <Text style={styles.details}>{formatDate(item.created_at)}</Text>
+           
+        </View>
+  
+        <TouchableOpacity
+          onPress={() => {
+            if (isXClicked) {
+              nav.navigate('Profile', { id: item.id });
+            } else {
+              nav.navigate('NouvelleDemande', { id: item.id });
+            }
+          }}
+          style={styles.iconContainer}
+        >
+          <Ionicons
+            name="settings-outline"
+            style={styles.icon}
+            size={24}
+            color="#5B5B5B"
+          />
         </TouchableOpacity>
       </TouchableOpacity>
     </TouchableOpacity>
-
-
-  )
-}
+  );
+}  
 
 const styles = StyleSheet.create({
   card: {
@@ -98,17 +157,75 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     marginRight: 16,
   },
+  rowHHHH : {
+    flexDirection: "row",
+    minHeight : 29,
+    alignItems : "center",
+    zIndex : 10
+  },
   infoContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
     marginBottom: 4,
   },
+  nameX : {
+    fontWeight: 'bold',
+    fontSize: 17,
+    marginRight: 0
+  } ,
   details: {
     color: 'gray',
     marginBottom: 2,
+  },
+  detailsKKKK1 : {
+    borderRadius : 50, 
+    padding : 2.2, 
+    paddingLeft : 8, 
+    paddingRight : 8,
+    backgroundColor : "#9001C2",
+    marginRight : 6,
+    color : "white"
+  },
+  detailsKKKKSP : {
+    borderRadius : 50, 
+    padding : 2.2, 
+    paddingLeft : 8, 
+    paddingRight : 8,
+    backgroundColor : "black",
+    marginRight : 6,
+    color : "white"
+  },
+  detailsKKKKStaff : {
+    borderRadius : 50, 
+    padding : 2.2, 
+    paddingLeft : 8, 
+    paddingRight : 8,
+    backgroundColor : "#DEA001",
+    marginRight : 6,
+    color : "white"
+  },
+  detailsKKKK2 : {
+    borderRadius : 50, 
+    padding : 2.2, 
+    paddingLeft : 8, 
+    paddingRight : 8,
+    backgroundColor : "#A30202",
+    color : "white"
+
+  },
+  detailsKKKNew : {
+    borderRadius : 50, 
+    padding :1, 
+    paddingLeft : 8, 
+    paddingRight : 8,
+    backgroundColor : "#F3F3F3",
+    marginRight : 6,
+    color : "black",
+    fontSize : 14,
+    borderRadius : 20,
+    borderWidth : 1, 
+    borderColor : "#E1E1E1"
   },
   iconContainer: {},
 });

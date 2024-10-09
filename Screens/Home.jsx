@@ -1,15 +1,18 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
-import React from 'react';
+import React, {useState,useEffect} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ImageBackground, Image } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import * as Font from 'expo-font';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
 
 
 const Home = ({ navigation, route }) => {
 
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const { settriggerIt, triggerIt } = useAuth();
 

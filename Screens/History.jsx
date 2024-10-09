@@ -9,13 +9,16 @@ import Card from '../Components/CardCalculation';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 import axios from "axios"
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 
 
 const History = ({route}) => {
  
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [role, setRole] = useState(null);
 
@@ -94,7 +97,7 @@ const History = ({route}) => {
   
           const token = await getToken(); 
           
-          const response = await axios.get(`http://10.0.2.2:8000/api/users/${userIdNum}/predictions`, {
+          const response = await axios.get(`${ENDPOINT_API}users/${userIdNum}/predictions`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

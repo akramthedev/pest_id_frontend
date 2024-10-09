@@ -7,6 +7,7 @@ import { formatDate } from './fct';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonLoader from "./SkeletonLoader"
+import { ENDPOINT_API } from '../Screens/endpoint';
 
 
 
@@ -33,7 +34,7 @@ export const CardPersonal = ({ item }) => {
       try {
         setLoading(true);
          const token = await getToken(); 
-        const response = await axios.get(`http://10.0.2.2:8000/api/user/${item.user_id}`, {
+        const response = await axios.get(`${ENDPOINT_API}user/${item.user_id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

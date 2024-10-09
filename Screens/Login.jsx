@@ -8,11 +8,16 @@ import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios"; 
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
+
+
 
 const Login = ({ route }) => {
   const { settriggerIt, triggerIt } = useAuth();
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
@@ -40,7 +45,7 @@ const Login = ({ route }) => {
           email: email,
           password: password,
         };
-        const response = await axios.post('http://10.0.2.2:8000/api/login', dataX);
+        const response = await axios.post(`${ENDPOINT_API}login`, dataX);
         
         if (response.status === 200) {
           const token = response.data.token;
@@ -52,7 +57,7 @@ const Login = ({ route }) => {
           settriggerIt((prev) => !prev);
           setTimeout(()=>{
             navigation.navigate('Dashboard');
-          }, 400);
+          }, 150);
           
         } else if (response.status === 202)  {
           Alert.alert("Invalid Credentials");

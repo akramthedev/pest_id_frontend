@@ -7,13 +7,17 @@ import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
-
 const { width: screenWidth } = Dimensions.get('window');
+
+
 
 export default function Dashboard({ route }) {
 
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [role, setRole] = useState(false);
 

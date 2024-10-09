@@ -12,7 +12,8 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';  
 import { useFocusEffect } from '@react-navigation/native';
- 
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 const SkeletonButtonLoader = ({route}) => {
@@ -54,6 +55,8 @@ const SkeletonButtonLoader = ({route}) => {
 export default function AllStaffs() {
 
 
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [role, setRole] = useState(null);
 
@@ -86,10 +89,10 @@ export default function AllStaffs() {
           const userId = await AsyncStorage.getItem('userId');
           const userIdNum = parseInt(userId);
          
-          const resp0 = await axios.get(`http://10.0.2.2:8000/api/getAdminIdFromUserId/${userIdNum}`);
+          const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userIdNum}`);
 
           if(resp0.status === 200){
-            const response = await axios.get(`http://10.0.2.2:8000/api/staffs/${resp0.data.id}`, {
+            const response = await axios.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

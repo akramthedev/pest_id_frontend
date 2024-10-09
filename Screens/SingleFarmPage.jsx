@@ -14,11 +14,14 @@ import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { formatDate } from '../Components/fct';
 import { formatLocation } from '../Helpers/locationTransf';
- 
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 
 const SingleFarmPage = () => {
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
 
   const [role, setRole] = useState(null);
@@ -89,7 +92,7 @@ const SingleFarmPage = () => {
           try {
             setLoading(true);  
             const token = await getToken(); 
-            const response = await axios.get(`http://10.0.2.2:8000/api/farms/getSingleFarm/${id}`, {
+            const response = await axios.get(`${ENDPOINT_API}farms/getSingleFarm/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -97,7 +100,7 @@ const SingleFarmPage = () => {
             
             if (response.status === 200) {
               setdataFarm(response.data[0]);
-              const response2 = await axios.get(`http://10.0.2.2:8000/api/serres-per-farm/${id}`, {
+              const response2 = await axios.get(`${ENDPOINT_API}serres-per-farm/${id}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`
                 }

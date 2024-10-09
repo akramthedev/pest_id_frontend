@@ -10,7 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';  
 import { useFocusEffect } from '@react-navigation/native';
 import SkeletonLoader from "../Components/SkeletonLoader"
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
  
  
@@ -21,6 +22,8 @@ import { useAuth } from '../Helpers/AuthContext';
 
 
 export default function MesClients({route}) {
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
     const [Number, setNumber] = useState(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -52,7 +55,7 @@ export default function MesClients({route}) {
     
             const token = await getToken(); 
             
-            const response = await axios.get(`http://10.0.2.2:8000/api/users`, {
+            const response = await axios.get(`${ENDPOINT_API}users`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -179,7 +182,7 @@ export default function MesClients({route}) {
                               return (
                                 <>
                                   {
-                                    data.canAccess === 1 && data.id !== ID && (
+                                    data.isEmailVerified === 1 && data.id !== ID && (
                                       <CardAdmin key={data.id}  index={index} item={data} isXClicked={isXClicked} />
                                     )
                                   }
@@ -195,7 +198,7 @@ export default function MesClients({route}) {
                               return (
                                 <>
                                   {
-                                    data.canAccess === 0 && (
+                                    (data.canAccess === 0 && data.isEmailVerified === 0) && (
                                       <CardAdmin key={data.id}  index={index} item={data} isXClicked={isXClicked} />
                                     )
                                   }

@@ -4,8 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
-
-
+import { ENDPOINT_API } from '../Screens/endpoint';
 
 
 const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, chrImpact }) => {
@@ -30,7 +29,7 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, c
         setLoading(true);
         const IdOfPredi = id;
         const token = await getToken(); 
-        const response = await axios.get(`http://10.0.2.2:8000/api/predictions/${IdOfPredi}/images`, {
+        const response = await axios.get(`${ENDPOINT_API}predictions/${IdOfPredi}/images`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

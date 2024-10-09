@@ -11,10 +11,14 @@ import CustomDatePicker from "../Components/CustomDatePicker";
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../Helpers/AuthContext';
 import axios from "axios";
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+
+
 
 const CreateCalculation = ({route}) => {
- 
-
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [role, setRole] = useState(null);
 
@@ -136,7 +140,7 @@ const takePhoto = async () => {
  
     try {
       const token = await getToken();   
-      const response = await axios.post('http://10.0.2.2:8000/api/create_prediction', formData, {
+      const response = await axios.post(`${ENDPOINT_API}create_prediction`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`

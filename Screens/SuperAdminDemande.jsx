@@ -10,15 +10,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import SkeletonLoader from "../Components/SkeletonLoader"
-
-  
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 
 
 
 export default function SuperAdminDemande({route}) {
-   
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -50,7 +52,7 @@ export default function SuperAdminDemande({route}) {
   
           const token = await getToken(); 
           
-          const response = await axios.get(`http://10.0.2.2:8000/api/users`, {
+          const response = await axios.get(`${ENDPOINT_API}users`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -195,7 +197,7 @@ export default function SuperAdminDemande({route}) {
                               return (
                                 <>
                                   {
-                                    data.canAccess === 0 &&
+                                    (data.canAccess === 0 && data.isEmailverified ) &&
                                     <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>

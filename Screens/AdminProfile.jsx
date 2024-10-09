@@ -11,8 +11,8 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 
 
@@ -39,7 +39,8 @@ const personnelData = [
 
 
 const AdminProfile = () => {
-
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { settriggerIt, triggerIt } = useAuth();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [userData,setUserData] = useState(null);
@@ -69,7 +70,7 @@ const AdminProfile = () => {
     
             const token = await getToken(); 
             
-            const response = await axios.get(`http://10.0.2.2:8000/api/user/${id}`, {
+            const response = await axios.get(`${ENDPOINT_API}user/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

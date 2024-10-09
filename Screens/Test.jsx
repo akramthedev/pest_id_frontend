@@ -3,7 +3,8 @@ import React, {useState} from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import axios from "axios";
 import { useAuth } from '../Helpers/AuthContextl';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 const Test = ({ navigation, route }) => {
@@ -11,7 +12,9 @@ const Test = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
     const { settriggerIt, triggerIt } = useAuth();
 
-
+    const [showError, setShowError] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+  
     const handlePress = async () => {
         try {
             setIsLoading(true);

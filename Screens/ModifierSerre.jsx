@@ -8,11 +8,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 
 const ModifierSerre = ({route}) => {
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const navigation = useNavigation();
   const [fermeAssocie, setFermeAssocie] = useState('');

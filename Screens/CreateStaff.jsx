@@ -9,14 +9,17 @@ import { MaterialIcons } from '@expo/vector-icons';
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 import axios from 'axios';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 const CreateStaff = ({route}) => {
  
 
   const [role, setRole] = useState(null);
 
-  
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
@@ -82,7 +85,7 @@ const CreateStaff = ({route}) => {
       const userId = await AsyncStorage.getItem('userId');
       const userIdNum = parseInt(userId);
 
-      const resp0 = await axios.get(`http://10.0.2.2:8000/api/getAdminIdFromUserId/${userIdNum}`);
+      const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userIdNum}`);
       if(resp0.status === 200){
         let idAdmin = resp0.data.id;
         let data = {
@@ -100,7 +103,7 @@ const CreateStaff = ({route}) => {
   
         const token = await getToken(); 
   
-        const resp = await axios.post('http://10.0.2.2:8000/api/staff', data, {
+        const resp = await axios.post(`${ENDPOINT_API}staff`, data, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

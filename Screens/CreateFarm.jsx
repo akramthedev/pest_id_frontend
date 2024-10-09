@@ -9,11 +9,14 @@ const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 
 const CreateFarm = ({route}) => {
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
 
   const [role, setRole] = useState(null);
@@ -111,7 +114,7 @@ const CreateFarm = ({route}) => {
         location : JSON.stringify(locationCoords), 
         size : Mesure
       }
-      const resp0 = await axios.post(`http://10.0.2.2:8000/api/farms`, dataX, {
+      const resp0 = await axios.post(`${ENDPOINT_API}farms`, dataX, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -8,8 +8,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 
 
@@ -90,6 +90,8 @@ import { useAuth } from '../Helpers/AuthContext';
 
 const Calculation = () => {
 
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [role, setRole] = useState(null);
 
@@ -173,7 +175,7 @@ const Calculation = () => {
 
         */
         const token = await getToken();         
-        const response = await axios.get(`http://10.0.2.2:8000/api/singlePrediction/${id}`, {
+        const response = await axios.get(`${ENDPOINT_API}singlePrediction/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -181,7 +183,7 @@ const Calculation = () => {
         
         if (response.status === 200) {
           setpredictionData(response.data[0]);
-          const response2 = await axios.get(`http://10.0.2.2:8000/api/predictions/${id}/images`, {
+          const response2 = await axios.get(`${ENDPOINT_API}predictions/${id}/images`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

@@ -7,7 +7,8 @@ import { useFonts } from 'expo-font';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../Helpers/AuthContext';
- 
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 const Register = ({route}) => {
@@ -20,6 +21,8 @@ const Register = ({route}) => {
   const [error, seterror] = useState('');
   const [showerror, setshowerror] = useState(false);
   const { settriggerIt, triggerIt } = useAuth();
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
 
 
@@ -55,7 +58,7 @@ const Register = ({route}) => {
         setshowerror(false);
         seterror('');
         
-        const response = await axios.post('http://10.0.2.2:8000/api/register', data);
+        const response = await axios.post(`${ENDPOINT_API}register`, data);
       
         if (response.status === 201) {
 

@@ -10,13 +10,15 @@ import { useRoute } from '@react-navigation/native';
 import { useAuth } from '../Helpers/AuthContext';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 
 
 const CreateSerre = () => {
  
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
 
   const [role, setRole] = useState(null);
@@ -102,7 +104,7 @@ const CreateSerre = () => {
           size : Mesure,
           type : typedeSerre
         }
-        const resp0 = await axios.post(`http://10.0.2.2:8000/api/serres`, dataX, {
+        const resp0 = await axios.post(`${ENDPOINT_API}serres`, dataX, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

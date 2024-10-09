@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import CardAdmin from '../Components/CardAdmin'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { ENDPOINT_API } from './endpoint';
+import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 
 const personnelData = [
   {
@@ -60,6 +61,11 @@ import { useAuth } from '../Helpers/AuthContext';
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function Dashboard({route}) {
+
+
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [isXClicked, setisXClicked] = useState(false);
     const slideAnim = useRef(new Animated.Value(screenWidth)).current;
