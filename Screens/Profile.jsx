@@ -1,3 +1,4 @@
+import * as ImagePicker from 'expo-image-picker';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { useCallback } from 'react';
@@ -12,24 +13,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { formatLocation } from '../Helpers/locationTransf';
 import { formatDate } from '../Components/fct';
+import { ENDPOINT_API } from './endpoint';
 
 
 const { width: screenWidth } = Dimensions.get('window');
 
 
 const Profile = () => {
-
+  const [image, setImage] = useState(null);  
+  const [URi, setURi] = useState(null);  
+  const [imageName, setImageName] = useState('');
   const route = useRoute();
   const { id } = route.params; 
   
   // id === 666 : Mon Profile     
   //otherwise : profil d une autre personne
-
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isModify, setisModify] = useState(false);
   const [isCurrent, setisCurrent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dataProfile, setdataProfile] = useState(null);
+  const [dataProfileOfChangement, setdataProfileOfChangement] = useState(null);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
   const { settriggerIt, triggerIt } = useAuth();
@@ -74,14 +78,21 @@ const Profile = () => {
 
           if(id === 666 || id === "666" || userIdNum === id){
             //fetch my infos
-            const response = await axios.get(`http://10.0.2.2:8000/api/user/${userIdNum}`, {
+            const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
             });
 
             if(response.status === 200){
-              setdataProfile(response.data)
+              setdataProfile(response.data);
+              setdataProfileOfChangement(response.data);
+              if(response.data.image === null || response.data.image === ""){
+                setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
+              }
+              else{
+                setImage(response.data.image)
+              }
             }
             else{
               console.log("Not Fetched...")
@@ -90,7 +101,8 @@ const Profile = () => {
           else{
             //fetch other infos
             setdataProfile(null);
-            const response = await axios.get(`http://10.0.2.2:8000/api/user/${id}`, {
+            setdataProfileOfChangement(null)
+            const response = await axios.get(`${ENDPOINT_API}user/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -98,7 +110,14 @@ const Profile = () => {
 
             if(response.status === 200){
               console.log("----------------------------");
-              setdataProfile(response.data)
+              setdataProfile(response.data);
+              setdataProfileOfChangement(response.data);
+              if(response.data.image === null || response.data.image === ""){
+                setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
+              }
+              else{
+                setImage(response.data.image)
+              }
             }
             else{
               console.log("Not Fetched...")
@@ -158,27 +177,108 @@ const Profile = () => {
     })
   ).current;
 
+  const getFileNameFromUri = (uri) => {
+    return uri.split('/').pop();  
+  };
+
+
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      setImage(imageUri);
+  
+      setURi(imageUri);
+      setImageName(getFileNameFromUri(imageUri)); 
+       
+    }
+  };
+
+
+
+  const handleSaveData = async()=>{
+    if(dataProfileOfChangement.fullName.length <= 1 || dataProfileOfChangement.email.length < 6){
+      Alert.alert('Erreur : Donnée(s) Incorrecte(s)');
+    }
+    else{
+      const userId = await AsyncStorage.getItem('userId');
+          const token = await getToken(); 
+          const userIdNum = parseInt(userId);
+      try{
+        let data = {
+          fullName : dataProfileOfChangement.fullName, 
+          email : dataProfileOfChangement.email, 
+          mobile : dataProfileOfChangement.mobile, 
+          image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
+        }
+        const resp = await axios.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp.status === 200){
+          setdataProfile({ ...dataProfile, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image })
+          setdataProfileOfChangement({ ...dataProfileOfChangement, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image })
+          setisModify(false);
+        }
+        else{
+          Alert.alert('Not Modified')
+        }
+      }
+      catch(e){
+        Alert.alert('Error')
+
+        console.log(e.message);
+      }
+    }
+  }
+
 
   return (
     <>
      
      <View style={styles.container}>
-        <View>
-          
-          {
-            loading === false &&
 
-            <>
-              <View style={styles.titleContainer}>
-                <Text style={styles.titleText}>
-                  {isCurrent !== null && <>{isCurrent ? "Mon " : ""}</>} Profil
-                </Text>
-                <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
-                  <Ionicons name="menu" size={24} color="#3E6715" />
-                </TouchableOpacity>
-              </View>
 
-              <View style={styles.profileContainer}>
+
+
+
+  
+  
+     <View>
+      {loading === false && (
+        <>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>
+              {isCurrent !== null && <>{isCurrent ? "Mon " : ""}</>} Profil
+            </Text>
+            <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+              <Ionicons name="menu" size={24} color="#3E6715" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.profileContainer}>
+            
+             
+
+            {
+              isModify ? 
+                <>
+                {
+                  image && 
+                  <Image
+                    style={styles.profileImage}
+                    source={{ uri: image }} 
+                  />
+                }
+                </>
+                :
                 <Image
                   style={styles.profileImage}
                   source={{
@@ -187,64 +287,114 @@ const Profile = () => {
                       : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
                   }}
                 />
-                <Text style={styles.roleText}>
-                  Role: {dataProfile && (
-                    <>
-                      {dataProfile.type.toLowerCase() === "admin"
-                        ? "Administrateur"
-                        : dataProfile.type.toLowerCase() === "superadmin"
-                          ? "Super-Administrateur"
-                          : "Staff"}
-                    </>
-                  )}
-                </Text>
-              </View>
+            }
+             
+
+
+            <Text style={styles.roleText}>
+              Role: {dataProfile && (
+                <>
+                  {dataProfile.type.toLowerCase() === "admin"
+                    ? "Administrateur"
+                    : dataProfile.type.toLowerCase() === "superadmin"
+                      ? "Super-Administrateur"
+                      : "Staff"}
+                </>
+              )}
+            </Text>
+
+
+            {isModify && (
+              <TouchableOpacity 
+                style={styles.modifyButton} 
+                onPress={pickImage}  
+              >
+                <Ionicons name="pencil" size={24} color="white" />
+                <Text style={styles.modifyButtonText}>Modifier l'image</Text>
+              </TouchableOpacity>
+            )}
+ 
+            
+          </View>
+        </>
+      )}
+
+      {loading ? (
+        <ProfileSkeleton />
+      ) : dataProfile && (
+        <>
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Nom et prénom :</Text>
+            {isModify ? (
+              <TextInput
+                placeholderTextColor="#ccc"
+                placeholder="Champs obligatoire"
+                style={styles.input2}
+                value={dataProfileOfChangement.fullName}
+                onChangeText={(text) => setdataProfileOfChangement({ ...dataProfileOfChangement, fullName: text })}
+              />
+            ) : (
+              <Text style={styles.value}>{dataProfile.fullName}</Text>
+            )}
+          </View>
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Adresse email :</Text>
+            {isModify ? (
+              <TextInput
+                style={styles.input2}
+                placeholderTextColor="#ccc"
+                placeholder="Champs obligatoire"
+                value={dataProfileOfChangement.email}
+                onChangeText={(text) => setdataProfileOfChangement({ ...dataProfileOfChangement, email: text })}
+              />
+            ) : (
+              <Text style={styles.value}>{dataProfile.email}</Text>
+            )}
+          </View>
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Téléphone :</Text>
+            {isModify ? (
+              <TextInput
+                style={styles.input2}
+                placeholderTextColor="#ccc"
+                placeholder="Champs non obligatoire"
+                value={dataProfileOfChangement.mobile}
+                onChangeText={(text) => setdataProfileOfChangement({ ...dataProfileOfChangement, mobile: text })}
+              />
+            ) : (
+              <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : '--'}</Text>
+            )}
+          </View>
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Date de création</Text>
+            <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
+          </View>
+
+          {isCurrent !== null && (
+            <>
+              {(isCurrent === true || (role && role === "superadmin")) && (
+                <>
+                  <View style={styles.hr} />
+                  <View style={styles.modifierVotreX}>
+                    <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
+                    <Ionicons name="arrow-forward" size={24} color="gray" />
+                  </View>
+                  <View style={styles.modifierVotreX}>
+                    <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
+                    <Ionicons name="arrow-forward" size={24} color="gray" />
+                  </View>
+                </>
+              )}
             </>
-          }
+          )}
+        </>
+      )}
+    </View>
 
-          {loading ? (
-            <ProfileSkeleton />   
-          ) : 
-            dataProfile && (  
-              <>
-                <View style={styles.rowXXX}>
-                  <Text style={styles.label}>Nom et prénom :</Text>
-                  <Text style={styles.value}>{dataProfile.fullName}</Text>
-                </View>
-                <View style={styles.rowXXX}>
-                  <Text style={styles.label}>Adresse email :</Text>
-                  <Text style={styles.value}>{dataProfile.email}</Text>
-                </View>
-                <View style={styles.rowXXX}>
-                  <Text style={styles.label}>Téléphone :</Text>
-                  <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : "--"}</Text>
-                </View>
-                <View style={styles.rowXXX}>
-                  <Text style={styles.label}>Date de création</Text>
-                  <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
-                </View>
 
-                {isCurrent !== null && (
-                  <>
-                    {(isCurrent === true || (role && role === "superadmin")) && (
-                      <>
-                        <View style={styles.hr} />
-                        <View style={styles.modifierVotreX}>
-                          <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
-                          <Ionicons name="arrow-forward" size={24} color="gray" />
-                        </View>
-                        <View style={styles.modifierVotreX}>
-                          <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
-                          <Ionicons name="arrow-forward" size={24} color="gray" />
-                        </View>
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            )
-          }
-        </View>
+
+
+
 
         <View style={styles.buttonContainer}>
           {role && isCurrent !== null && (
@@ -255,7 +405,10 @@ const Profile = () => {
                     <>
                       <TouchableOpacity
                         disabled={loading || !dataProfile}
-                        style={styles.saveButton}
+                        style={[
+                          styles.saveButton, 
+                          { opacity: loading ? 0.3 : 1 } 
+                        ]} 
                         onPress={() => { setisModify(!isModify); }}
                       >
                         <Text style={styles.buttonTextWhite}>Modifier le profile</Text>
@@ -266,13 +419,21 @@ const Profile = () => {
                       <TouchableOpacity
                         disabled={loading || !dataProfile}
                         style={styles.cancelButton}
-                        onPress={() => { setisModify(!isModify); }}
-                      >
+                        onPress={() => { 
+                          if(dataProfile.image === null || dataProfile.image === ""){
+                            setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
+                          }
+                          else{
+                            setImage(dataProfile.image);
+                          }
+                          setURi(null);setImageName('');setdataProfileOfChangement(dataProfile);setisModify(!isModify); }}
+                      >  
                         <Text style={styles.buttonTextBlack}>Annuler</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         disabled={loading || !dataProfile}
                         style={styles.saveButton}
+                        onPress={handleSaveData}
                       >
                         <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
                       </TouchableOpacity>
@@ -283,7 +444,10 @@ const Profile = () => {
                 <>
                   <TouchableOpacity
                     disabled={loading || !dataProfile}
-                    style={styles.supprimerLepersonel}
+                     style={[
+                      styles.supprimerLepersonel, 
+                      { opacity: loading ? 0.3 : 1 } 
+                    ]}
                   >
                     <Text style={styles.buttonTextWhite}>Supprimer le personnel</Text>
                   </TouchableOpacity>
@@ -293,6 +457,16 @@ const Profile = () => {
           )}
         </View>
       </View>
+
+
+
+
+
+
+
+
+
+
 
       
       {isMenuVisible && (
@@ -458,7 +632,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 110,
     height: 110,
-    borderRadius: 15,
+    borderRadius: 1000,
   },
   roleText: {
     marginTop: 10,
@@ -477,6 +651,15 @@ const styles = StyleSheet.create({
     marginLeft : 23, 
     marginRight : 23,
     fontSize : 16
+  },input2: {
+    height: 30,
+    borderColor: '#ccc',
+    borderWidth: 1,
+     borderRadius: 8,
+     fontSize : 16, 
+     width : 190,
+     paddingLeft : 10,
+     paddingRight : 10
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -488,6 +671,16 @@ const styles = StyleSheet.create({
     right: 0,
     marginRight: 23,
    },
+   newImageContainer: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  newImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10, // Optional: Add border radius for rounded corners
+  },
+
   cancelButton: {
     flex: 1,
     marginRight: 8,
@@ -513,6 +706,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#B40000',
     alignItems: 'center',
     borderRadius: 8,
+  },
+  modifyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3E6715', // Button color
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  modifyButtonText: {
+    color: 'white', // Text color
+    marginLeft: 5, // Space between icon and text
   },
   buttonTextWhite: {
     color: '#fff',
@@ -541,6 +746,16 @@ const styles = StyleSheet.create({
   popupContent: {
     padding: 20,
   },
+  imagePreview: {
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  imageName: {
+    marginTop: 8,
+    fontSize: 16,
+    color: 'gray',
+  },
+
   logo: {
     marginTop : 40,
     marginLeft : "auto",

@@ -161,7 +161,7 @@ const History = ({route}) => {
               :
               <>
               {
-                 allPredictions.map((predic, key)=>{
+                 allPredictions.map((predic)=>{
                   return(
                     <Card
                       id={predic.id}
