@@ -23,6 +23,8 @@ const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
 
 const Profile = () => {
 
+
+  const hasFetched = useRef(false);
   const [showError, setShowError] = useState(false);
   const [messageError,setmessageError] = useState("");
   const [messageSuccess,setmessageSuccess] = useState("");
@@ -47,9 +49,13 @@ const Profile = () => {
   const { settriggerIt, triggerIt } = useAuth();
   const [role, setRole] = useState(null);
   const [canHeAccess, setCanHeAccess] = useState(null);
-  const [voirPersonelClicked, setvoirPersonelClicked] = useState(null);
   const [changePasswordClicked, setchangePasswordClicked] = useState(null);
   const [PayemenetClicked, setPayemenetClicked] = useState(null);
+  const [ancienMotDepasse, setancienMotDepasse] = useState("");
+  const [nouveauMotDePasse, setnouveauMotDePasse] = useState("");
+  const [confirmNvmotedepasse, setconfirmNvmotedepasse] = useState("");
+  const [loadingPassword, setloadingPassword] = useState(false);
+  //const [voirPersonelClicked, setvoirPersonelClicked] = useState(null);
 
 
   useFocusEffect(
@@ -414,12 +420,7 @@ const Profile = () => {
     }
   }
 
-  const [ancienMotDepasse, setancienMotDepasse] = useState("");
-  const [nouveauMotDePasse, setnouveauMotDePasse] = useState("");
-  const [confirmNvmotedepasse, setconfirmNvmotedepasse] = useState("");
-  const [loadingPassword, setloadingPassword] = useState(false);
-
-
+  
  
   const handleClick = (number)=>{
     if(isModify){
@@ -434,11 +435,7 @@ const Profile = () => {
         setURi(null);setImageName('');setdataProfileOfChangement(dataProfile);setisModify(!isModify);
       }
     }
-    if(number === 1){
-      //voir personnels
-      setvoirPersonelClicked(true);
-    }
-    else if (number === 2){
+    if (number === 2){
       //change password
       setchangePasswordClicked(true);
     }
@@ -557,91 +554,82 @@ const Profile = () => {
     }
   }
 
-
+  /*
+  
   const [allPersonnels, setallPersonnels] = useState(null);
   const [loadingPersonnel, setloadingPersonnel] = useState(null);
 
-  const fetchPersonnels = async()=>{
-    if(dataProfile!== null){
-      if(dataProfile.type  === "admin" || dataProfile.type === 'superadmin'){
-        try{
+  
 
+
+  
+
+  const fetchPersonnels = async () => {
+    if (loadingPersonnel) return; // Prevent duplicate requests
+    if (dataProfile !== null) {
+      if (dataProfile.type === "admin" || dataProfile.type === 'superadmin') {
+        try {
           setloadingPersonnel(true);
-          const token = await getToken(); 
+          const token = await getToken();
           let adminId;
           let userId;
-  
-          if(id === 666 || id === "666"){
-            const u = await AsyncStorage.getItem('userId');          
+
+          if (id === 666 || id === "666") {
+            const u = await AsyncStorage.getItem('userId');
             userId = parseInt(u);
-          }
-          else{
+          } else {
             userId = id;
           }
-  
+
           const resp1 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
-          if(resp1.status === 200){
-              
-              adminId = resp1.data.id;
-              
-              const resp2 = await axios.get(`${ENDPOINT_API}staffs/${adminId}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-              if(resp2.status === 200){
-                setallPersonnels(resp2.data);
+          if (resp1.status === 200) {
+            adminId = resp1.data.id;
+
+            const resp2 = await axios.get(`${ENDPOINT_API}staffs/${adminId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
               }
-              else{
-                setmessageError("Erreur : un problème technique est survenu.");
-                setShowError(true);
-                setTimeout(() => {
-                  setShowError(false);
-                }, 3000);
-                setTimeout(() => {
-                  setmessageError("");
-                }, 4000);
-                
-              }
-  
+            });
+            if (resp2.status === 200) {
+              setallPersonnels(resp2.data);
+            }
           }
-          else{
-            setmessageError("Erreur : un problème technique est survenu.");
-            setShowError(true);
-            setTimeout(() => {
-              setShowError(false);
-            }, 3000);
-            setTimeout(() => {
-              setmessageError("");
-            }, 4000);
-          }
-          
-        }
-        catch(e){
-            setmessageError("Erreur : un problème technique est survenu. Veuillez réessayer plus tard.");
-            setShowError(true);
-            setTimeout(() => {
-              setShowError(false);
-            }, 3000);
-            setTimeout(() => {
-              setmessageError("");
-            }, 4000);
-            Alert.alert(e.message)
-        } finally{
+        } catch (e) {
+          console.log(e);
+          setmessageError("Erreur : un problème technique est survenu. Veuillez réessayer plus tard.");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
+          Alert.alert(e.message);
+        } finally {
           setloadingPersonnel(false);
         }
       }
     }
-  }
+  };
 
-  
+  useFocusEffect(
+    useCallback(() => {
+      if (dataProfile !== null && dataProfile.type !== "staff" && !hasFetched.current) {
+        fetchPersonnels();
+        hasFetched.current = true;  
+      }
+    }, [dataProfile, id])  
+  );
+
   useEffect(() => {
-    fetchPersonnels();
+    hasFetched.current = false;  
   }, [id]);
+  
+  */
 
 
 
@@ -651,7 +639,7 @@ const Profile = () => {
      
     {
       changePasswordClicked  &&
-        <View  style={[styles.popUpSecond, { height: screenHeight - 100  }]} >
+        <View  style={[styles.popUpSecond, { height: screenHeight - 110  }]} >
 
               <Text style={styles.titlePP}>
                 <Ionicons name="arrow-forward" size={18} color="black" />&nbsp;
@@ -699,10 +687,11 @@ const Profile = () => {
     }
 
 
-
+    {/*
+    
     {
       (voirPersonelClicked  && isCurrent!== null) &&
-        <View  style={[styles.popUpSecond, { height: screenHeight - 100  }]} >
+        <View  style={[styles.popUpSecond, { height: screenHeight - 110  }]} >
 
               <Text style={styles.titlePP}>
                 <Ionicons name="arrow-forward" size={18} color="black" />&nbsp;
@@ -711,7 +700,7 @@ const Profile = () => {
 
               <ScrollView style={[styles.scrollViewXX, { height: screenHeight - 500  }]}  >
               {
-                loadingPersonnel || (allPersonnels === null) ? 
+                loadingPersonnel ? 
                 <View style={{ height : 333, alignItems : "center", justifyContent : "center" }} >           
                   <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
                 </View> 
@@ -732,8 +721,7 @@ const Profile = () => {
                           item={personel} 
                           index={personel.id} 
                           isXClicked={true} 
-                          setvoirPersonelClicked={setvoirPersonelClicked} 
-                          voirPersonelClicked={voirPersonelClicked} 
+                           
                         />
                       )
                     })
@@ -757,6 +745,8 @@ const Profile = () => {
              
         </View>
     }
+    
+    */}
 
 
 
@@ -925,25 +915,7 @@ const Profile = () => {
               {(isCurrent === true || (role && role === "superadmin")) && (
                 <>
 
-                  {dataProfile && (
-                    <>
-                      {dataProfile.type.toLowerCase() === "admin"
-                        ? 
-                        <TouchableOpacity onPress={()=>{handleClick(1)}} style={styles.modifierVotreX}>
-                          <Text style={styles.modifierVotreXText}>Voir {isCurrent ? "mes" : "ses"} personnels</Text>
-                          <Ionicons name="arrow-forward" size={24} color="gray" />
-                        </TouchableOpacity> 
-                        : dataProfile.type.toLowerCase() === "superadmin"
-                          ?
-                          <TouchableOpacity  onPress={()=>{handleClick(1)}} style={styles.modifierVotreX}>
-                            <Text style={styles.modifierVotreXText}>Voir {isCurrent ? "mes" : "ses"} personnels</Text>
-                            <Ionicons name="arrow-forward" size={24} color="gray" />
-                          </TouchableOpacity> 
-                          :
-                        null  
-                        }
-                    </>
-                  )}
+                   
                    
                   <TouchableOpacity  onPress={()=>{handleClick(2)}} style={styles.modifierVotreX}>
                     <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
@@ -1457,7 +1429,8 @@ const styles = StyleSheet.create({
     borderWidth : 1, 
     borderColor : "#487C15",
     width : "35%",
-  },buttonPPQUITER : {
+  },
+  buttonPPQUITER : {
     backgroundColor: 'white',
     paddingVertical: 12,
     alignItems : "center",

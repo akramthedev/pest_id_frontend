@@ -197,7 +197,7 @@ export default function SuperAdminDemande({route}) {
                               return (
                                 <>
                                   {
-                                    (data.canAccess === 0 && data.isEmailverified ) &&
+                                    (data.canAccess === 0 && data.isEmailVerified === 0 ) &&
                                     <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>

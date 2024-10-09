@@ -10,7 +10,7 @@ import SkeletonLoader from './SkeletonLoader';
 
 
 
-export  const CardAdmin2 = ({ item,index, isXClicked, setvoirPersonelClicked, voirPersonelClicked }) => {
+export  const CardAdmin2 = ({ item,index, isXClicked }) => {
   
 
   const nav = useNavigation();
@@ -144,25 +144,6 @@ export  const CardAdmin2 = ({ item,index, isXClicked, setvoirPersonelClicked, vo
                     <Text style={styles.details}>{formatDate(data.created_at)}</Text>
                     
                 </View>
-
-                <TouchableOpacity
-                    onPress={() => {
-                    if (isXClicked) {
-                        setvoirPersonelClicked(!voirPersonelClicked);
-                        nav.navigate('Profile', { id: data.id });
-                    } else {
-                        nav.navigate('NouvelleDemande', { id: data.id });
-                    }
-                    }}
-                    style={styles.iconContainer}
-                >
-                    <Ionicons
-                    name="settings-outline"
-                    style={styles.icon}
-                    size={24}
-                    color="#5B5B5B"
-                    />
-                </TouchableOpacity>
                 </TouchableOpacity>
             </TouchableOpacity>
         :

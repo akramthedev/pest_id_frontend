@@ -103,24 +103,6 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
           <Text style={styles.details}>{formatDate(item.created_at)}</Text>
            
         </View>
-  
-        <TouchableOpacity
-          onPress={() => {
-            if (isXClicked) {
-              nav.navigate('Profile', { id: item.id });
-            } else {
-              nav.navigate('NouvelleDemande', { id: item.id });
-            }
-          }}
-          style={styles.iconContainer}
-        >
-          <Ionicons
-            name="settings-outline"
-            style={styles.icon}
-            size={24}
-            color="#5B5B5B"
-          />
-        </TouchableOpacity>
       </TouchableOpacity>
     </TouchableOpacity>
   );

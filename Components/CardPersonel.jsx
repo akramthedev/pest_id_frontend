@@ -76,9 +76,6 @@ export const CardPersonal = ({ item }) => {
             <Text style={styles.details}>Status: {item.position ? item.position : "--"}</Text>
             <Text style={styles.details}>Date de création: {formatDate(item.created_at)}</Text>
           </View>
-          <TouchableOpacity   style={styles.iconContainer}>
-            <Ionicons name="settings-outline" style={styles.icon} size={24} color="#5B5B5B" />
-          </TouchableOpacity>
         </View>
       </TouchableOpacity>
       :

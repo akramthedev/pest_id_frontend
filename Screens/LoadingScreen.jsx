@@ -8,7 +8,7 @@ const LoadingScreen = () => {
   return (
    <View style={styles.container}>
      <Image
-        source={LoaderSVG} // Use require for local images
+        source={LoaderSVG}  
         style={styles.image} 
       />
    </View>

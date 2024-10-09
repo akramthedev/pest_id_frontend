@@ -23,8 +23,9 @@ import Calculation from './Screens/Calculation';
 import SuperAdminDemande from './Screens/SuperAdminDemande';
 import { getToken } from './Helpers/tokenStorage';
 import { AuthProvider, useAuth } from './Helpers/AuthContext';
-
 const Stack = createNativeStackNavigator();
+
+
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);

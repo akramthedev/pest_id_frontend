@@ -12,6 +12,8 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import LoaderSVG from '../images/Loader.gif'
+
 
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -196,11 +198,13 @@ const NouvelleDemande = () => {
 
       {
         loading ? 
-        <>
-          <Text>
-            Loading ...
-          </Text>
-        </>
+        <View style={styles.containerXKPZRSF}>
+          
+          <Image
+            source={LoaderSVG}  
+            style={styles.imageJOZNJORSFD} 
+          />
+        </View>
         :
         <View style={styles.container}>
           <View>
@@ -216,16 +220,36 @@ const NouvelleDemande = () => {
                 style={styles.profileImage}
                 source={{ uri: data && data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }}
               />
-              <Text style={styles.roleText}>Administrateur</Text>
             </View>
 
-            <Text style={styles.input}>Nom et Prénom: {data && data.fullName}</Text>
-            <Text style={styles.input}>Addresse email: {data && data.email}</Text>
-            <Text style={styles.input}>Société: --</Text>
-            <Text style={styles.input}>Numéro de téléphone: --</Text>
-            <Text style={styles.input}>
-              Date de création du compte: {formatDate(data && data.created_at)}
-            </Text>
+
+            <View style={styles.rowJHR}>
+              <Text style={styles.labelJHR}>Nom et Prénom:</Text>
+              <Text style={styles.valueJHR}>{data && data.fullName}</Text>
+            </View>
+
+            <View style={styles.rowJHR}>
+              <Text style={styles.labelJHR}>Adresse email:</Text>
+              <Text style={styles.valueJHR}>{data && data.email}</Text>
+            </View>
+
+            <View style={styles.rowJHR}>
+              <Text style={styles.labelJHR}>Société:</Text>
+              <Text style={styles.valueJHR}>--</Text>
+            </View>
+
+            <View style={styles.rowJHR}>
+              <Text style={styles.labelJHR}>Numéro de téléphone:</Text>
+              <Text style={styles.valueJHR}>--</Text>
+            </View>
+
+            <View style={styles.rowJHR}>
+              <Text style={styles.labelJHR}>Date de la demande:</Text>
+              <Text style={styles.valueJHR}>{formatDate(data && data.created_at)}</Text>
+            </View>
+
+            
+            
           </View>
           <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={()=>{refuserDemande();}}  style={styles.cancelButton}>
@@ -375,6 +399,10 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 15,
   },
+  imageJOZNJORSFD: {
+    width: 39,
+    height: 39,  
+  },
   roleText: {
     marginTop: 1,
     fontSize: 14,
@@ -419,6 +447,12 @@ const styles = StyleSheet.create({
   buttonTextWhite: {
     color: '#fff',
     fontSize: 16,
+  },
+  containerXKPZRSF: {
+    flex: 1,
+    justifyContent: 'center',  
+    alignItems: 'center',      
+    backgroundColor: '#fff',   
   },
   buttonTextBlack: {
     color: 'black',
@@ -504,7 +538,24 @@ const styles = StyleSheet.create({
   modifierVotreXText : {
     color: "#6D6D6D",
     fontSize : 16
-  }
+  },
+  rowJHR: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 10,  
+    paddingLeft : 23, 
+    paddingRight : 23
+  },
+  labelJHR: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    flex: 1,  
+  },
+  valueJHR: {
+    fontSize: 16,
+    flex: 1, 
+    textAlign: 'right',  
+  },
 });
 
 export default NouvelleDemande;
