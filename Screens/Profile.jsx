@@ -6,8 +6,7 @@ import { Image,TextInput, ScrollView,Alert, StyleSheet, TouchableOpacity, Text, 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import SkeletonLoaderFarm from "../Components/SkeletonLoaderFarm"
-import CardFarm from '../Components/CardFarm';
+import ProfileSkeleton from '../Components/ProfileSkeleton';
 import { useAuth } from '../Helpers/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -162,120 +161,137 @@ const Profile = () => {
 
   return (
     <>
-      <View style={styles.container}>
+     
+     <View style={styles.container}>
+        <View>
+          
+          {
+            loading === false &&
 
+            <>
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>
+                  {isCurrent !== null && <>{isCurrent ? "Mon " : ""}</>} Profil
+                </Text>
+                <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+                  <Ionicons name="menu" size={24} color="#3E6715" />
+                </TouchableOpacity>
+              </View>
 
-          <View>
-            
-
-                <View style={styles.titleContainer}>
-                  <Text style={styles.titleText}>
-                    {
-                      isCurrent !== null &&
-                      <>
-                      {isCurrent ? "Mon " : ""}
-                      </>
-                    }  
-                    Profil
-                  </Text>
-                  <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
-                    <Ionicons name="menu" size={24} color="#3E6715" />
-                  </TouchableOpacity>
-                </View>
-                
               <View style={styles.profileContainer}>
                 <Image
                   style={styles.profileImage}
-                  source={{ uri: dataProfile &&  dataProfile.image ? dataProfile.image : "https://cdn-icons-png.flaticon.com/256/149/149071.png" }}  
+                  source={{
+                    uri: dataProfile && dataProfile.image
+                      ? dataProfile.image
+                      : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
+                  }}
                 />
-                <Text style={styles.roleText}>Role: {dataProfile && <>{dataProfile.type.toLowerCase() === "admin" ? "Administrateur" : dataProfile.type.toLowerCase() === "superadmin" ? "Super-Administrateur" : "Staff" }</>}</Text>
+                <Text style={styles.roleText}>
+                  Role: {dataProfile && (
+                    <>
+                      {dataProfile.type.toLowerCase() === "admin"
+                        ? "Administrateur"
+                        : dataProfile.type.toLowerCase() === "superadmin"
+                          ? "Super-Administrateur"
+                          : "Staff"}
+                    </>
+                  )}
+                </Text>
               </View>
-
-             {
-              dataProfile ? 
-              <>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Nom et prénom :</Text>
-                <Text style={styles.value}>{dataProfile.fullName}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Addresse email :</Text>
-                <Text style={styles.value}>{dataProfile.email}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Téléphone :</Text>
-                <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : "--"}</Text>
-              </View>
-              <View style={styles.rowXXX}>
-                <Text style={styles.label}>Date de création</Text>
-                <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
-              </View>
-              {
-                (isCurrent !== null) &&
-                <>
-                {
-                  (isCurrent === true || (role && role === "superadmin"))&& 
-                  <>
-                  <View style={styles.hr} />
-                  <View style={styles.modifierVotreX} >
-                      <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
-                      <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
-                  <View style={styles.modifierVotreX} >
-                      <Text style={styles.modifierVotreXText}>Réglages de payements</Text>
-                      <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </View>
-                  </>
-                }
-                </>
-              }
-              </>
-              :
-              <View style={{ height : 250, alignItems : "center", justifyContent : "center" }} >           
-                <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
-              </View>
-             }
-
-            
-              
-                
-          </View>
-          <View style={styles.buttonContainer}>
-          {
-            role && (isCurrent !== null) &&
-            <>
-            {
-              (role === "superadmin" || isCurrent=== true  ) ?
-              <>
-                {
-                  !isModify ? 
-
-                  <>
-                  <TouchableOpacity style={styles.saveButton}onPress={()=>{setisModify(!isModify)}}  >
-                    <Text style={styles.buttonTextWhite}>Modifier le profile</Text>
-                  </TouchableOpacity>
-                 
-                  </>:
-                  <>
-                  <TouchableOpacity style={styles.cancelButton} onPress={()=>{setisModify(!isModify)}}>
-                    <Text style={styles.buttonTextBlack}>Annuler</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.saveButton} >
-                    <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
-                  </TouchableOpacity>
-                  </>
-                }
-              </>
-              :
-              <>
-                <TouchableOpacity style={styles.supprimerLepersonel} >
-                  <Text style={styles.buttonTextWhite}>Supprimer le personel</Text>
-                </TouchableOpacity>
-              </>
-            }
             </>
           }
-          </View>
+
+          {loading ? (
+            <ProfileSkeleton />   
+          ) : 
+            dataProfile && (  
+              <>
+                <View style={styles.rowXXX}>
+                  <Text style={styles.label}>Nom et prénom :</Text>
+                  <Text style={styles.value}>{dataProfile.fullName}</Text>
+                </View>
+                <View style={styles.rowXXX}>
+                  <Text style={styles.label}>Adresse email :</Text>
+                  <Text style={styles.value}>{dataProfile.email}</Text>
+                </View>
+                <View style={styles.rowXXX}>
+                  <Text style={styles.label}>Téléphone :</Text>
+                  <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : "--"}</Text>
+                </View>
+                <View style={styles.rowXXX}>
+                  <Text style={styles.label}>Date de création</Text>
+                  <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
+                </View>
+
+                {isCurrent !== null && (
+                  <>
+                    {(isCurrent === true || (role && role === "superadmin")) && (
+                      <>
+                        <View style={styles.hr} />
+                        <View style={styles.modifierVotreX}>
+                          <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
+                          <Ionicons name="arrow-forward" size={24} color="gray" />
+                        </View>
+                        <View style={styles.modifierVotreX}>
+                          <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
+                          <Ionicons name="arrow-forward" size={24} color="gray" />
+                        </View>
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )
+          }
+        </View>
+
+        <View style={styles.buttonContainer}>
+          {role && isCurrent !== null && (
+            <>
+              {role === "superadmin" || isCurrent === true ? (
+                <>
+                  {!isModify ? (
+                    <>
+                      <TouchableOpacity
+                        disabled={loading || !dataProfile}
+                        style={styles.saveButton}
+                        onPress={() => { setisModify(!isModify); }}
+                      >
+                        <Text style={styles.buttonTextWhite}>Modifier le profile</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        disabled={loading || !dataProfile}
+                        style={styles.cancelButton}
+                        onPress={() => { setisModify(!isModify); }}
+                      >
+                        <Text style={styles.buttonTextBlack}>Annuler</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        disabled={loading || !dataProfile}
+                        style={styles.saveButton}
+                      >
+                        <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    disabled={loading || !dataProfile}
+                    style={styles.supprimerLepersonel}
+                  >
+                    <Text style={styles.buttonTextWhite}>Supprimer le personnel</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </>
+          )}
+        </View>
       </View>
 
       
