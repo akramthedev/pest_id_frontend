@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
+import LoaderSVG from '../images/Loader.gif'
 
 
 const Carousel = ({ images }) => {
@@ -237,6 +238,15 @@ const Calculation = () => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
+          {
+            loading && 
+            <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
             <Text style={styles.titleText}>{isModifyClicked ? "Modifier le Calcul" : "Détails du Calcul"}</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
@@ -458,6 +468,7 @@ const styles = StyleSheet.create({
     padding: 23,
   },
   titleContainer: {
+    marginTop : 18,
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -605,10 +616,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#656565',
     textAlign: 'center',
+  }, imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
+ 
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

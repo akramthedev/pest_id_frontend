@@ -18,6 +18,7 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import CardAdmin from '../Components/CardAdmin2';
 const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
+import LoaderSVG from '../images/Loader.gif'
 
 
 
@@ -758,6 +759,16 @@ const Profile = () => {
       {loading === false && (
         <>
           <View style={styles.titleContainer}>
+          {
+            loading && 
+            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
+
             <Text style={styles.titleText}>
               {isCurrent !== null && <>{isCurrent ? "Mon " : ""}</>} Profil
             </Text>
@@ -1168,6 +1179,8 @@ const styles = StyleSheet.create({
     paddingTop: 23,
   },
   titleContainer: {
+    marginTop : 18,
+
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -1240,6 +1253,10 @@ const styles = StyleSheet.create({
     fontSize : 16,
      height: 48, 
   },
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  },
+  
   input: {
     height: 50,
     borderColor: '#ccc',
@@ -1523,7 +1540,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

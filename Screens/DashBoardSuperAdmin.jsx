@@ -8,6 +8,9 @@ import CardAdmin from '../Components/CardAdmin'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import LoaderSVG from '../images/Loader.gif'
+
+
 
 const personnelData = [
   {
@@ -126,6 +129,15 @@ export default function Dashboard({route}) {
       <ScrollView>
 
         <View style={styles.titleContainer}>
+          {
+             
+            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
           <Text style={styles.titleText}>Tableau de Board</Text>
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
@@ -282,6 +294,8 @@ const styles = StyleSheet.create({
     paddingTop: 23,
   },
   titleContainer: {
+    marginTop : 18,
+
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -458,7 +472,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

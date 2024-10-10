@@ -14,6 +14,7 @@ import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import LoaderSVG from '../images/Loader.gif'
 
 
 const SkeletonButtonLoader = ({route}) => {
@@ -167,6 +168,15 @@ export default function AllStaffs() {
       
       <ScrollView>
         <View style={styles.titleContainer}>
+        {
+            loading && 
+            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
           <Text style={styles.titleText}>Mes Personels</Text>
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
@@ -328,6 +338,7 @@ const styles = StyleSheet.create({
     paddingTop: 23,
   },
   titleContainer: {
+    marginTop : 18,
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -348,6 +359,9 @@ const styles = StyleSheet.create({
   skeletonButtonContainer: {
     marginHorizontal: 23,
     marginVertical: 20,
+  },
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
   },
   skeletonButtonLoader: {
     width: '100%',
@@ -463,7 +477,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

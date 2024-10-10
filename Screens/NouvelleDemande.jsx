@@ -43,7 +43,7 @@ const NouvelleDemande = () => {
   const navigation = useNavigation();
   const { settriggerIt, triggerIt } = useAuth();
   const [loading,setLoading] = useState(true);
-  const [loading2,setLoading2] = useState(true);
+  const [loading2,setLoading2] = useState(false);
   const [data, setData] = useState(null);
 
 
@@ -209,6 +209,17 @@ const NouvelleDemande = () => {
         <View style={styles.container}>
           <View>
             <View style={styles.titleContainer}>
+
+            {
+            loading2 && 
+            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
+
               <Text style={styles.titleText}>Nouvelle Demande</Text>
               <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
                 <Ionicons name="menu" size={24} color="#3E6715" />
@@ -374,7 +385,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingTop: 23,
   },
-  titleContainer: {
+  titleContainer: {    marginTop : 18,
+
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -513,11 +525,14 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,
     borderRadius: 50,
+  },
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
   },
   closeButtonText: {
     fontSize: 16,

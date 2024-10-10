@@ -11,6 +11,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import LoaderSVG from '../images/Loader.gif'
 
 
 
@@ -149,6 +150,16 @@ const CreateFarm = ({route}) => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
+          {
+            loading && 
+            <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
+
             <Text style={styles.titleText}>Nouvelle Ferme</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
@@ -333,7 +344,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position : "relative",
     marginLeft : 23, 
-    marginRight : 23
+    marginRight : 23,
+    marginTop : 18,
   },
   menu :{
     position : "absolute",
@@ -560,7 +572,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,
@@ -570,7 +582,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
   },
-
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  },
 
 });
 export default CreateFarm;

@@ -16,7 +16,8 @@ import { formatDate } from '../Components/fct';
 import { formatLocation } from '../Helpers/locationTransf';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
-
+import LoaderSVG from '../images/Loader.gif'
+ 
 
 
 const SingleFarmPage = () => {
@@ -150,8 +151,12 @@ const SingleFarmPage = () => {
                 
               {
                 loading?
-                <View style={{ height : 600, alignItems : "center", justifyContent : "center" }} >           
-                  <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
+                <View style={styles.containerXKPZRSF}>
+                  
+                  <Image
+                    source={LoaderSVG}  
+                    style={styles.imageJOZNJORSFD} 
+                  />
                 </View>
                 :
                 <>
@@ -377,7 +382,8 @@ const styles = StyleSheet.create({
     paddingTop: 23,
   },
   titleContainer: {
-    marginBottom : 23,
+    marginBottom : 23,    marginTop : 18,
+
     alignItems: 'center',
     position : "relative"
   },
@@ -395,6 +401,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
+  containerXKPZRSF: {
+    justifyContent: 'center',  
+    alignItems: 'center',      
+    backgroundColor: '#fff', 
+    height : 444,  
+    width : "100%",
+  },
+
+  imageJOZNJORSFD: {
+    width: 30,
+    height: 30,  
+  },
+  buttonTextBlack: {
+    color: 'black',
+    fontSize: 16,
+  },
+  
   profileImage: {
     width: 110,
     height: 110,
@@ -490,7 +513,10 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
   },
-
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  },
+  
   //pop Up Menu 
   popup: {
     position: 'absolute',
@@ -545,7 +571,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

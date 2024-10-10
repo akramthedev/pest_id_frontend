@@ -13,6 +13,7 @@ import { useAuth } from '../Helpers/AuthContext';
 import axios from "axios";
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import LoaderSVG from '../images/Loader.gif'
 
 
 
@@ -174,6 +175,15 @@ const takePhoto = async () => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
+          {
+            loading && 
+            <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
             <Text style={styles.titleText}>Nouveau Calcul</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
@@ -373,6 +383,7 @@ const styles = StyleSheet.create({
     padding: 23,
   },
   titleContainer: {
+    marginTop : 18,
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
@@ -387,7 +398,9 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
   },
-   
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  }, 
   label: {
     fontSize: 16,
     marginBottom: 8,
@@ -525,7 +538,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,

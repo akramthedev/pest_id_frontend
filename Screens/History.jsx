@@ -13,6 +13,7 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
+import LoaderSVG from '../images/Loader.gif'
 
 
 const History = ({route}) => {
@@ -140,7 +141,17 @@ const History = ({route}) => {
 
       
       <ScrollView>
+          
         <View style={styles.titleContainer}>
+        {
+            loading && 
+            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+              <Image
+                source={LoaderSVG}  
+                style={styles.imageJOZNJORSFDOJFSWNVDO} 
+              />
+            </View>
+          }
           <Text style={styles.titleText}>Historique des calculs</Text>
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
@@ -403,6 +414,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginBottom : 23,
+    marginTop : 18,
     alignItems: 'center',
     position : "relative"
   },
@@ -500,7 +512,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
 
-
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  },
 
   //pop Up Menu 
   popup: {
@@ -556,7 +570,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 35,
     right: 17,
     backgroundColor: '#BAE790',
     padding: 10,
