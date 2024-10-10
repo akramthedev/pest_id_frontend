@@ -344,7 +344,6 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginTop : 18,
-
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"

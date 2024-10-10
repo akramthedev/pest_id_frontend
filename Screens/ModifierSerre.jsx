@@ -2,7 +2,7 @@ import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
@@ -14,10 +14,11 @@ import LoaderSVG from '../images/Loader.gif'
 
 
 
-const ModifierSerre = ({route}) => {
+const ModifierSerre = () => {
+
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [isModify, setisModify] = useState(false);
   const navigation = useNavigation();
   const [fermeAssocie, setFermeAssocie] = useState('');
   const [typedeSerre, settypedeSerre] = useState('');
@@ -27,13 +28,22 @@ const ModifierSerre = ({route}) => {
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const { settriggerIt, triggerIt } = useAuth();
 
+  const route = useRoute();
+  const { serreId, farmId } = route.params; 
+
 
   const [role, setRole] = useState(null);
   useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
       setRole(rolex);
-     }
+
+      console.log("-------------------");
+      console.log("farmId : "+farmId);
+      console.log("serreId : "+serreId);
+      console.log("-------------------");
+      
+    }
     x();
   },[ ]);
 
@@ -146,14 +156,23 @@ const ModifierSerre = ({route}) => {
           </View>
       </ScrollView>
 
-      <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
-          <Text style={styles.buttonTextB} >Annuler</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.buttonTextW}>Enregistrer la serre</Text>
-        </TouchableOpacity>
-      </View>
+      {
+        !isModify ? 
+        <View style={styles.buttonRow1}>
+            <TouchableOpacity  onPress={()=>{setisModify(!isModify)}}  style={styles.saveButton2}>
+              <Text style={styles.buttonTextW}>Modifier la serre</Text>
+            </TouchableOpacity>
+          </View>
+          :
+          <View style={styles.buttonRow1}>
+          <TouchableOpacity onPress={()=>{setisModify(!isModify)}} style={styles.cancelButton}>
+            <Text style={styles.buttonTextB} >Annuler</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.saveButton}>
+            <Text style={styles.buttonTextW}>Sauvegarder</Text>
+          </TouchableOpacity>
+        </View>        
+      }
 
 
     </View>
@@ -277,14 +296,13 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginTop : 18,
-
     marginBottom : 23,
     alignItems: 'center',
     position : "relative"
   },
   menu :{
     position : "absolute",
-    right : 0,
+    right : 23,
     zIndex: 10, 
   }, 
   titleText: {
@@ -296,6 +314,8 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 8,
+    marginLeft : 23, 
+    marginRight :23
   },
   input: {
     borderWidth: 1,
@@ -305,13 +325,17 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     marginBottom: 16,
-    height: 48
+    height: 48,
+    marginLeft : 23, 
+    marginRight :23
   },
   pickerWrapper: {  
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
     marginBottom: 16,
+    marginLeft : 23, 
+    marginRight :23,
     justifyContent : "center"
   },
   picker: {
@@ -329,6 +353,9 @@ const styles = StyleSheet.create({
   buttonRow1: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginVertical: 20,
+    marginLeft: 23,
+    marginRight: 23,
   },
   buttonOutline: {
     borderWidth: 1,
@@ -346,7 +373,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '32%',
+    width: '48%',
     alignItems: 'center',
   },
   saveButton: {
@@ -354,7 +381,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '64%',
+    width: '48%',
+    alignItems: 'center',
+  },
+  saveButton2: {
+    backgroundColor: '#487C15',
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    width: '100%',
     alignItems: 'center',
   },
   buttonTextW: {

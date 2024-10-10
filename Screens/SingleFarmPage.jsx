@@ -17,6 +17,7 @@ import { formatLocation } from '../Helpers/locationTransf';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import ProfileSkeleton from '../Components/ProfileSkeleton';
  
 
 
@@ -151,13 +152,7 @@ const SingleFarmPage = () => {
                 
               {
                 loading?
-                <View style={styles.containerXKPZRSF}>
-                  
-                  <Image
-                    source={LoaderSVG}  
-                    style={styles.imageJOZNJORSFD} 
-                  />
-                </View>
+                <ProfileSkeleton />
                 :
                 <>
                   {
@@ -197,7 +192,19 @@ const SingleFarmPage = () => {
 
                         <View style={styles.hr} />
 
-                        <Text style={{marginLeft: 23, marginBottom : 20, fontSize : 17, fontWeight : "800"}}>Serres associées</Text>
+                        <View
+                          style={{
+                            flexDirection : "row", 
+                            justifyContent : "space-between",
+                            alignItems : "center",
+                            marginBottom : 20
+                          }}
+                        >
+                            <Text style={{marginLeft: 23,  fontSize : 17, fontWeight : "800"}}>Serres associées</Text>
+                            <TouchableOpacity onPress={()=>{ navigation.navigate('AjouterUneSerre', { id: id });}}  style={styles.saveButtonUZUQSOEFD}>
+                              <Text style={styles.text487C15}>+ Ajouter une Serre</Text>
+                            </TouchableOpacity>
+                        </View>
                         {
                           dataSerre && 
                           <>
@@ -223,6 +230,11 @@ const SingleFarmPage = () => {
                                       marginRight : 23, 
                                       marginLeft : 23
                                     }}
+                                    onPress={
+                                      ()=>{
+                                        navigation.navigate('ModifierSerre', { serreId: serre.id, farmId : serre.farm_id });
+                                      }
+                                    }
                                   >
                                     <Text>{serre.name}</Text>   
                                     
@@ -233,9 +245,6 @@ const SingleFarmPage = () => {
                               )
                             })
                           }
-                            <TouchableOpacity onPress={()=>{ navigation.navigate('AjouterUneSerre', { id: id });}}  style={styles.saveButtonUZUQSOEFD}>
-                              <Text style={styles.text487C15}>+ Ajouter une Serre</Text>
-                            </TouchableOpacity>
                           </>
                         }
 
@@ -247,21 +256,26 @@ const SingleFarmPage = () => {
 
 
           {
-            !isModifyClicked ? 
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={()=>{setIsModifyClick(!isModifyClicked)}}  style={styles.saveButton}>
-                <Text style={styles.buttonTextWhite}>Modifier la ferme</Text>
-              </TouchableOpacity>
-            </View>
-            :
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.cancelButton}  onPress={()=>{setIsModifyClick(!isModifyClicked)}} >
-                <Text style={styles.buttonTextBlack}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveButton}  onPress={()=>{}} >
-                <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
-              </TouchableOpacity>
-            </View> 
+            loading === false && 
+            <>
+            {
+              !isModifyClicked ? 
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity onPress={()=>{setIsModifyClick(!isModifyClicked)}}  style={styles.saveButton}>
+                  <Text style={styles.buttonTextWhite}>Modifier la ferme</Text>
+                </TouchableOpacity>
+              </View>
+              :
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.cancelButton}  onPress={()=>{setIsModifyClick(!isModifyClicked)}} >
+                  <Text style={styles.buttonTextBlack}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveButton}  onPress={()=>{}} >
+                  <Text style={styles.buttonTextWhite}>Sauvegarder</Text>
+                </TouchableOpacity>
+              </View> 
+            }
+            </>
           }
 
 
@@ -490,10 +504,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   saveButtonUZUQSOEFD : {
-    flex: 1,
-    width : 200,
-    margin : "auto",
-    paddingVertical:9,
+    width : 180,
+    height : 40,
+    alignItems : "center",
+    justifyContent : "center",
+    marginRight : 23, 
     backgroundColor: '#DAFFB7',
     alignItems: 'center',
     borderRadius: 8,
