@@ -165,8 +165,9 @@ const CreateSerre = () => {
           <TextInput
             style={styles.input}
             placeholder="Veuillez saisir la mesure en m²..."
-            value={Mesure}
-            onChangeText={setMesure}
+            value={Mesure.toString()} 
+            onChangeText={(num) => setMesure(parseFloat(num) || 0)}  
+            keyboardType="numeric" 
           />
  
 
@@ -181,7 +182,6 @@ const CreateSerre = () => {
               <Picker.Item label="Fruit" value="Fruit" />
               <Picker.Item label="Légume" value="Légume" />
               <Picker.Item label="Fleur" value="Fleur" />
-              <Picker.Item label="Autre" value="Autre" />
             </Picker>
           </View>
             

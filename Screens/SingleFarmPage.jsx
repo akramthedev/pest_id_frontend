@@ -232,7 +232,7 @@ const SingleFarmPage = () => {
                                     }}
                                     onPress={
                                       ()=>{
-                                        navigation.navigate('ModifierSerre', { serreId: serre.id, farmId : serre.farm_id });
+                                        navigation.navigate('ModifierSerre', { serreId: serre.id,type: serre.type, farmId : serre.farm_id, size: serre.size, name : serre.name});
                                       }
                                     }
                                   >

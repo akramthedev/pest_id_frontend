@@ -1,6 +1,6 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
+import {Image ,ScrollView,Alert, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
@@ -11,41 +11,62 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
-
+import axios from 'axios';
 
 
 const ModifierSerre = () => {
 
+  const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isModify, setisModify] = useState(false);
   const navigation = useNavigation();
-  const [fermeAssocie, setFermeAssocie] = useState('');
-  const [typedeSerre, settypedeSerre] = useState('');
-  const [Mesure, setMesure] = useState('');
-  const [Appelation, setAppelation] = useState('');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const { settriggerIt, triggerIt } = useAuth();
-
+  const [loading, setLoading] = useState(true);
   const route = useRoute();
-  const { serreId, farmId } = route.params; 
-
-
   const [role, setRole] = useState(null);
+  const [TriggerIt, setTriggerIt] = useState(null);
+  const [nameS, setNameS] = useState(null);
+  const [sizeS, setSizeS] = useState(null);
+  const [typeS, setTypeS] = useState(null);
+  const [IdSerre, setIdSerre] = useState(null);
+  const [IdFarm, setIdFarm] = useState(null);
+  const [loaderDelete, setloaderDelete] = useState(false);
+  const [loaderUpdate, setloaderUpdate] = useState(false);
+
+
+  const { serreId, farmId,name, size, type } = route.params; 
+
+
+
   useEffect(()=>{
     const x = async ()=>{
-      const rolex = JSON.parse(await AsyncStorage.getItem('type'));
-      setRole(rolex);
-
-      console.log("-------------------");
-      console.log("farmId : "+farmId);
-      console.log("serreId : "+serreId);
-      console.log("-------------------");
-      
+      if(name && size && type && farmId && serreId){
+        const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+        setRole(rolex);
+        setIdFarm(farmId);setIdSerre(serreId);setTypeS(type);setSizeS(parseFloat(size));setNameS(name)
+        setLoading(false);
+      }
     }
     x();
   },[ ]);
+
+
+
+
+
+  useEffect(()=>{
+    
+    const fetchDataSerre = async()=>{
+      if(serreId){
+        
+      }
+    }
+    fetchDataSerre();
+
+  }, [TriggerIt]);
 
 
 
@@ -87,6 +108,73 @@ const ModifierSerre = () => {
   ).current;
 
 
+  
+
+
+
+  const handleLickDelete = async ()=>{
+    if(IdSerre !== null && IdSerre !== undefined){
+      try{
+        setloaderDelete(true);
+        const token = await getToken();
+        const resp = await axios.delete(`${ENDPOINT_API}serres/${IdSerre}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp.status === 200){
+          setIsSupprimerClicked(false);
+          navigation.navigate('SingleFarmPage', { id: IdFarm });
+        }
+        else{
+          Alert.alert('Oops, something went wrong!');
+        }
+      }
+      catch(e){
+        Alert.alert('Oops, something went wrong!');
+        console.log(e.message);
+      } finally{
+        setloaderDelete(false);
+      }
+    }
+  }
+
+
+
+  const handleUpdate = async ()=>{
+    if(IdSerre !== null && IdSerre !== undefined){
+      try{
+        setloaderUpdate(true);
+        const token = await getToken();
+
+        let datak = {
+          name : nameS, 
+          size : sizeS, 
+          type : typeS
+        }
+
+        const resp = await axios.patch(`${ENDPOINT_API}serres/${IdSerre}`, datak , {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp.status === 200){
+          setisModify(!isModify);          
+          Alert.alert("Update avec success");
+        }
+        else{
+          Alert.alert('Oops, something went wrong!');
+        }
+      }
+      catch(e){
+        Alert.alert('Oops, something went wrong!');
+        console.log(e.message);
+      } finally{
+        setloaderUpdate(false);
+      }
+    }
+  }
+
 
 
   return (
@@ -104,7 +192,7 @@ const ModifierSerre = () => {
               />
             </View>
           }
-            <Text style={styles.titleText}>Modifier Serre</Text>
+            <Text style={styles.titleText}>Ma Serre</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />
             </TouchableOpacity>
@@ -112,66 +200,150 @@ const ModifierSerre = () => {
        
           <Text style={styles.label}>Appelation</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { color: isModify ? 'black' : 'gray' } 
+            ]}
             placeholder="Veuillez saisir le nom de la serre..."
-            value={Appelation}
-            onChangeText={setAppelation}
-          />
-
+            value={loading ? "" : nameS}
+            editable={isModify} 
+            onChangeText={(text) => setNameS(text)}
+            />
 
           <Text style={styles.label}>Mesure (en Mètre)</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { color: isModify ? 'black' : 'gray' } 
+            ]}
             placeholder="Veuillez saisir la mesure..."
-            value={Mesure}
-            onChangeText={setMesure}
+            value={loading ? "" : sizeS.toString()} 
+            onChangeText={(num) => setSizeS(parseFloat(num) || 0)}  
+            keyboardType="numeric"
+            editable={isModify} 
           />
- 
 
          <Text style={styles.label}>Type de serre</Text>
           <View style={styles.pickerWrapper}>
             <Picker
-              selectedValue={typedeSerre}
-              style={styles.picker} 
-              onValueChange={(itemValue) => settypedeSerre(itemValue)}
+              selectedValue={typeS}
+              enabled={isModify} 
+              style={[
+                styles.picker,
+                { color: isModify ? 'black' : 'gray' } 
+              ]}
+              onValueChange={(itemValue) => setTypeS(itemValue)}
             >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
+              <Picker.Item label="Fruit" value="fruit" />
+              <Picker.Item label="Légume" value="vegetable" />
+              <Picker.Item label="Fleur" value="flower" />
             </Picker>
           </View>
 
-
-         <Text style={styles.label}>Ferme associée</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={fermeAssocie}
-              style={styles.picker} 
-              onValueChange={(itemValue) => setFermeAssocie(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value="option1" />
-              <Picker.Item label="Option 2" value="option2" />
-            </Picker>
-          </View>
       </ScrollView>
+ 
+      {
+        isSupprimerClicked && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '80%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: 'bold', 
+              marginBottom: 20 
+            }}>
+
+              Si vous supprimez cette serre, toutes les prédictions associées seront également supprimées.
+
+            </Text>
+            <View style={{ 
+              flexDirection: 'row', 
+              justifyContent: 'space-between' 
+            }}>
+
+              <TouchableOpacity style={{
+                backgroundColor: '#eee', 
+                paddingVertical: 13,
+                width : "30%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center"
+                }}
+                onPress={()=>{setIsSupprimerClicked(false)}}
+                disabled={loaderDelete}
+                >
+                <Text style={{ color: 'black', fontWeight: 'bold' }}>
+                Annuler
+                </Text>
+              </TouchableOpacity>
+
+
+              <TouchableOpacity style={{
+                backgroundColor: 'black', 
+                paddingVertical: 13,
+                width : "67%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={loaderDelete}
+                onPress={()=>{
+                  handleLickDelete();
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {
+                  loaderDelete ? 
+                  "suppression en cours..."
+                  :
+                  "Supprimer définitivement"
+                }
+                </Text>
+              </TouchableOpacity>
+              
+            </View>
+          </View>
+        </View>
+      }
 
       {
         !isModify ? 
-        <View style={styles.buttonRow1}>
-            <TouchableOpacity  onPress={()=>{setisModify(!isModify)}}  style={styles.saveButton2}>
-              <Text style={styles.buttonTextW}>Modifier la serre</Text>
+          <View style={styles.buttonRow1}>
+            <TouchableOpacity disabled={loaderDelete}  onPress={()=>{setIsSupprimerClicked(true);}}   style={styles.cancelButton2}>
+              <Text style={styles.buttonTextW} >Supprimer</Text>
             </TouchableOpacity>
-          </View>
+            <TouchableOpacity disabled={loaderDelete} onPress={()=>{setisModify(!isModify)}}  style={styles.saveButton22}>
+              <Text style={styles.buttonTextW}>Modifier</Text>
+            </TouchableOpacity>
+          </View>    
           :
           <View style={styles.buttonRow1}>
-          <TouchableOpacity onPress={()=>{setisModify(!isModify)}} style={styles.cancelButton}>
-            <Text style={styles.buttonTextB} >Annuler</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton}>
-            <Text style={styles.buttonTextW}>Sauvegarder</Text>
-          </TouchableOpacity>
-        </View>        
+            <TouchableOpacity onPress={()=>{setisModify(!isModify);setNameS(name);setSizeS(size);setTypeS(type);}} disabled={loaderDelete} style={styles.cancelButton}>
+              <Text style={styles.buttonTextB} >Annuler</Text>
+            </TouchableOpacity>
+            <TouchableOpacity disabled={loaderDelete} onPress={handleUpdate}  style={styles.saveButton}>
+              <Text style={styles.buttonTextW}>{loaderUpdate ? "Sauvegarde en cours..." : "Sauvegarder"}</Text>
+            </TouchableOpacity>
+          </View>        
       }
 
 
@@ -357,6 +529,13 @@ const styles = StyleSheet.create({
     marginLeft: 23,
     marginRight: 23,
   },
+  buttonRow2: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 0,
+    marginLeft: 23,
+    marginRight: 23,
+  },
   buttonOutline: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -373,6 +552,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
+    width: '34%',
+    alignItems: 'center',
+  },
+  cancelButton2: {
+    backgroundColor: '#A30202',
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
     width: '48%',
     alignItems: 'center',
   },
@@ -381,17 +568,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '48%',
+    width: '62%',
     alignItems: 'center',
   },
-  saveButton2: {
+
+  saveButton22: {
     backgroundColor: '#487C15',
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '100%',
+    width: '48%',
     alignItems: 'center',
   },
+   
   buttonTextW: {
     color: 'white',
     fontSize: 16,
