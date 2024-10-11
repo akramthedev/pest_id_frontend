@@ -24,6 +24,8 @@ import LoaderSVG from '../images/Loader.gif'
 
 const Profile = () => {
 
+  const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
+  const [loaderDelete, setloaderDelete] = useState(false);
 
   const hasFetched = useRef(false);
   const [showError, setShowError] = useState(false);
@@ -634,10 +636,162 @@ const Profile = () => {
 
 
 
+  const handleLickDelete = async ()=>{
+    //delete of a user staff not admin 
+    if(id !== null && id !== undefined){
+      if(dataProfile.type === "admin"){
+        try{
+          setloaderDelete(true);
+          const token = await getToken();
+          const resp = await axios.delete(`${ENDPOINT_API}deleteUserWhoIsAdmin/${parseInt(id)}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(resp.status === 200){
+            setIsSupprimerClicked(false);
+            navigation.goBack();
+            Alert.alert('User Supprimé');
+          }
+          else{
+            Alert.alert('Oops, something went wrong!');
+          }
+        }
+        catch(e){
+          Alert.alert('Oops, something went wrong!');
+          console.log(e.message);
+        } finally{
+          setloaderDelete(false);
+        }
+      }
+      else if(dataProfile.type === "staff"){
+        try{
+          setloaderDelete(true);
+          const token = await getToken();
+          const resp = await axios.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${parseInt(id)}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(resp.status === 200){
+            setIsSupprimerClicked(false);
+            navigation.goBack();
+            Alert.alert('User Supprimé');
+          }
+          else{
+            Alert.alert('Oops, something went wrong!');
+          }
+        }
+        catch(e){
+          Alert.alert('Oops, something went wrong!');
+          console.log(e.message);
+        } finally{
+          setloaderDelete(false);
+        }
+      }
+    }
+  }
+
 
   return (
     <>
      
+
+     
+    {
+        isSupprimerClicked && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '90%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: 'bold', 
+              marginBottom: 5 
+            }}>
+
+              Si vous supprimez ce membre du personnel,
+            
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 25 
+            }}>
+
+              toutes les données associées, notamment ses données, seront également supprimées.
+
+            </Text>
+            <View style={{ 
+              flexDirection: 'row', 
+              justifyContent: 'space-between' 
+            }}>
+
+              <TouchableOpacity style={{
+                backgroundColor: '#eee', 
+                paddingVertical: 13,
+                width : "30%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center"
+                }}
+                onPress={()=>{setIsSupprimerClicked(false)}}
+                disabled={loaderDelete}
+                >
+                <Text style={{ color: 'black', fontWeight: 'bold' }}>
+                Annuler
+                </Text>
+              </TouchableOpacity>
+
+
+              <TouchableOpacity style={{
+                backgroundColor: 'black', 
+                paddingVertical: 13,
+                width : "67%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={loaderDelete}
+                onPress={()=>{
+                  handleLickDelete();
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {
+                  loaderDelete ? 
+                  "suppression en cours..."
+                  :
+                  "Supprimer définitivement"
+                }
+                </Text>
+              </TouchableOpacity>
+              
+            </View>
+          </View>
+        </View>
+      }
+
+
+
     {
       changePasswordClicked  &&
         <View  style={[styles.popUpSecond, { height: screenHeight - 110  }]} >
@@ -982,12 +1136,12 @@ const Profile = () => {
                               <TouchableOpacity
                                 disabled={loading || !dataProfile || loader2}
                                 style={[
-                                  canHeAccess ? styles.canHeAccess : styles.canHeAccessNot,
+                                   styles.canHeAccessNot,
                                   { opacity: loading || !dataProfile || loader2 || loader1 ? 0.3 : 1 }
                                 ]}
                                 onPress={() => {restreindreCompte()}}
                               >
-                                <Text style={styles.buttonTextWhite}>{canHeAccess ? "Restreindre l'accès" : "Accorder l'accès"}</Text>
+                                <Text style={styles.buttonTextWhite}>{canHeAccess ? "Restreindre" : "Autoriser"}</Text>
                               </TouchableOpacity>
                             )
                           }
@@ -1000,8 +1154,23 @@ const Profile = () => {
                             ]} 
                             onPress={() => { setisModify(!isModify); }}
                           >
-                            <Text style={styles.buttonTextWhite}>Modifier le profil</Text>
+                            <Text style={styles.buttonTextWhite}>Modifier</Text>
                           </TouchableOpacity>
+
+                          <TouchableOpacity
+                            onPress={()=>{
+                              setIsSupprimerClicked(true);
+                            }}
+                            disabled={loading || loader2 || loader1 || !dataProfile}
+                            style={[
+                              
+                              styles.supprimerLepersonel2, 
+                              { opacity: loading ? 0.3 : 1 } 
+                            ]}
+                          >
+                            <Text style={styles.buttonTextWhite}>Supprimer</Text>
+                          </TouchableOpacity>
+
                         </>
                       }
                       
@@ -1039,6 +1208,9 @@ const Profile = () => {
               ) : (
                 <>
                   <TouchableOpacity
+                    onPress={()=>{
+                      setIsSupprimerClicked(true);
+                    }}
                     disabled={loading || !dataProfile}
                      style={[
                       styles.supprimerLepersonel, 
@@ -1288,6 +1460,16 @@ const styles = StyleSheet.create({
     right: 0,
     marginRight: 23,
    },
+   buttonContainer2: {
+    flexDirection: "row",
+    marginLeft: 23,
+    justifyContent : "space-between", 
+    position: 'absolute',  
+    bottom: 75,           
+    left: 0,
+    right: 0,
+    marginRight: 23,
+   },
    zisfudowcuosdw : {
     backgroundColor : "#AF0000", 
     padding : 3, 
@@ -1325,7 +1507,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex : 1
   },
-  
+  supprimerLepersonel2 :{
+    marginLeft: 8,
+    paddingVertical: 12,
+    backgroundColor: '#AF0000',
+    alignItems: 'center',
+    borderRadius: 8,
+    flex : 1
+  },
   canHeAccess : {
     marginLeft: 8,
     paddingVertical: 12,
@@ -1334,6 +1523,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex : 1
   },
+  
   canHeAccessNot : {
     marginLeft: 8,
     paddingVertical: 12,
