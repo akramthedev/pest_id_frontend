@@ -26,7 +26,8 @@ export default function MesClients({route}) {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-    const [Number, setNumber] = useState(null);
+    const [NumberOfDemands, setNumberOfDemand] = useState(null);
+    const [NumberOfCLients, setNumberOfClients] = useState(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const isXClicked = true;
     const slideAnim = useRef(new Animated.Value(screenWidth)).current;
@@ -61,16 +62,24 @@ export default function MesClients({route}) {
                 'Authorization': `Bearer ${token}`
               }
             });
-            
+            const userId = await AsyncStorage.getItem('userId');
+            const userIdNum = parseInt(userId);
             if (response.status === 200) {
               setAllUsers(response.data.users);
-              let x = 0;
+              let numberOfCLients = 0; 
+              let numberOfNewDemands = 0;
               for(let i=0;i<response.data.users.length;i++){
-                if(response.data.users[i].canAccess === 1){
-                  x++
+                if(response.data.users[i].id !== userIdNum){
+                  if(response.data.users[i].canAccess === 1){
+                    numberOfCLients++;
+                  }
+                  else{
+                    numberOfNewDemands++;
+                  }
                 }
               }
-              setNumber(x);
+              setNumberOfDemand(numberOfNewDemands);
+              setNumberOfClients(numberOfCLients);
             } else {
               Alert.alert('Erreur lors de la récupération de données.');
             }
@@ -178,7 +187,7 @@ export default function MesClients({route}) {
             :
             <>
               {
-                AllUsers && Number === 0 ? (
+                AllUsers && NumberOfCLients === 0 ? (
                   <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
                     <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
                   </View>

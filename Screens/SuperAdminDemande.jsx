@@ -41,7 +41,7 @@ export default function SuperAdminDemande({route}) {
   const { settriggerIt, triggerIt } = useAuth();
   const [AllUsers,setAllUsers] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [Number, setNumber] = useState(null);
+  const [NumberOfDemands, setNumberOfDemand] = useState(null);
 
 
 
@@ -50,7 +50,8 @@ export default function SuperAdminDemande({route}) {
       const fetchData = async () => {
         try {
           setLoading(true);
-  
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
           const token = await getToken(); 
           
           const response = await axios.get(`${ENDPOINT_API}users`, {
@@ -63,11 +64,13 @@ export default function SuperAdminDemande({route}) {
             setAllUsers(response.data.users);
             let x = 0;
             for(let i=0;i<response.data.users.length;i++){
-              if(response.data.users[i].canAccess === 0){
-                x++
+              if(response.data.users[i].id !== userIdNum){
+                if(response.data.users[i].canAccess === 0){
+                  x++;
+                }
               }
             }
-            setNumber(x);
+            setNumberOfDemand(x);
           } else {
             Alert.alert('Erreur lors de la récupération de données.');
           }
@@ -179,7 +182,7 @@ export default function SuperAdminDemande({route}) {
              </> :
             <>
               {
-                AllUsers && Number === 0 ? (
+                AllUsers && NumberOfDemands === 0 ? (
                   <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
                     <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
                   </View>
@@ -194,7 +197,7 @@ export default function SuperAdminDemande({route}) {
                                 <>
                                   {
                                     data.canAccess === 1 &&
-                                    <CardAdmin key={data.id} index={index} item={data} isXClicked={isXClicked} />
+                                    <CardAdmin  key={data.id} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>
                               )
