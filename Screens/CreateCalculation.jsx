@@ -174,6 +174,18 @@ const takePhoto = async () => {
 
   const createCalculation = async () => {
    
+      if (!URi) {
+        setmessageError("Veuillez sélectionner une image avant de créer le calcul.");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+        setTimeout(() => {
+          setmessageError("");
+        }, 4000);
+        return;
+      }
+
       setloading(true);
       const userId = await AsyncStorage.getItem('userId');
       const userIdNum = parseInt(userId);
@@ -223,9 +235,24 @@ const takePhoto = async () => {
           }, 3000);
         }
         else{
-          Alert.alert('Erreur...')
+          setmessageError("Oups, Une erreur est survenue lors du calcul, veuillez réessayer!");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         }
       } catch (error) {
+        setmessageError("Oups, problème interne du serveur!");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         console.error('Erreur :',error.message);
       } finally{
         setloading(false);
@@ -380,7 +407,7 @@ const takePhoto = async () => {
               <>
               <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="people-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Mes Clients</Text>
+                <Text style={styles.menuText}>Liste des Utilisateurs</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>

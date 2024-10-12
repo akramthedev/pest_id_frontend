@@ -4,14 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
- 
+import { useRoute } from '@react-navigation/native';
+
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {
   
 
   const nav = useNavigation();
   const [diffInDays, setDiffInDays] = useState(null);
-  
+  const route = useRoute();
+
 
   useEffect(()=>{
     const x =   ()=>{
@@ -78,7 +80,11 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
         
   
           <View style={styles.rowHHHH}>
-            <Text
+
+
+            {  route.name === "MesClients"  && (
+              
+              <Text
               style={
                 item.type === 'admin'
                   ? styles.detailsKKKK1
@@ -93,10 +99,15 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
                 ? 'Personnel'
                 : 'Super-Administrateur'}
             </Text>
-  
+
+            )}
             {item.canAccess === 0 && (
               <Text style={styles.detailsKKKK2}>Accès restreint</Text>
             )}
+
+            
+  
+            
           </View>
   
           <Text style={styles.details}>{item.email}</Text>

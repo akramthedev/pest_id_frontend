@@ -7,6 +7,7 @@ import { ENDPOINT_API } from '../Screens/endpoint';
 import axios from 'axios';
 import { getToken } from '../Helpers/tokenStorage';
 import SkeletonLoader from './SkeletonLoader';
+import { useRoute } from '@react-navigation/native';
 
 
 
@@ -17,6 +18,9 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
   const [diffInDays, setDiffInDays] = useState(null);
   const [data, setdata] = useState(null);
   const [loading, setloading] = useState(null);
+  const route = useRoute();
+
+
 
   useEffect(()=>{
     const x =async  ()=>{
@@ -119,24 +123,27 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
                 
 
                     <View style={styles.rowHHHH}>
-                    <Text
-                        style={
-                        data.type === 'admin'
-                            ? styles.detailsKKKK1
-                            : data.type === 'superadmin'
-                            ? styles.detailsKKKKSP
-                            : styles.detailsKKKKStaff
-                        }
+                    {  route.name === "MesClients"  && (
+              
+                      <Text
+                      style={
+                        item.type === 'admin'
+                          ? styles.detailsKKKK1
+                          : item.type === 'superadmin'
+                          ? styles.detailsKKKKSP
+                          : styles.detailsKKKKStaff
+                      }
                     >
-                        {data.type === 'admin'
+                      {item.type === 'admin'
                         ? 'Administrateur'
-                        : data.type === 'staff'
+                        : item.type === 'staff'
                         ? 'Personnel'
                         : 'Super-Administrateur'}
                     </Text>
 
-                    {data.canAccess === 0 && (
-                        <Text style={styles.detailsKKKK2}>Accès restreint</Text>
+                    )}
+                    {item.canAccess === 0 && (
+                      <Text style={styles.detailsKKKK2}>Accès restreint</Text>
                     )}
                     </View>
 

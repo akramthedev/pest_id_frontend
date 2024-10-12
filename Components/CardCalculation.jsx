@@ -7,7 +7,7 @@ import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { ENDPOINT_API } from '../Screens/endpoint';
 
 
-const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, chrImpact }) => {
+const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage }) => {
 
   const { width: screenWidth } = Dimensions.get('window');
   const navigation = useNavigation();
@@ -57,13 +57,16 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, c
 
   return (
     <View style={styles.card} key={key} >
+    {
+      id && idFarm && idPlaque && idSerre && date && percentage  && 
+      <>
       <View style={styles.row}>
         <Text style={styles.idText}>ID Ferme : {idFarm}</Text>
-        <Text style={styles.loremText}>Plaque : {id}</Text>
+        <Text style={styles.loremText}>Plaque : {idPlaque}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.idText}>ID Serre : {idSerre}</Text>
-        <Text style={styles.percentageText}>{percentage}</Text>
+        <Text style={styles.percentageText}>{percentage+"%"}</Text>
       </View>
       <Text style={styles.detailsText}>
         Mineuse : {!data ? "--" : data.class_A} • Mouche : {!data ? "--" : data.class_B} • Thrips : {!data ? "--" : data.class_C}
@@ -83,6 +86,8 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, c
           <Text style={styles.buttonText}>Voir détails</Text>
         </TouchableOpacity>
       </View>
+      </>
+    }
     </View>
   );
 };

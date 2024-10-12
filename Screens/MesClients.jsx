@@ -167,7 +167,9 @@ export default function MesClients({route}) {
               />
             </View>
           }
-          <Text style={styles.titleText}>Mes Clients</Text> 
+                         
+
+          <Text style={styles.titleText}>Liste des Utilisateurs</Text> 
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
           </TouchableOpacity>
@@ -266,7 +268,7 @@ export default function MesClients({route}) {
               <>
               <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="people-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Mes Clients</Text>
+                <Text style={styles.menuText}>Liste des Utilisateurs</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>

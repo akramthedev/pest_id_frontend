@@ -383,7 +383,7 @@ const Calculation = () => {
               <>
               <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="people-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Mes Clients</Text>
+                <Text style={styles.menuText}>Liste des Utilisateurs</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
