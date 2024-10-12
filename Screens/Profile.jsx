@@ -119,7 +119,7 @@ const Profile = () => {
                
             }
             else{
-              setmessageError("Oops, Une erreur est survenue!");
+              setmessageError("Oups, Une erreur est survenue!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -166,7 +166,7 @@ const Profile = () => {
               }
             }
             else{
-              setmessageError("Oops, Une erreur est survenue!");
+              setmessageError("Oups, Une erreur est survenue!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -180,7 +180,7 @@ const Profile = () => {
         catch(e){
           console.log(e.message);
           if(e.message === "Request failed with status code 404"){
-            setmessageError("Oops, utilisateur introuvable!");
+            setmessageError("Oups, utilisateur introuvable!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -190,7 +190,7 @@ const Profile = () => {
               }, 4000);           
           }
           else{
-            setmessageError("Oops, problème interne du serveur!");
+            setmessageError("Oups, problème interne du serveur!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -323,7 +323,7 @@ const Profile = () => {
           }, 4000);
         }
         else{
-          setmessageError("Oops, un incident est survenu pendant l'enregistrement.");
+          setmessageError("Oups, un incident est survenu pendant l'enregistrement.");
           setShowError(true);
           setTimeout(() => {
             setShowError(false);
@@ -336,7 +336,7 @@ const Profile = () => {
       catch(e){
         console.log(e.message);
         console.log(e);
-        setmessageError("Oops, problème interne du serveur!");
+        setmessageError("Oups, problème interne du serveur!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -392,7 +392,7 @@ const Profile = () => {
 
           }
           else{
-            setmessageError("Oops, Une erreur est survenue!");
+            setmessageError("Oups, Une erreur est survenue!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -404,7 +404,7 @@ const Profile = () => {
 
       }
       catch(e){
-        setmessageError("Oops, problème interne du serveur!");
+        setmessageError("Oups, problème interne du serveur!");
         setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -689,15 +689,36 @@ const Profile = () => {
             }
             
             setIsSupprimerClicked(false);
-            navigation.navigate('MesClients');
-            Alert.alert('User Supprimé');
+            setmessageSuccess("Succès : utilisateur supprimé.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 4000);
+            navigation.goBack();
           }
           else{
-            Alert.alert('Oops, something went wrong!');
+            setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
         }
         catch(e){
-          Alert.alert('Oops, something went wrong!');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           console.log(e.message);
         } finally{
           setloaderDelete(false);
@@ -714,15 +735,36 @@ const Profile = () => {
           });
           if(resp.status === 200){
             setIsSupprimerClicked(false);
-            navigation.goBack();
-            Alert.alert('User Supprimé');
-          }
+            setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+              navigation.goBack();
+            }
           else{
-            Alert.alert('Oops, something went wrong!');
+            setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
         }
         catch(e){
-          Alert.alert('Oops, something went wrong!');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           console.log(e.message);
         } finally{
           setloaderDelete(false);
@@ -1005,7 +1047,7 @@ const Profile = () => {
                     ? "Administrateur"
                     : dataProfile.type.toLowerCase() === "superadmin"
                       ? "Super-Administrateur"
-                      : "Staff"}
+                      : "Personnel"}
                 </>
               )}
             </Text>
