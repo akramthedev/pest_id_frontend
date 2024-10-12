@@ -206,11 +206,10 @@ const takePhoto = async () => {
               onValueChange={(itemValue) => setSerre(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value={1} />
-              <Picker.Item label="Option 2" value={2} />
-              <Picker.Item label="Option 3" value={3} />
+              <Picker.Item label="Option 1" value={15} />
             </Picker>
           </View>
+          
 
           <Text style={styles.label}>Ferme</Text>
           <View style={styles.pickerWrapper}>
@@ -220,7 +219,7 @@ const takePhoto = async () => {
               onValueChange={(itemValue) => setFerme(itemValue)}
             >
               <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value={1} />
+              <Picker.Item label="Option 1" value={8} />
             </Picker>
           </View>
 

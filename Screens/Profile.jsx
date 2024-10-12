@@ -20,13 +20,9 @@ import CardAdmin from '../Components/CardAdmin2';
 const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
 
-
-
 const Profile = () => {
-
   const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
   const [loaderDelete, setloaderDelete] = useState(false);
-
   const hasFetched = useRef(false);
   const [showError, setShowError] = useState(false);
   const [messageError,setmessageError] = useState("");
