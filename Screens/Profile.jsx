@@ -633,20 +633,63 @@ const Profile = () => {
 
 
   const handleLickDelete = async ()=>{
-    //delete of a user staff not admin 
+
+    let staffsUsers = [];
+
     if(id !== null && id !== undefined){
       if(dataProfile.type === "admin"){
         try{
           setloaderDelete(true);
           const token = await getToken();
+
+          const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${parseInt(id)}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if(resp0.status === 200){
+            const idAdmin = resp0.data.id;
+            console.log("-------------");
+            console.log(idAdmin);
+            console.log('-------------');
+            const resp00 = await axios.get(`${ENDPOINT_API}staffs/${idAdmin}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }); 
+
+            if(resp00.status === 200){
+              staffsUsers = resp00.data;
+              console.log("-------------");
+              console.log(resp00.data);
+              console.log("-------------");
+            }
+          }
+
           const resp = await axios.delete(`${ENDPOINT_API}deleteUserWhoIsAdmin/${parseInt(id)}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
           if(resp.status === 200){
+
+            if (staffsUsers.length !== 0) {
+              for (const staff of staffsUsers) {
+                try {
+                  await axios.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${staff.user_id}`, {
+                    headers: {
+                      'Authorization': `Bearer ${token}`
+                    }
+                  });
+                } catch (error) {
+                  console.error('Error deleting user:', error);
+                }
+              }
+            }
+            
             setIsSupprimerClicked(false);
-            navigation.goBack();
+            navigation.navigate('MesClients');
             Alert.alert('User Supprimé');
           }
           else{
