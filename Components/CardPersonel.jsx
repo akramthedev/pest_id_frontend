@@ -71,9 +71,8 @@ export const CardPersonal = ({ item }) => {
           <Image source={{ uri: data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
           <View style={styles.infoContainer}>
             <Text style={styles.name}>{data.fullName}</Text>
-            <Text style={styles.details}>{data.email}</Text>
+            <Text style={styles.details}>Email : {data.email}</Text>
             <Text style={styles.details}>Téléphone: {data.mobile ? data.mobile : "--"}</Text>
-            <Text style={styles.details}>Status: {item.position ? item.position : "--"}</Text>
             <Text style={styles.details}>Date de création: {formatDate(item.created_at)}</Text>
           </View>
         </View>

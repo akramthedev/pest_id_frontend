@@ -20,7 +20,13 @@ import LoaderSVG from '../images/Loader.gif'
 const CreateCalculation = ({route}) => {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+  const [farms, setFarms] = useState([]);
+  const [selectedFarm, setSelectedFarm] = useState('');
+  const [greenhouses, setGreenhouses] = useState([]);
+  const [selectedGreenhouse, setSelectedGreenhouse] = useState('');
+  const [LoadingX,setLoadingX] = useState(true);
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -119,52 +125,111 @@ const takePhoto = async () => {
   }
 };
  
- 
-  const calculate = async () => {
-    setloading(true);
-    const userId = await AsyncStorage.getItem('userId');
-    const userIdNum = parseInt(userId);
-    console.log(URi, serre, ferme);
-    console.log("User Id : "+userIdNum);
-    let formData = new FormData();
-    
-    formData.append('image', {
-      uri: URi,   
-      name: 'photo.jpg',   
-      type: 'image/jpeg'   
-    });
-    
-    
-    formData.append('serre_id', serre);  
-    formData.append('farm_id', ferme);
-    formData.append('user_id', userIdNum);  
- 
-    try {
-      const token = await getToken();   
-      const response = await axios.post(`${ENDPOINT_API}create_prediction`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+
+  useEffect(()=>{
+    const x = async()=>{
+      try{
+        setLoadingX(true);
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        
+        const token = await getToken();   
+        const response = await axios.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if(response.status  === 200){
+          console.log(response.data);
+          setFarms(response.data);
         }
-      });
-      if(response.status === 201){
-        setSelectedDate(new Date());
-        setFerme("");
-        setImage("");
-        setImageName("");
-        setURi('');
-        setSerre("");
-        setPlaqueId("");
-        navigation.navigate("Historique")
+        else{
+          console.log("Not Fetched All Farms With Their Serres");
+        }
       }
-      else{
-        Alert.alert('Erreur...')
+      catch(e){
+        console.log(e.message);
+      } finally{
+        setLoadingX(false);
+
       }
-    } catch (error) {
-      console.error('Erreur :',error.message);
-    } finally{
-      setloading(false);
     }
+    x();
+  }, []);
+
+
+  const handleFarmChange = (farmId) => {
+    setSelectedFarm(farmId);
+    
+    const selectedFarm = farms.find(farm => farm.id === farmId);
+    
+    if (selectedFarm && selectedFarm.serres && Array.isArray(selectedFarm.serres)) {
+      setGreenhouses(selectedFarm.serres);
+    } else {
+      setGreenhouses([]);
+    }
+  };
+
+
+  const createCalculation = async () => {
+   
+      setloading(true);
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+      console.log(URi, serre, ferme);
+      console.log("User Id : "+userIdNum);
+      let formData = new FormData();
+      
+      formData.append('image', {
+        uri: URi,   
+        name: 'photo.jpg',   
+        type: 'image/jpeg'   
+      });
+      
+      
+      formData.append('serre_id', selectedGreenhouse); 
+      formData.append('farm_id', ferme);
+      formData.append('farm_id', selectedFarm);
+      formData.append('user_id', userIdNum);  
+      formData.append('plaque_id', plaqueId);  
+  
+      try {
+        const token = await getToken();   
+        const response = await axios.post(`${ENDPOINT_API}create_prediction`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(response.status === 201){
+          setSelectedDate(new Date());
+          setFerme("");
+          setImage("");
+          setImageName("");
+          setURi('');
+          setSerre("");
+          setPlaqueId("");
+          setmessageSuccess("Succès : Votre calcul a bien été créé.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
+          setTimeout(()=>{
+            navigation.navigate("Historique")
+          }, 3000);
+        }
+        else{
+          Alert.alert('Erreur...')
+        }
+      } catch (error) {
+        console.error('Erreur :',error.message);
+      } finally{
+        setloading(false);
+      }
   };
 
 
@@ -172,7 +237,8 @@ const takePhoto = async () => {
   return (
     <>
     <View style={styles.container}>
-
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>
           <View style={styles.titleContainer}>
           {
@@ -197,31 +263,45 @@ const takePhoto = async () => {
             value={plaqueId}
             onChangeText={setPlaqueId}
           />
-
-          <Text style={styles.label}>Serre</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={serre}
-              style={styles.picker}
-              onValueChange={(itemValue) => setSerre(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value={15} />
-            </Picker>
-          </View>
+ 
           
+            <Text style={styles.label}>Ferme</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                enabled={!LoadingX}
+                selectedValue={selectedFarm}
+                style={styles.picker}
+                onValueChange={(itemValue) => handleFarmChange(itemValue)}
+              >
+                <Picker.Item label="Veuillez saisir la valeur..." value="" />
+                {farms && farms.length > 0 ? (
+                  farms.map((farm) => (
+                    <Picker.Item key={farm.id} label={farm.name} value={farm.id} />
+                  ))
+                ) : (
+                  <Picker.Item label="Aucune ferme disponible" value="" />  
+                )}
+              </Picker>
+            </View>
 
-          <Text style={styles.label}>Ferme</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={ferme}
-              style={styles.picker}
-              onValueChange={(itemValue) => setFerme(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="Option 1" value={8} />
-            </Picker>
-          </View>
+
+
+            <Text style={styles.label}>Serre</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={selectedGreenhouse}
+                style={styles.picker}
+                onValueChange={(itemValue) => setSelectedGreenhouse(itemValue)}
+                enabled={!!selectedFarm}  
+              >
+                <Picker.Item label="Veuillez saisir la valeur..." value="" />
+                {greenhouses && greenhouses.length > 0 && greenhouses.map((greenhouse) => (
+                  <Picker.Item key={greenhouse.id} label={greenhouse.name} value={greenhouse.id} />
+                ))}
+              </Picker>
+            </View>
+
+
 
           <Text style={styles.label}>Date de réalisation</Text>
           <CustomDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
@@ -249,13 +329,16 @@ const takePhoto = async () => {
 
 
       <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
+        <TouchableOpacity disabled={loading} onPress={()=>{navigation.goBack()}} style={[
+            styles.cancelButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]} >
           <Text style={styles.buttonTextB}   >Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity disabled={loading} style={[
             styles.saveButton, 
             { opacity: loading ? 0.5 : 1 } 
-          ]} onPress={calculate} >
+          ]} onPress={createCalculation} >
           <Text style={styles.buttonTextW}>{ loading ? "Création du calcul..." : "Enregistrer le calcul" }</Text>
         </TouchableOpacity>
       </View>

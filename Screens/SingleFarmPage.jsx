@@ -200,11 +200,12 @@ const SingleFarmPage = () => {
                             marginBottom : 20
                           }}
                         >
-                            <Text style={{marginLeft: 23,  fontSize : 17, fontWeight : "800"}}>Serres associées</Text>
+                            <Text style={{marginLeft: 23,  fontSize : 17, fontWeight : "800"}}>Serres associées {dataSerre && ": "+dataSerre.length} </Text>
                             <TouchableOpacity onPress={()=>{ navigation.navigate('AjouterUneSerre', { id: id });}}  style={styles.saveButtonUZUQSOEFD}>
                               <Text style={styles.text487C15}>+ Ajouter une Serre</Text>
                             </TouchableOpacity>
                         </View>
+                        <ScrollView style={{ height : 222 }} >
                         {
                           dataSerre && 
                           <>
@@ -247,6 +248,7 @@ const SingleFarmPage = () => {
                           }
                           </>
                         }
+                        </ScrollView>
 
                       </>
                     }

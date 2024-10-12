@@ -21,6 +21,9 @@ const CreateStaff = ({route}) => {
 
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+
 
   useEffect(()=>{
     const x = async ()=>{
@@ -31,7 +34,6 @@ const CreateStaff = ({route}) => {
   },[ ]);
 
   const navigation = useNavigation();
-  const [typeEmploiyement, setTypeEmployement] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
@@ -95,7 +97,6 @@ const CreateStaff = ({route}) => {
           email : email, 
           password : password, 
           mobile : mobile, 
-          typeEmploiyement : typeEmploiyement, 
           admin_id :idAdmin ,
           position : "hired",
           typeS : "Staff"
@@ -115,18 +116,50 @@ const CreateStaff = ({route}) => {
           setEmail('');
           setPassword('');
           setMobile('');
-          setTypeEmployement('');
-          navigation.navigate('MesPersonels');
+          setmessageSuccess("Succès : le personnel a été créé.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
+
+          setTimeout(()=>{
+            navigation.navigate('MesPersonels');
+          }, 3000);
         }
-        else{
-          console.log("Error");
+        else if (resp.status === 222){
+          setmessageError("Veuillez entrer des informations complètes et correctes.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       }
       else{
-        console.log('Not fetched the ID admin')
+        setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
       }
     }
     catch(e){
+      setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
       console.log(e.message);
     } finally{
       setloading(false);
@@ -139,7 +172,8 @@ const CreateStaff = ({route}) => {
   return (
     <>
     <View style={styles.container}>
-
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>
           <View style={styles.titleContainer}>
           {
@@ -188,21 +222,6 @@ const CreateStaff = ({route}) => {
             value={password}
             onChangeText={setPassword}
           />
-
-          <Text style={styles.label}>Type d'employement</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={typeEmploiyement}
-              style={styles.picker} 
-              onValueChange={(itemValue) => setTypeEmployement(itemValue)}
-            >
-              <Picker.Item label="Veuillez saisir la valeur..." value="" />
-              <Picker.Item label="CDI" value="CDI" />
-              <Picker.Item label="CDD" value="CDD" />
-              <Picker.Item label="Stage" value="Stage" />
-              <Picker.Item label="Freelance" value="Freelance" />
-            </Picker>
-          </View>
       </ScrollView>
 
       <View style={styles.buttonRow1}>

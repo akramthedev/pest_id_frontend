@@ -18,9 +18,11 @@ import LoaderSVG from '../images/Loader.gif'
 const CreateFarm = ({route}) => {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
   const [role, setRole] = useState(null);
+  const [loaderOfMap, setloaderOfMap] = useState(false);
 
   
   useEffect(()=>{
@@ -46,6 +48,7 @@ const CreateFarm = ({route}) => {
   // to use it go to tokens and create a new one and put it instead of  "pk.1705505b29c5df0924b07d671b88b7b9"
   const fetchCoordinates = async () => {
     try {
+      setloaderOfMap(true);
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
       const data = await response.json();
       if (data.length > 0) {
@@ -55,6 +58,8 @@ const CreateFarm = ({route}) => {
       }
     } catch (error) {
       console.error('Error fetching coordinates:', error);
+    } finally{
+      setloaderOfMap(false);
     }
   };
 
@@ -103,39 +108,79 @@ const CreateFarm = ({route}) => {
 
 
   const createFarmFct= async () => {
+
+    if(Appelation === "" ){
+      setmessageError("Le nom de la ferme ne peut pas être vide.");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
+    }
+    else{
     try{
-      setloading(true);
-      const userId = await AsyncStorage.getItem('userId');
-      const userIdNum = parseInt(userId);
-      const token = await getToken(); 
+        setloading(true);
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        const token = await getToken(); 
 
-      let dataX = {
-        user_id : userIdNum, 
-        name : Appelation, 
-        location : JSON.stringify(locationCoords), 
-        size : Mesure
-      }
-      const resp0 = await axios.post(`${ENDPOINT_API}farms`, dataX, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+        let dataX = {
+          user_id : userIdNum, 
+          name : Appelation, 
+          location : JSON.stringify(locationCoords), 
+          size : Mesure
         }
-      });
-      if(resp0.status === 201){
-        setAppelation('');
-        setLocationCoords(null);
-        setMesure('');
-        navigation.navigate('MesFermes');
+        const resp0 = await axios.post(`${ENDPOINT_API}farms`, dataX, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if(resp0.status === 201){
+          setAppelation('');
+          setLocationCoords(null);
+          setMesure('');
+          setSearchQuery("");
+          setMapUrl("");
+          setmessageSuccess("Succès : Vos informations ont été mis à jour.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
+          setTimeout(()=>{
+            navigation.navigate('MesFermes');
+          }, 3000);
+        }
+        else{
+          setmessageError("Oups, un incident est survenu lors de la création.");
+            setShowError(true);
+            setTimeout(() => {
+              setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageError("");
+            }, 4000);
+        }
       }
-      else{
-        console.log('Data not fetched')
-      }
-    }
 
-    catch(e){
-      console.log(e.message);
-    } finally{
-      setloading(false);
-    }
+      catch(e){
+        console.log(e.message);
+        setmessageError("Oups, problème interne du serveur!");
+            setShowError(true);
+            setTimeout(() => {
+              setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageError("");
+            }, 4000);
+      } finally{
+        setloading(false);
+      }
+      }
   }
 
 
@@ -147,7 +192,8 @@ const CreateFarm = ({route}) => {
   return (
     <>
     <View style={styles.container}>
-
+    <AlertError message={messageError} visible={showError} />
+    <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>
           <View style={styles.titleContainer}>
           {
@@ -188,10 +234,13 @@ const CreateFarm = ({route}) => {
           style={styles.input}
           placeholder="Veuillez saisir une région ou ville..."
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={setSearchQuery} 
         />
-        <TouchableOpacity onPress={fetchCoordinates} style={styles.searchButton}>
-          <Text style={styles.buttonTextB}>Search</Text>
+        <TouchableOpacity disabled={loaderOfMap} style={[
+            styles.searchButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]}   onPress={fetchCoordinates} >
+          <Text style={styles.buttonTextB}>{loaderOfMap ? "Chargement..." :"Chercher"}</Text>
         </TouchableOpacity>
 
         {mapUrl ? (
@@ -207,7 +256,10 @@ const CreateFarm = ({route}) => {
       </ScrollView>
 
       <View style={styles.buttonRow1}>
-        <TouchableOpacity onPress={()=>{navigation.goBack()}} style={styles.cancelButton}>
+        <TouchableOpacity  disabled={loading}  style={[
+            styles.cancelButton, 
+            { opacity: loading ? 0.5 : 1 } 
+          ]}    onPress={()=>{navigation.goBack()}}  >
           <Text style={styles.buttonTextB} >Annuler</Text>
         </TouchableOpacity>
         <TouchableOpacity disabled={loading}  style={[

@@ -184,8 +184,8 @@ const ModifierSerre = () => {
         <ScrollView>
           <View style={styles.titleContainer}>
           {
-              
-            <View style={{ position: "absolute", left :23 ,zIndex: 10,}} > 
+            loading && 
+            <View style={{ position: "absolute", left :23 ,zIndex: 10}} > 
               <Image
                 source={LoaderSVG}  
                 style={styles.imageJOZNJORSFDOJFSWNVDO} 

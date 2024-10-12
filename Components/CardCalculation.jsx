@@ -59,7 +59,7 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage, c
     <View style={styles.card} key={key} >
       <View style={styles.row}>
         <Text style={styles.idText}>ID Ferme : {idFarm}</Text>
-        <Text style={styles.loremText}>Plaque : {idPlaque}</Text>
+        <Text style={styles.loremText}>Plaque : {id}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.idText}>ID Serre : {idSerre}</Text>

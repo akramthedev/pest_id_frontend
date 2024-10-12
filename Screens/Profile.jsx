@@ -323,7 +323,7 @@ const Profile = () => {
           }, 4000);
         }
         else{
-          setmessageError("Oups, un incident est survenu pendant l'enregistrement.");
+          setmessageError("Oups, un incident est survenu lors de l'enregistrement.");
           setShowError(true);
           setTimeout(() => {
             setShowError(false);
@@ -448,7 +448,7 @@ const Profile = () => {
 
   const handleConfirmPassword = async()=>{
     if(ancienMotDepasse.length<5 || nouveauMotDePasse.length <5 || confirmNvmotedepasse.length < 5){
-      setmessageError("Erreur : Votre mot de passe doit comporter au moins 5 caractères.");
+      setmessageError("Votre mot de passe doit comporter au moins 5 caractères.");
       setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -458,7 +458,7 @@ const Profile = () => {
               }, 4000);
     }
     else if((nouveauMotDePasse !== confirmNvmotedepasse) && (nouveauMotDePasse.length !== confirmNvmotedepasse.length)){
-      setmessageError("Erreur : le mot de passe et la confirmation ne sont pas identiques.");
+      setmessageError("le mot de passe et la confirmation ne sont pas identiques.");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -505,7 +505,7 @@ const Profile = () => {
           }, 4000);
         }
         else if (resp.status === 287){
-          setmessageError("Erreur : l'ancien mot de passe est invalide.");
+          setmessageError("l'ancien mot de passe est invalide.");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -515,7 +515,7 @@ const Profile = () => {
               }, 4000);
         }
         else if (resp.status === 301){
-          setmessageError("Erreur : un problème technique est survenu. Veuillez réessayer plus tard.");
+          setmessageError("un problème technique est survenu. Veuillez réessayer plus tard.");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -527,7 +527,7 @@ const Profile = () => {
 
         }
         else if(resp.status === 399){
-          setmessageError("Erreur : Votre mot de passe doit comporter au moins 5 caractères.");
+          setmessageError("Votre mot de passe doit comporter au moins 5 caractères.");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);
@@ -539,7 +539,7 @@ const Profile = () => {
       }
       catch(e){
         console.log(e.message);
-        setmessageError("Erreur : une erreur interne du serveur s'est produite.");
+        setmessageError("une erreur interne du serveur s'est produite.");
         setShowError(true);
         setTimeout(() => {
           setShowError(false);
@@ -599,7 +599,7 @@ const Profile = () => {
           }
         } catch (e) {
           console.log(e);
-          setmessageError("Erreur : un problème technique est survenu. Veuillez réessayer plus tard.");
+          setmessageError("un problème technique est survenu. Veuillez réessayer plus tard.");
           setShowError(true);
           setTimeout(() => {
             setShowError(false);
@@ -1041,7 +1041,7 @@ const Profile = () => {
 
 
             <Text style={styles.roleText}>
-              Role: {dataProfile && (
+              {dataProfile && (
                 <>
                   {dataProfile.type.toLowerCase() === "admin"
                     ? "Administrateur"
