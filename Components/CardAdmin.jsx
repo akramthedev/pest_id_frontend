@@ -5,11 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
 import { useRoute } from '@react-navigation/native';
+import { AlertError, AlertSuccess } from "./AlertMessage";
 
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {
   
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const nav = useNavigation();
   const [diffInDays, setDiffInDays] = useState(null);
   const route = useRoute();
@@ -41,6 +45,7 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
 
 
   return (
+    <>
     <TouchableOpacity key={index} style={styles.card}>
       <TouchableOpacity
         onPress={() => {
@@ -116,6 +121,7 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
         </View>
       </TouchableOpacity>
     </TouchableOpacity>
+    </>
   );
 }  
 

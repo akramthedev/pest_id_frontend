@@ -19,6 +19,11 @@ const ModifierSerre = () => {
   const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+
+
   const [isModify, setisModify] = useState(false);
   const navigation = useNavigation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -56,17 +61,7 @@ const ModifierSerre = () => {
 
 
 
-
-  useEffect(()=>{
-    
-    const fetchDataSerre = async()=>{
-      if(serreId){
-        
-      }
-    }
-    fetchDataSerre();
-
-  }, [TriggerIt]);
+  
 
 
 
@@ -124,14 +119,40 @@ const ModifierSerre = () => {
         });
         if(resp.status === 200){
           setIsSupprimerClicked(false);
-          navigation.navigate('SingleFarmPage', { id: IdFarm });
+          setmessageSuccess("Succès : la serre a bien été supprimée.");
+          setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
+            setTimeout(()=>{
+              navigation.navigate('SingleFarmPage', { id: IdFarm });
+            }, 3000);
+
+
         }
         else{
-          Alert.alert('Oops, something went wrong!');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       }
       catch(e){
-        Alert.alert('Oops, something went wrong!');
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.log(e.message);
       } finally{
         setloaderDelete(false);
@@ -160,14 +181,35 @@ const ModifierSerre = () => {
         });
         if(resp.status === 200){
           setisModify(!isModify);          
-          Alert.alert("Update avec success");
+          setmessageSuccess("Succès : la serre a bien été modifiée.");
+          setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
         }
         else{
-          Alert.alert('Oops, something went wrong!');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       }
       catch(e){
-        Alert.alert('Oops, something went wrong!');
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.log(e.message);
       } finally{
         setloaderUpdate(false);
@@ -180,6 +222,13 @@ const ModifierSerre = () => {
   return (
     <>
     <View style={styles.container}>
+
+
+           <AlertError message={messageError} visible={showError} />
+          <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
+
+
 
         <ScrollView>
           <View style={styles.titleContainer}>

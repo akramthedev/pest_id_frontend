@@ -20,6 +20,8 @@ const { width: screenWidth } = Dimensions.get('window');
 
 
 const NouvelleDemande = () => {
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -64,9 +66,24 @@ const NouvelleDemande = () => {
         if (response.status === 200) {
           setData(response.data);
          } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       } catch (error) {
+        setmessageError("Oups, problème interne du serveu!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.error('Erreur :', error.message);
       } finally {
         setLoading(false);
@@ -147,16 +164,48 @@ const NouvelleDemande = () => {
             }
           });
           if(response2){
-            navigation.goBack();
-            Alert.alert('Succès : Utilisateur a obtenu les privilèges.');
+            
+              setmessageSuccess("Succès : la demande a été accéptée.");
+            setShowSuccess(true);
+            setTimeout(() => {
+              setShowSuccess(false);
+            }, 2000);
+            setTimeout(() => {
+              setmessageSuccess("");
+            }, 3000);
+            setTimeout(()=>{
+              navigation.goBack();
+            }, 3000);
           }
           else {
-            Alert.alert('Erreur');
+            setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
          } else {
-          Alert.alert('Erreur');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       } catch (error) {
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.error('Erreur :', error.message);
       } finally {
         setLoading2(false);
@@ -177,12 +226,36 @@ const NouvelleDemande = () => {
         });
         
         if (response.status === 200) {
-          navigation.goBack();
-          Alert.alert('La demande a été refusée avec succès.');
+          setmessageSuccess("Succès : la demande a été refusée.");
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 2000);
+          setTimeout(() => {
+            setmessageSuccess("");
+          }, 3000);
+          setTimeout(()=>{
+            navigation.goBack();
+          }, 3000);
          } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       } catch (error) {
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.error('Erreur :', error.message);
       } finally {
         setLoading2(false);
@@ -207,6 +280,11 @@ const NouvelleDemande = () => {
         </View>
         :
         <View style={styles.container}>
+
+          <AlertError message={messageError} visible={showError} />
+          <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
+
           <View>
             <View style={styles.titleContainer}>
 
