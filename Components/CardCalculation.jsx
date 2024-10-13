@@ -56,7 +56,7 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage })
 
 
   return (
-    <View style={styles.card} key={key} >
+    <View style={styles.card} key={id} >
     {
       id && idFarm && idPlaque && idSerre && date && percentage  && 
       <>

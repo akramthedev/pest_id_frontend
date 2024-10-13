@@ -89,6 +89,28 @@ const Profile = () => {
   useFocusEffect(
     useCallback(() => {
     const fetchProfileData = async ()=>{
+
+      if(dataProfileOfChangement.email.length < 5){
+        setmessageError("Le champ d'addresse email est invalide!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+      }
+      else if(dataProfileOfChangement.fullName.length <= 1){
+        setmessageError("Le champ du nom et prénom est invalide.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+      }
+      else {
       setLoading(true);
       if(id!== null && id !== undefined){
          try{
@@ -202,6 +224,7 @@ const Profile = () => {
         } finally{
           setLoading(false);
         }
+      }
       } 
     }
     fetchProfileData();
@@ -274,17 +297,7 @@ const Profile = () => {
 
   const handleSaveData = async()=>{
 
-    if( dataProfileOfChangement.fullName.length <= 1 || dataProfileOfChangement.email.length < 6){
-              setmessageError("Vos informations ne sont pas conformes aux exigences.");
-              setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
-    }
-    else{
+     
       setLoader1(true);
           const userId = await AsyncStorage.getItem('userId');
           const token = await getToken(); 
@@ -347,8 +360,7 @@ const Profile = () => {
       } finally{
         setLoader1(false);
       }
-    }
-  }
+   }
 
 
   const restreindreCompte = async()=>{

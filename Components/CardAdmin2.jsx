@@ -82,7 +82,7 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
     <>
     {
         (!loading && data !== null) ?
-        <TouchableOpacity key={index} style={styles.card}>
+        <TouchableOpacity key={item.id} style={styles.card}>
             <TouchableOpacity
                 onPress={() => {
                     if (isXClicked) {

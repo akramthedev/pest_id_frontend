@@ -27,7 +27,7 @@ export const CardFarm = ({ item }) => {
     <>
     {
       item && 
-      <TouchableOpacity style={styles.card} onPress={ 
+      <TouchableOpacity key={item.id} style={styles.card} onPress={ 
         ()=>{
           navigation.navigate('SingleFarmPage', { id: item.id });
         }

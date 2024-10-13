@@ -45,8 +45,7 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
 
 
   return (
-    <>
-    <TouchableOpacity key={index} style={styles.card}>
+    <TouchableOpacity key={item.id} style={styles.card}>
       <TouchableOpacity
         onPress={() => {
           if (isXClicked) {
@@ -121,7 +120,6 @@ export  const CardAdmin = ({ item,index, isXClicked }) => {
         </View>
       </TouchableOpacity>
     </TouchableOpacity>
-    </>
   );
 }  
 
