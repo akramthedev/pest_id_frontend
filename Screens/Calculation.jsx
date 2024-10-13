@@ -1,6 +1,6 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import {Image ,ScrollView, TextInput,StyleSheet,FlatList, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
+import {Image ,ScrollView, TextInput,Alert,StyleSheet,FlatList, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
  import { Picker } from '@react-native-picker/picker'; 
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
@@ -12,6 +12,19 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
+
+
+
+
+const convertToMySQLDateTime = (dateString) => {
+  const [day, month, year] = dateString.split('/');
+
+  // Create a date string in the format "yyyy-mm-dd HH:mm:ss"
+  // Assuming you want to set the time to midnight (00:00:00)
+  return `${year}-${month}-${day} 00:00:00`;
+};
+
+
 
 
 const Carousel = ({ images }) => {
@@ -93,7 +106,11 @@ const Calculation = () => {
 
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [farms, setFarms] = useState([]);
+  const [selectedFarm, setSelectedFarm] = useState('');
+  const [greenhouses, setGreenhouses] = useState([]);
+  const [selectedGreenhouse, setSelectedGreenhouse] = useState('');
+  const [loadingX, setLoadingX] = useState(true);
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -109,8 +126,9 @@ const Calculation = () => {
   const route = useRoute();
   const { id } = route.params;
   const [predictionData,setpredictionData] = useState(null);
-  const [DataImages, setDataImages] = useState(null);
-  const [isModifyClicked, setisModifyClicked] = useState(false)
+  const [predictionDataModifying,setpredictionDataModifying] = useState(null);
+  const [dataImages, setDataImages] = useState(null);
+  const [isModifyClicked, setisModifiedClicked] = useState(false)
   const navigation = useNavigation();
   const [plaqueId, setPlaqueId] = useState('');
   const [serre, setSerre] = useState('');
@@ -163,6 +181,56 @@ const Calculation = () => {
 
 
 
+  useEffect(()=>{
+    const x = async()=>{
+      try{
+        setLoadingX(true);
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        
+        const token = await getToken();   
+        const response = await axios.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if(response.status  === 200){
+          console.log(response.data);
+          setFarms(response.data);
+        }
+        else{
+          console.log("Not Fetched All Farms With Their Serres");
+        }
+      }
+      catch(e){
+        console.log(e.message);
+      } finally{
+        setLoadingX(false);
+
+      }
+    }
+    x();
+  }, []);
+
+
+
+
+
+  
+  const handleFarmChange = (farmId) => {
+    setSelectedFarm(farmId);
+    
+    const selectedFarm = farms.find(farm => farm.id === farmId);
+    
+    if (selectedFarm && selectedFarm.serres && Array.isArray(selectedFarm.serres)) {
+      setGreenhouses(selectedFarm.serres);
+    } else {
+      setGreenhouses([]);
+    }
+  };
+
+
 
 
   const fetchData = async () => {
@@ -184,6 +252,7 @@ const Calculation = () => {
         
         if (response.status === 200) {
           setpredictionData(response.data[0]);
+          setpredictionDataModifying(response.data[0]);
           const response2 = await axios.get(`${ENDPOINT_API}predictions/${id}/images`, {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -229,6 +298,33 @@ const Calculation = () => {
     return `${day}/${month}/${year}`; 
   };
 
+
+
+  const handleSaveData = async (id)=>{
+
+   try{
+     // id : prediction id 
+      const token = await getToken();         
+      const response = await axios.patch(`${ENDPOINT_API}updatePrediction/${id}`, predictionDataModifying , {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if(response.status === 200){
+        Alert.alert('Modified Successfully ! ');
+      }
+      else{
+        Alert.alert('Oops...');
+      }
+      setisModifiedClicked(false);
+    }
+   catch(e){
+      Alert.alert('Oops...');
+      console.log(e.message);
+      setisModifiedClicked(false);
+   }
+
+  }
   
 
 
@@ -236,8 +332,9 @@ const Calculation = () => {
     <>
     <View style={styles.container}>
 
-        <ScrollView>
-          <View style={styles.titleContainer}>
+    <ScrollView>
+        <View style={styles.titleContainer}>
+
           {
             loading && 
             <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
@@ -247,86 +344,101 @@ const Calculation = () => {
               />
             </View>
           }
-            <Text style={styles.titleText}>{isModifyClicked ? "Modifier le Calcul" : "Détails du Calcul"}</Text>
-            <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
-              <Ionicons name="menu" size={24} color="#3E6715" />
-            </TouchableOpacity>
-          </View>
-       
+
+
+          <Text style={styles.titleText}>{isModifyClicked ? "Modifier le Calcul" : "Détails du Calcul"}</Text>
+          <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
+            <Ionicons name="menu" size={24} color="#3E6715" />
+          </TouchableOpacity>
+        </View>
+
+        {isModifyClicked  ? 
+          <> 
           {
-            isModifyClicked ? 
+            predictionDataModifying && 
             <>
               <Text style={styles.label}>Plaque</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Veuillez saisir l’ ID de la plaque..."
-                value={plaqueId}
-                onChangeText={setPlaqueId}
+                placeholder="Veuillez saisir l’ID de la plaque..."
+                value={predictionDataModifying.plaque_id}
+                onChangeText={(text) =>
+                  setpredictionDataModifying((prevData) => ({
+                    ...prevData,
+                    plaque_id: text,  
+                  }))
+                }
               />
-
-              <Text style={styles.label}>Serre</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={serre}
-                  style={styles.picker}
-                  onValueChange={(itemValue) => setSerre(itemValue)}
-                >
-                  <Picker.Item label="Veuillez saisir la valeur..." value="" />
-                  <Picker.Item label="Option 1" value="option1" />
-                  <Picker.Item label="Option 2" value="option2" />
-                </Picker>
-              </View>
 
               <Text style={styles.label}>Ferme</Text>
               <View style={styles.pickerWrapper}>
                 <Picker
-                  selectedValue={ferme}
+                  selectedValue={selectedFarm}
                   style={styles.picker}
-                  onValueChange={(itemValue) => setFerme(itemValue)}
+                  onValueChange={handleFarmChange}
+                  enabled={!loadingX}
                 >
-                  <Picker.Item label="Veuillez saisir la valeur..." value="" />
-                  <Picker.Item label="Option 1" value="option1" />
-                  <Picker.Item label="Option 2" value="option2" />
+                  <Picker.Item label={`Ferme ancienne`} value={predictionDataModifying.farm_id} />
+                  {farms.map(farm => (
+                    <Picker.Item key={farm.id} label={farm.name} value={farm.id} />
+                  ))}
                 </Picker>
               </View>
 
-
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.buttonOutline}>
-                  <Text style={styles.buttonTextB}>Prendre une photo</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonOutline}>
-                  <Text style={styles.buttonTextB}>Choisir une image</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-            :
-            <>
-              <View style={styles.infoContainer}>
-                <Text style={styles.title}>Informations du Calcul</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de ferme: {loading ? "--" : predictionData.farm_id} </Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
+              <Text style={styles.label}>Serre</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={selectedGreenhouse}
+                  style={styles.picker}
+                  onValueChange={setSelectedGreenhouse}
+                  enabled={!!selectedFarm}
+                >
+                  <Picker.Item label={`Serre anciennce`} value={predictionDataModifying.serre_id} />
+                  {greenhouses.map(serre => (
+                    <Picker.Item key={serre.id} label={serre.name} value={serre.id} />
+                  ))}
+                </Picker>
               </View>
 
-              <View style={styles.resultsContainer}>
-                <Text style={styles.title}>Résultats du Calcul</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Pourcentage: {loading ? "--" : <>{predictionData.result}%</>}</Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mouches:  {loading ? "--" : <>{DataImages && DataImages.class_A}</>} </Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de mineuses:  {loading ? "--" : <>{DataImages && DataImages.class_B}</>} </Text>
-                <Text style={styles.info}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;Nombre de Thrips:  {loading ? "--" : <>{DataImages && DataImages.class_C}</>} </Text>
-              </View>
-
-              <View style={styles.carouselContainer}>
-                <Text style={styles.titleXX}>Images du Calcul</Text>
-                {
-                  <Carousel images={images} />
-                }
-              </View> 
+              <Text style={styles.label}>Date de Création</Text>
+              <TextInput
+                style={styles.input}
+                value={formatDate(predictionDataModifying.created_at)}
+                onChangeText={(text) => {
+                  setpredictionDataModifying((prevData) => ({
+                    ...prevData,
+                    created_at: convertToMySQLDateTime(text),  
+                  }));
+                }}
+              />
             </>
           }
+          </>
+         : (
+          <>
+            <View style={styles.infoContainer}>
+              <Text style={styles.title}>Informations du Calcul</Text>
+              <Text style={styles.info}>• ID de ferme: {loading ? "--" : predictionData.farm_id}</Text>
+              <Text style={styles.info}>• ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
+              <Text style={styles.info}>• ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
+              <Text style={styles.info}>• Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
+              <Text style={styles.info}>• Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
+            </View>
+
+            <View style={styles.resultsContainer}>
+              <Text style={styles.title}>Résultats du Calcul</Text>
+              <Text style={styles.info}>• Pourcentage: {loading ? "--" : `${predictionData.result}%`}</Text>
+              <Text style={styles.info}>• Nombre de mouches: {loading ? "--" : dataImages?.class_A}</Text>
+              <Text style={styles.info}>• Nombre de mineuses: {loading ? "--" : dataImages?.class_B}</Text>
+              <Text style={styles.info}>• Nombre de Thrips: {loading ? "--" : dataImages?.class_C}</Text>
+            </View>
+
+            <View style={styles.carouselContainer}>
+              <Text style={styles.title}>Images du Calcul</Text>
+              <Carousel images={images} />
+            </View>
+          </>
+        )}
 
       </ScrollView>
 
@@ -334,16 +446,16 @@ const Calculation = () => {
       {
         isModifyClicked ? 
         <View style={styles.buttonRow1} >
-          <TouchableOpacity onPress={()=>{ setisModifyClicked(!isModifyClicked) }} style={styles.cancelButton}>
+          <TouchableOpacity onPress={()=>{ setisModifiedClicked(!isModifyClicked);setpredictionDataModifying(predictionData); }} style={styles.cancelButton}>
             <Text style={styles.buttonTextB}>Annuler</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton} onPress={()=>{ setisModifyClicked(!isModifyClicked) }} >
-            <Text style={styles.buttonTextW}>Enregistrer</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={()=>{ handleSaveData(predictionData.id); }} >
+            <Text style={styles.buttonTextW}>Sauvegarder</Text>
           </TouchableOpacity>
         </View>
         :
         <View style={styles.buttonRow1} >
-          <TouchableOpacity onPress={()=>{ setisModifyClicked(!isModifyClicked) }} style={styles.saveButton1}>
+          <TouchableOpacity onPress={()=>{ setisModifiedClicked(!isModifyClicked) }} style={styles.saveButton1}>
             <Text style={styles.buttonTextW}>Modifier le calcul</Text>
           </TouchableOpacity>
         </View>
