@@ -479,6 +479,8 @@ const takePhoto = async () => {
                 onPress={async ()=>{
                     deleteToken();
                     settriggerIt((prev) => !prev);
+                    await AsyncStorage.removeItem('userId');
+                    await AsyncStorage.removeItem('type');
                     setTimeout(()=>{
                       navigation.navigate('Home');
                     }, 400);

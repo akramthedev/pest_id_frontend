@@ -9,6 +9,7 @@ import { getToken } from '../Helpers/tokenStorage';
 import SkeletonLoader from './SkeletonLoader';
 import { useRoute } from '@react-navigation/native';
 import rateLimit from 'axios-rate-limit';
+import { Svg, Path } from 'react-native-svg';
 
 
 const axiosInstance = rateLimit(axios.create(), {
@@ -122,8 +123,13 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
                     {
                     diffInDays !== null && 
                         <>
-                        {diffInDays <= 5 && (
-                        <Text style={styles.detailsKKKNew}>Nouveau</Text>
+                        {diffInDays <= 7 && (
+                        <Svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 64 64">
+                          <Path 
+                            fill="#FFC017" 
+                            d="m39.637 40.831-5.771 15.871a1.99 1.99 0 0 1-3.732 0l-5.771-15.87a2.02 2.02 0 0 0-1.194-1.195L7.298 33.866a1.99 1.99 0 0 1 0-3.732l15.87-5.771a2.02 2.02 0 0 0 1.195-1.194l5.771-15.871a1.99 1.99 0 0 1 3.732 0l5.771 15.87a2.02 2.02 0 0 0 1.194 1.195l15.871 5.771a1.99 1.99 0 0 1 0 3.732l-15.87 5.771a2.02 2.02 0 0 0-1.195 1.194"
+                          />
+                          </Svg>
                         )}
                         </>
                     }
@@ -245,7 +251,7 @@ const styles = StyleSheet.create({
     padding : 2.2, 
     paddingLeft : 8, 
     paddingRight : 8,
-    backgroundColor : "#DEA001",
+    backgroundColor : "#1E971E",
     marginRight : 6,
     color : "white"
   },
@@ -263,7 +269,7 @@ const styles = StyleSheet.create({
     padding :1, 
     paddingLeft : 8, 
     paddingRight : 8,
-    backgroundColor : "#F3F3F3",
+    backgroundColor : "#E9830F",
     marginRight : 6,
     color : "black",
     fontSize : 14,

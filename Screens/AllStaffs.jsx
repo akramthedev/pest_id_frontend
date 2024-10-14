@@ -343,14 +343,16 @@ export default function AllStaffs() {
             
             
             <TouchableOpacity 
-                onPress={async ()=>{
-                    deleteToken();
-                    settriggerIt((prev) => !prev);
-                    setTimeout(()=>{
-                      navigation.navigate('Home');
-                    }, 400);
-                  }
-                } 
+               onPress={async ()=>{
+                deleteToken();
+                settriggerIt((prev) => !prev);
+                await AsyncStorage.removeItem('userId');
+                await AsyncStorage.removeItem('type');
+                setTimeout(()=>{
+                  navigation.navigate('Home');
+                }, 400);
+              }
+            } 
                 style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>

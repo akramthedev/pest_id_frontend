@@ -404,7 +404,7 @@ const Profile = () => {
             else{
               setdataProfile({ ...dataProfile, canAccess: 1 })
             }
-            setTriggerTheFucker(!TriggerTheFucker);
+             
            
             setmessageSuccess("Succès : le status du client a été mis à jour.");
             setShowSuccess(true);
@@ -1108,7 +1108,7 @@ const Profile = () => {
                         <>
                           
                           {
-                            canHeAccess!== null && 
+                            dataProfile!== null && 
                             (
                               <TouchableOpacity
                                 disabled={loading || !dataProfile || loader2}
@@ -1118,7 +1118,7 @@ const Profile = () => {
                                 ]}
                                 onPress={() => {restreindreCompte()}}
                               >
-                                <Text style={styles.buttonTextWhite}>{canHeAccess ? "Restreindre" : "Autoriser"}</Text>
+                                <Text style={styles.buttonTextWhite}>{dataProfile.canAccess === 1 ? "Restreindre" : "Autoriser"}</Text>
                               </TouchableOpacity>
                             )
                           }
@@ -1299,13 +1299,15 @@ const Profile = () => {
             
             <TouchableOpacity 
                 onPress={async ()=>{
-                    deleteToken();
-                    settriggerIt((prev) => !prev);
-                    setTimeout(()=>{
-                      navigation.navigate('Home');
-                    }, 400);
-                  }
-                } 
+                  deleteToken();
+                  settriggerIt((prev) => !prev);
+                  await AsyncStorage.removeItem('userId');
+                  await AsyncStorage.removeItem('type');
+                  setTimeout(()=>{
+                    navigation.navigate('Home');
+                  }, 400);
+                }
+              } 
                 style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
               <Text style={styles.menuText}>Logout</Text>
