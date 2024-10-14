@@ -13,8 +13,12 @@ import SkeletonLoader from "../Components/SkeletonLoader"
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
- 
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
  
   
 const { width: screenWidth } = Dimensions.get('window');
@@ -69,7 +73,7 @@ export default function MesClients({route}) {
     
             const token = await getToken(); 
             
-            const response = await axios.get(`${ENDPOINT_API}users`, {
+            const response = await axiosInstance.get(`${ENDPOINT_API}users`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

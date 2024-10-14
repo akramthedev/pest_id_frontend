@@ -12,8 +12,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const CreateFarm = ({route}) => {
   const [showError, setShowError] = useState(false);
@@ -132,7 +136,7 @@ const CreateFarm = ({route}) => {
           location : JSON.stringify(locationCoords), 
           size : Mesure
         }
-        const resp0 = await axios.post(`${ENDPOINT_API}farms`, dataX, {
+        const resp0 = await axiosInstance.post(`${ENDPOINT_API}farms`, dataX, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

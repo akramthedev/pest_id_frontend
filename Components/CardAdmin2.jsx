@@ -8,6 +8,14 @@ import axios from 'axios';
 import { getToken } from '../Helpers/tokenStorage';
 import SkeletonLoader from './SkeletonLoader';
 import { useRoute } from '@react-navigation/native';
+import rateLimit from 'axios-rate-limit';
+
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 10, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
+
 
 
 
@@ -35,7 +43,7 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
           setloading(true);
           const token = await getToken(); 
 
-          const resp = await axios.get(`${ENDPOINT_API}user/${item.user_id}`, {
+          const resp = await axiosInstance.get(`${ENDPOINT_API}user/${item.user_id}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

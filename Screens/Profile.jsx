@@ -19,6 +19,12 @@ import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import CardAdmin from '../Components/CardAdmin2';
 const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 8, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const Profile = () => {
   const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
@@ -104,7 +110,7 @@ const Profile = () => {
 
           if(id === 666 || id === "666" || userIdNum === id){
             //fetch my infos
-            const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+            const response = await axiosInstance.get(`${ENDPOINT_API}user/${userIdNum}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -139,7 +145,7 @@ const Profile = () => {
             //fetch other infos
             setdataProfile(null);
             setdataProfileOfChangement(null)
-            const response = await axios.get(`${ENDPOINT_API}user/${id}`, {
+            const response = await axiosInstance.get(`${ENDPOINT_API}user/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -147,7 +153,7 @@ const Profile = () => {
 
             if(response.status === 200){
 
-              const responseVisitor = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+              const responseVisitor = await axiosInstance.get(`${ENDPOINT_API}user/${userIdNum}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`
                 }
@@ -323,7 +329,7 @@ const Profile = () => {
           image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png", 
           type : dataProfileOfChangement.type
         }
-        const resp = await axios.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
+        const resp = await axiosInstance.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -385,7 +391,7 @@ const Profile = () => {
             access = "canNotAccess";
           }
 
-          const resp = await axios.get(`${ENDPOINT_API}updateUserRestriction/${id}/${access}`, {
+          const resp = await axiosInstance.get(`${ENDPOINT_API}updateUserRestriction/${id}/${access}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -504,7 +510,7 @@ const Profile = () => {
         else{
           userIdX = id;
         }
-        const resp = await axios.post(`${ENDPOINT_API}updatePassword/${userIdX}`,dataPss, {
+        const resp = await axiosInstance.post(`${ENDPOINT_API}updatePassword/${userIdX}`,dataPss, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -585,7 +591,7 @@ const Profile = () => {
           setloaderDelete(true);
           const token = await getToken();
 
-          const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${parseInt(id)}`, {
+          const resp0 = await axiosInstance.get(`${ENDPOINT_API}getAdminIdFromUserId/${parseInt(id)}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -596,7 +602,7 @@ const Profile = () => {
             console.log("-------------");
             console.log(idAdmin);
             console.log('-------------');
-            const resp00 = await axios.get(`${ENDPOINT_API}staffs/${idAdmin}`, {
+            const resp00 = await axiosInstance.get(`${ENDPOINT_API}staffs/${idAdmin}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -610,7 +616,7 @@ const Profile = () => {
             }
           }
 
-          const resp = await axios.delete(`${ENDPOINT_API}deleteUserWhoIsAdmin/${parseInt(id)}`, {
+          const resp = await axiosInstance.delete(`${ENDPOINT_API}deleteUserWhoIsAdmin/${parseInt(id)}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -620,7 +626,7 @@ const Profile = () => {
             if (staffsUsers.length !== 0) {
               for (const staff of staffsUsers) {
                 try {
-                  await axios.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${staff.user_id}`, {
+                  await axiosInstance.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${staff.user_id}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`
                     }
@@ -671,7 +677,7 @@ const Profile = () => {
         try{
           setloaderDelete(true);
           const token = await getToken();
-          const resp = await axios.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${parseInt(id)}`, {
+          const resp = await axiosInstance.delete(`${ENDPOINT_API}deleteUserStaffNotAdmin/${parseInt(id)}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

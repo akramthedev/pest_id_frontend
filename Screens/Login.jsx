@@ -11,8 +11,12 @@ import axios from "axios";
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 3, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const Login = ({ route }) => {
   const { settriggerIt, triggerIt } = useAuth();
@@ -45,7 +49,7 @@ const Login = ({ route }) => {
           email: email,
           password: password,
         };
-        const response = await axios.post(`${ENDPOINT_API}login`, dataX);
+        const response = await axiosInstance.post(`${ENDPOINT_API}login`, dataX);
         
         if (response.status === 200) {
           const token = response.data.token;

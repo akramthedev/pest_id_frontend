@@ -15,6 +15,14 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
+
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
+
 
 
 const personnelData = [
@@ -89,7 +97,7 @@ const AdminProfile = () => {
     
             const token = await getToken(); 
             
-            const response = await axios.get(`${ENDPOINT_API}user/${id}`, {
+            const response = await axiosInstance.get(`${ENDPOINT_API}user/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

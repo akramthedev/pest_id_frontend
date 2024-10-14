@@ -6,7 +6,10 @@ import { formatLocation } from '../Helpers/locationTransf';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
+ 
 
+
+ 
 
 
 export const CardFarm = ({ item }) => {

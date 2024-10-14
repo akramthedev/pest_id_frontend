@@ -12,8 +12,12 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 const convertToMySQLDateTime = (dateString) => {
@@ -206,7 +210,7 @@ const Calculation = () => {
         const userIdNum = parseInt(userId);
         
         const token = await getToken();   
-        const response = await axios.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -261,7 +265,7 @@ const Calculation = () => {
 
         */
         const token = await getToken();         
-        const response = await axios.get(`${ENDPOINT_API}singlePrediction/${id}`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}singlePrediction/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -270,7 +274,7 @@ const Calculation = () => {
         if (response.status === 200) {
           setpredictionData(response.data[0]);
           setpredictionDataModifying(response.data[0]);
-          const response2 = await axios.get(`${ENDPOINT_API}predictions/${id}/images`, {
+          const response2 = await axiosInstance.get(`${ENDPOINT_API}predictions/${id}/images`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -322,7 +326,7 @@ const Calculation = () => {
    try{
      // id : prediction id 
       const token = await getToken();         
-      const response = await axios.patch(`${ENDPOINT_API}updatePrediction/${id}`, predictionDataModifying , {
+      const response = await axiosInstance.patch(`${ENDPOINT_API}updatePrediction/${id}`, predictionDataModifying , {
         headers: {
           'Authorization': `Bearer ${token}`
         }

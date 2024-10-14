@@ -15,7 +15,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 const SkeletonButtonLoader = () => {
@@ -105,7 +111,7 @@ export default function AllFarms() {
           const userId = await AsyncStorage.getItem('userId');
           const userIdNum = parseInt(userId);
 
-          const response = await axios.get(`${ENDPOINT_API}farms/${userIdNum}`, {
+          const response = await axiosInstance.get(`${ENDPOINT_API}farms/${userIdNum}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

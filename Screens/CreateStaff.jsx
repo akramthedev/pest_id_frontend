@@ -12,8 +12,12 @@ import axios from 'axios';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const CreateStaff = ({route}) => {
 
@@ -104,7 +108,7 @@ const CreateStaff = ({route}) => {
       const userId = await AsyncStorage.getItem('userId');
       const userIdNum = parseInt(userId);
 
-      const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userIdNum}`);
+      const resp0 = await axiosInstance.get(`${ENDPOINT_API}getAdminIdFromUserId/${userIdNum}`);
       if(resp0.status === 200){
         let idAdmin = resp0.data.id;
         let data = {
@@ -121,7 +125,7 @@ const CreateStaff = ({route}) => {
   
         const token = await getToken(); 
   
-        const resp = await axios.post(`${ENDPOINT_API}staff`, data, {
+        const resp = await axiosInstance.post(`${ENDPOINT_API}staff`, data, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

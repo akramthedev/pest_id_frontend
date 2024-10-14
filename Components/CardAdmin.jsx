@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
 import { useRoute } from '@react-navigation/native';
 import { AlertError, AlertSuccess } from "./AlertMessage";
+ 
+
+ 
 
 
 export  const CardAdmin = ({ item,index, isXClicked }) => {

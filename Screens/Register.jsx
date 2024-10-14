@@ -9,6 +9,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../Helpers/AuthContext';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
+import rateLimit from 'axios-rate-limit';
+
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 3, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
+
 
 
 const Register = ({route}) => {
@@ -58,7 +66,7 @@ const Register = ({route}) => {
         setshowerror(false);
         seterror('');
         
-        const response = await axios.post(`${ENDPOINT_API}register`, data);
+        const response = await axiosInstance.post(`${ENDPOINT_API}register`, data);
       
         if (response.status === 201) {
 

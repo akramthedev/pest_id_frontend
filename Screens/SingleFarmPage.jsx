@@ -18,8 +18,14 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
 import ProfileSkeleton from '../Components/ProfileSkeleton';
- 
+import rateLimit from 'axios-rate-limit';
 
+
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const SingleFarmPage = () => {
   const [showError, setShowError] = useState(false);
@@ -106,7 +112,7 @@ const SingleFarmPage = () => {
           try {
             setLoading(true);  
             const token = await getToken(); 
-            const response = await axios.get(`${ENDPOINT_API}farms/getSingleFarm/${id}`, {
+            const response = await axiosInstance.get(`${ENDPOINT_API}farms/getSingleFarm/${id}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -114,7 +120,7 @@ const SingleFarmPage = () => {
             
             if (response.status === 200) {
               setdataFarm(response.data[0]);
-              const response2 = await axios.get(`${ENDPOINT_API}serres-per-farm/${id}`, {
+              const response2 = await axiosInstance.get(`${ENDPOINT_API}serres-per-farm/${id}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`
                 }

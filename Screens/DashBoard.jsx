@@ -12,7 +12,11 @@ import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
 const { width: screenWidth } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
-
+import rateLimit from 'axios-rate-limit';
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 export default function Dashboard({ route }) {

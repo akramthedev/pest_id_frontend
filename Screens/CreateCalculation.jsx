@@ -14,7 +14,11 @@ import axios from "axios";
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
-
+import rateLimit from 'axios-rate-limit';
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 const CreateCalculation = ({route}) => {
@@ -134,7 +138,7 @@ const takePhoto = async () => {
         const userIdNum = parseInt(userId);
         
         const token = await getToken();   
-        const response = await axios.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -208,7 +212,7 @@ const takePhoto = async () => {
   
       try {
         const token = await getToken();   
-        const response = await axios.post(`${ENDPOINT_API}create_prediction`, formData, {
+        const response = await axiosInstance.post(`${ENDPOINT_API}create_prediction`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`

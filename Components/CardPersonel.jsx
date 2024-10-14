@@ -8,7 +8,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonLoader from "./SkeletonLoader"
 import { ENDPOINT_API } from '../Screens/endpoint';
+import rateLimit from 'axios-rate-limit';
 
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 10, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 export const CardPersonal = ({ item }) => {
@@ -34,7 +40,7 @@ export const CardPersonal = ({ item }) => {
       try {
         setLoading(true);
          const token = await getToken(); 
-        const response = await axios.get(`${ENDPOINT_API}user/${item.user_id}`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}user/${item.user_id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

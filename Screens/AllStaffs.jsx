@@ -15,7 +15,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
-
+import rateLimit from 'axios-rate-limit';
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const SkeletonButtonLoader = () => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
@@ -116,10 +120,10 @@ export default function AllStaffs() {
             setLoading(true);
   
             const token = await getToken();
-            const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${id}`);
+            const resp0 = await axiosInstance.get(`${ENDPOINT_API}getAdminIdFromUserId/${id}`);
   
             if (resp0.status === 200) {
-              const response = await axios.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
+              const response = await axiosInstance.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`,
                 },

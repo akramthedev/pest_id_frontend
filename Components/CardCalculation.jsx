@@ -5,6 +5,13 @@ import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { ENDPOINT_API } from '../Screens/endpoint';
+import rateLimit from 'axios-rate-limit';
+
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 10, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 
 const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage }) => {
@@ -29,7 +36,7 @@ const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage })
         setLoading(true);
         const IdOfPredi = id;
         const token = await getToken(); 
-        const response = await axios.get(`${ENDPOINT_API}predictions/${IdOfPredi}/images`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}predictions/${IdOfPredi}/images`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

@@ -14,6 +14,13 @@ import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
+
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
+
 
 
 const History = ({route}) => {
@@ -110,7 +117,7 @@ const History = ({route}) => {
   
           const token = await getToken(); 
           
-          const response = await axios.get(`${ENDPOINT_API}users/${userIdNum}/predictions`, {
+          const response = await axiosInstance.get(`${ENDPOINT_API}users/${userIdNum}/predictions`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

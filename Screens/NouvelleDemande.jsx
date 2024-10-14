@@ -13,8 +13,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -69,7 +73,7 @@ const NouvelleDemande = () => {
         setLoading(true);
        
         const token = await getToken(); 
-        const response = await axios.get(`${ENDPOINT_API}user/${id}`, {
+        const response = await axiosInstance.get(`${ENDPOINT_API}user/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -163,14 +167,14 @@ const NouvelleDemande = () => {
         setLoading2(true);
        
         const token = await getToken(); 
-        const response = await axios.post(`${ENDPOINT_API}accept/${id}`, {
+        const response = await axiosInstance.post(`${ENDPOINT_API}accept/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
         if (response.status === 200) {
-          const response2 = await axios.get(`${ENDPOINT_API}admin/${id}`, {
+          const response2 = await axiosInstance.get(`${ENDPOINT_API}admin/${id}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -231,7 +235,7 @@ const NouvelleDemande = () => {
         setLoading2(true);
        
         const token = await getToken(); 
-        const response = await axios.post(`${ENDPOINT_API}refuse/${id}`, {
+        const response = await axiosInstance.post(`${ENDPOINT_API}refuse/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

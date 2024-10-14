@@ -12,8 +12,12 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
 import axios from 'axios';
+import rateLimit from 'axios-rate-limit';
 
-
+const axiosInstance = rateLimit(axios.create(), {
+  maxRequests: 5, // maximum number of requests
+  perMilliseconds: 1000, // time window in milliseconds
+});
 const ModifierSerre = () => {
 
   const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
@@ -124,7 +128,7 @@ const ModifierSerre = () => {
       try{
         setloaderDelete(true);
         const token = await getToken();
-        const resp = await axios.delete(`${ENDPOINT_API}serres/${IdSerre}`, {
+        const resp = await axiosInstance.delete(`${ENDPOINT_API}serres/${IdSerre}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -186,7 +190,7 @@ const ModifierSerre = () => {
           type : typeS
         }
 
-        const resp = await axios.patch(`${ENDPOINT_API}serres/${IdSerre}`, datak , {
+        const resp = await axiosInstance.patch(`${ENDPOINT_API}serres/${IdSerre}`, datak , {
           headers: {
             'Authorization': `Bearer ${token}`
           }
