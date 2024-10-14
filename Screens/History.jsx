@@ -33,6 +33,18 @@ const History = ({route}) => {
   },[ ]);
 
 
+  const [IDCurrent, setIDCurrent] = useState(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        setIDCurrent(userIdNum);
+      }
+      x(); 
+  }, []));
   const { settriggerIt, triggerIt } = useAuth();
   const [allPredictions,setAllPredictions] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -279,10 +291,13 @@ const History = ({route}) => {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                  {
+                  IDCurrent && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

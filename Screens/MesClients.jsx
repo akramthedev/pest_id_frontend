@@ -26,6 +26,18 @@ export default function MesClients({route}) {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const [IDCurrent, setIDCurrent] = useState(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        setIDCurrent(userIdNum);
+      }
+      x(); 
+  }, []));
     const [NumberOfDemands, setNumberOfDemand] = useState(null);
     const [NumberOfCLients, setNumberOfClients] = useState(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -302,10 +314,13 @@ export default function MesClients({route}) {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                  {
+                  IDCurrent && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

@@ -1,8 +1,8 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {Image ,ScrollView, TextInput,Alert,StyleSheet,FlatList, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
  import { Picker } from '@react-native-picker/picker'; 
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { useRoute } from '@react-navigation/native';
@@ -104,6 +104,7 @@ import { useAuth } from '../Helpers/AuthContext';
 
 const Calculation = () => {
 
+
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [farms, setFarms] = useState([]);
@@ -113,6 +114,22 @@ const Calculation = () => {
   const [loadingX, setLoadingX] = useState(true);
   const [role, setRole] = useState(null);
 
+
+  
+  const [IDCurrent, setIDCurrent] = useState(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        setIDCurrent(userIdNum);
+      }
+      x(); 
+  }, []));
+
+  
   useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
@@ -529,10 +546,13 @@ const Calculation = () => {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                  {
+                  IDCurrent && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

@@ -1,9 +1,9 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Image ,ScrollView, TextInput,StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
 const { width: screenWidth } = Dimensions.get('window');
@@ -82,6 +82,21 @@ const CreateStaff = ({route}) => {
   ).current;
 
 
+  
+  const [IDCurrent, setIDCurrent] = useState(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        setIDCurrent(userIdNum);
+      }
+      x(); 
+  }, []));
+  
+
   const [loading, setloading] = useState(false);
   const CreatePersonel= async () => {
     try{
@@ -126,7 +141,9 @@ const CreateStaff = ({route}) => {
             }, 3000);
 
           setTimeout(()=>{
-            navigation.navigate('MesPersonels');
+            if(IDCurrent){
+              navigation.navigate('MesPersonels', {id : IDCurrent});
+            }
           }, 3000);
         }
         else if (resp.status === 222){
@@ -304,10 +321,13 @@ const CreateStaff = ({route}) => {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                  {
+                  IDCurrent && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

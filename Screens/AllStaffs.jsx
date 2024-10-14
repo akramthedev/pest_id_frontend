@@ -1,7 +1,7 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, SafeAreaView, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import CardPersonal from '../Components/CardPersonel';
@@ -17,8 +17,9 @@ import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
 
 
-const SkeletonButtonLoader = ({route}) => {
+const SkeletonButtonLoader = () => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
+ 
 
   useEffect(() => {
     Animated.loop(
@@ -58,7 +59,9 @@ export default function AllStaffs() {
 
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [TriggerITTTT, setTriggerITTTT] = useState(false);
+  const route = useRoute();
+  const { id } = route.params; 
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -77,51 +80,76 @@ export default function AllStaffs() {
   const [AllStaffs,setAllStaffs] = useState(null);
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const navigation = useNavigation();
+ 
+
 
 
  
+  const [isCurrent, setisCurrent] = useState(null);
+  const [IDCurrent, setIDCurrent] = useState(null);
+  const [IDCurrent2, setIDCurrent2] = useState(null);
+
+
+  
   useFocusEffect(
     useCallback(() => {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-  
-          const token = await getToken(); 
-          const userId = await AsyncStorage.getItem('userId');
-          const userIdNum = parseInt(userId);
-         
-          const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userIdNum}`);
 
-          if(resp0.status === 200){
-            const response = await axios.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
+      const x = async ()=>{
+        if(id !== null && id !== undefined){
+          const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+          if(rolex !== null && rolex !== undefined ){
+            setRole(rolex);
+            const userId = await AsyncStorage.getItem('userId');
+            const userIdNum = parseInt(userId);
+            setIDCurrent2(userIdNum);
+            if(id!== null && id !== undefined){
+              if(id === 666 || id === "666" || userIdNum === id){setisCurrent(true);setIDCurrent(userIdNum);}else{setisCurrent(false);setIDCurrent(id);}}}
+          else{console.log('Rolex Undefined... WTF');}}}
+      x(); }, [id])  );
+
+
+
+
+      const fetchData = async () => {
+        if (id !== null && id !== undefined) {
+          try {
+            setLoading(true);
+  
+            const token = await getToken();
+            const resp0 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${id}`);
+  
+            if (resp0.status === 200) {
+              const response = await axios.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              });
+  
+              if (response.status === 200) {
+                setAllStaffs(response.data);
+                console.log(response.data);
+              } else {
+                Alert.alert('Erreur lors de la récupération de données.');
               }
-            });
-            if (response.status === 200) {
-              setAllStaffs(response.data);
-              console.log(response.data);
             } else {
-              Alert.alert('Erreur lors de la récupération de données.');
+              navigation.navigate('Dashboard');
             }
+          } catch (error) {
+            console.error('Erreur :', error.message);
+          } finally {
+            setLoading(false);
           }
-          else{
-            navigation.navigate('Dashboard');
-          }
-           
-        } catch (error) {
-          console.error('Erreur :', error.message);
-        } finally {
-          setLoading(false);
         }
       };
   
-      fetchData();
-      
-      return () => setLoading(false);  
-  
-    }, [navigation])
-  );
+
+
+      useFocusEffect(
+        useCallback(() => {
+          fetchData();
+        }, [id]) 
+      );
+
 
    
   const toggleMenu = () => {
@@ -177,7 +205,7 @@ export default function AllStaffs() {
               />
             </View>
           }
-          <Text style={styles.titleText}>Mes Personels</Text>
+          <Text style={styles.titleText}>Personnels</Text>
           <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
             <Ionicons name="menu" size={24} color="#3E6715" />
           </TouchableOpacity>
@@ -212,15 +240,22 @@ export default function AllStaffs() {
       </ScrollView>
       
       {
-        loading ? (
-          <View style={styles.skeletonButtonContainer}>
-            <SkeletonButtonLoader />
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate('AjouterUnPersonel')}} >
-            <Text style={styles.addButtonText}>+ Ajouter un nouveau personel</Text>
-          </TouchableOpacity>
-        )
+        
+          isCurrent === true && 
+          <>
+          {
+            loading ? (
+              <View style={styles.skeletonButtonContainer}>
+                <SkeletonButtonLoader />
+              </View> 
+            ) : (
+              <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate('AjouterUnPersonel')}} >
+                <Text style={styles.addButtonText}>+ Ajouter un nouveau personel</Text>
+              </TouchableOpacity>
+            )
+          }
+          </>
+         
       }
 
 
@@ -287,10 +322,14 @@ export default function AllStaffs() {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                     
+                  {
+                    IDCurrent && 
+                    <TouchableOpacity onPress={() => { setTriggerITTTT(prev => !prev);navigation.navigate('MesPersonels', {id: IDCurrent2 } ); toggleMenu(); }} style={styles.menuItem}>
+                      <Ionicons name="people-outline" size={24} color="black" />
+                      <Text style={styles.menuText}>Mes personnels</Text>
+                    </TouchableOpacity>
+                  }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

@@ -55,7 +55,8 @@ const Profile = () => {
   const [confirmNvmotedepasse, setconfirmNvmotedepasse] = useState("");
   const [loadingPassword, setloadingPassword] = useState(false);
   //const [voirPersonelClicked, setvoirPersonelClicked] = useState(null);
-
+  const [IDCurrent, setIDCurrent] = useState(null);
+  const [IDCurrent2, setIDCurrent2] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -66,12 +67,15 @@ const Profile = () => {
         setRole(rolex);
         const userId = await AsyncStorage.getItem('userId');
         const userIdNum = parseInt(userId);
+        setIDCurrent2(userIdNum);
         if(id!== null && id !== undefined){
           if(id === 666 || id === "666" || userIdNum === id){
             setisCurrent(true);
+            setIDCurrent(userIdNum);
           }
           else{
             setisCurrent(false);
+            setIDCurrent(id);
           }
         }
       }
@@ -568,82 +572,6 @@ const Profile = () => {
     }
   }
 
-  /*
-  
-  const [allPersonnels, setallPersonnels] = useState(null);
-  const [loadingPersonnel, setloadingPersonnel] = useState(null);
-
-  
-
-
-  
-
-  const fetchPersonnels = async () => {
-    if (loadingPersonnel) return; // Prevent duplicate requests
-    if (dataProfile !== null) {
-      if (dataProfile.type === "admin" || dataProfile.type === 'superadmin') {
-        try {
-          setloadingPersonnel(true);
-          const token = await getToken();
-          let adminId;
-          let userId;
-
-          if (id === 666 || id === "666") {
-            const u = await AsyncStorage.getItem('userId');
-            userId = parseInt(u);
-          } else {
-            userId = id;
-          }
-
-          const resp1 = await axios.get(`${ENDPOINT_API}getAdminIdFromUserId/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (resp1.status === 200) {
-            adminId = resp1.data.id;
-
-            const resp2 = await axios.get(`${ENDPOINT_API}staffs/${adminId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            if (resp2.status === 200) {
-              setallPersonnels(resp2.data);
-            }
-          }
-        } catch (e) {
-          console.log(e);
-          setmessageError("un problème technique est survenu. Veuillez réessayer plus tard.");
-          setShowError(true);
-          setTimeout(() => {
-            setShowError(false);
-          }, 3000);
-          setTimeout(() => {
-            setmessageError("");
-          }, 4000);
-          Alert.alert(e.message);
-        } finally {
-          setloadingPersonnel(false);
-        }
-      }
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      if (dataProfile !== null && dataProfile.type !== "staff" && !hasFetched.current) {
-        fetchPersonnels();
-        hasFetched.current = true;  
-      }
-    }, [dataProfile, id])  
-  );
-
-  useEffect(() => {
-    hasFetched.current = false;  
-  }, [id]);
-  
-  */
 
 
 
@@ -938,69 +866,6 @@ const Profile = () => {
     }
 
 
-    {/*
-    
-    {
-      (voirPersonelClicked  && isCurrent!== null) &&
-        <View  style={[styles.popUpSecond, { height: screenHeight - 110  }]} >
-
-              <Text style={styles.titlePP}>
-                <Ionicons name="arrow-forward" size={18} color="black" />&nbsp;
-                Liste de {isCurrent ? "mes" : "ses"} personnels
-              </Text>
-
-              <ScrollView style={[styles.scrollViewXX, { height: screenHeight - 500  }]}  >
-              {
-                loadingPersonnel ? 
-                <View style={{ height : 333, alignItems : "center", justifyContent : "center" }} >           
-                  <Text style={{ fontSize : 15, textAlign : "center" }}>Chargement...</Text>
-                </View> 
-                :
-                <>
-                {
-                  allPersonnels && 
-                  <>
-                  {
-                    allPersonnels.length === 0 ? 
-                    <View style={{ height : 333, alignItems : "center", justifyContent : "center" }} >           
-                      <Text style={{ fontSize : 15, textAlign : "center" }}>Aucune donnée</Text>
-                    </View>
-                    :
-                    allPersonnels.map((personel)=>{
-                      return(
-                        <CardAdmin 
-                          item={personel} 
-                          index={personel.id} 
-                          isXClicked={true} 
-                           
-                        />
-                      )
-                    })
-                  }
-                  </>   
-                }
-                </>
-              }
-              </ScrollView>
-
-              <View style={styles.buttonRowPP}>
-                <TouchableOpacity 
-                  onPress={()=>{
-                    setvoirPersonelClicked(false);
-                  }}
-                  style={styles.buttonPPQUITER}
-                >
-                  <Text style={styles.buttonTextPPA}>Quitter cette fenêtre</Text>
-                </TouchableOpacity>
-              </View>
-             
-        </View>
-    }
-    
-    */}
-
-
-
 
     <View style={styles.container}>
       <AlertError message={messageError} visible={showError} />
@@ -1182,10 +1047,20 @@ const Profile = () => {
                     <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
                     <Ionicons name="arrow-forward" size={24} color="gray" />
                   </TouchableOpacity>
+                  
+                  {
+                    (IDCurrent !== null && dataProfile.type !== "staff") && 
+                    <TouchableOpacity  onPress={()=>{ navigation.navigate('MesPersonels', { id: IDCurrent }) }} style={styles.modifierVotreX}>
+                      <Text style={styles.modifierVotreXText}>Voir {isCurrent!== null && (isCurrent === true ? "mes" : "ses")} personnels</Text>
+                      <Ionicons name="arrow-forward" size={24} color="gray" />
+                    </TouchableOpacity>
+                  }
+                  
                   <TouchableOpacity  onPress={()=>{handleClick(3)}} style={styles.modifierVotreX}>
                     <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
                     <Ionicons name="arrow-forward" size={24} color="gray" />
                   </TouchableOpacity >
+                  
                 </>
               )}
             </>
@@ -1396,10 +1271,18 @@ const Profile = () => {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                 
+                 
+                 
+                  {
+                  IDCurrent2 && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent2}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
+
+                  
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>

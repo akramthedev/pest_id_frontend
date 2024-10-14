@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';  
@@ -91,6 +91,31 @@ export default function Dashboard({ route }) {
     })
   ).current;
 
+
+
+
+  
+  const [IDCurrent, setIDCurrent] = useState(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+        setIDCurrent(userIdNum);
+      }
+      x(); 
+  }, []));
+
+
+
+
+
+
+
+
+  
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -261,10 +286,13 @@ export default function Dashboard({ route }) {
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter une ferme</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels'); toggleMenu(); }} style={styles.menuItem}>
-                    <Ionicons name="people-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes personnels</Text>
-                  </TouchableOpacity>
+                  {
+                  IDCurrent && 
+                  <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
+                  <Ionicons name="people-outline" size={24} color="black" />
+                  <Text style={styles.menuText}>Mes personnels</Text>
+                </TouchableOpacity>
+                 }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.menuText}>Ajouter un personnel</Text>
