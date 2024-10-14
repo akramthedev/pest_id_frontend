@@ -236,7 +236,7 @@ export default function MesClients({route}) {
                                 <>
                                   {
                                     (data.canAccess === 0 && data.isEmailVerified === 0) && (
-                                      <CardAdmin key={data.id}  index={data.id} item={data} isXClicked={isXClicked} />
+                                      <CardAdmin key={data}  index={data.id} item={data} isXClicked={isXClicked} />
                                     )
                                   }
                                 </>

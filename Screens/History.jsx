@@ -198,7 +198,6 @@ const History = ({route}) => {
                   return(
                     <Card
                       id={predic.id}
-                      key={predic.id} 
                       idPlaque={predic.plaque_id}
                       idFarm={predic.farm_id}
                       idSerre={predic.serre_id}
@@ -278,7 +277,7 @@ const History = ({route}) => {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
+              <Ionicons name="archive-outline" size={24} color="black" />
               <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>

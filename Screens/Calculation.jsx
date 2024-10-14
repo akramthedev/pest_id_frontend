@@ -1,7 +1,8 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {Image ,ScrollView, TextInput,Alert,StyleSheet,FlatList, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
- import { Picker } from '@react-native-picker/picker'; 
+import CustomDatePicker from "../Components/CustomDatePicker";
+import { Picker } from '@react-native-picker/picker'; 
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons'; 
@@ -108,7 +109,7 @@ import { useAuth } from '../Helpers/AuthContext';
 
 const Calculation = () => {
 
-
+  const [loaderMM, setloaderMM] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [farms, setFarms] = useState([]);
@@ -117,9 +118,9 @@ const Calculation = () => {
   const [selectedGreenhouse, setSelectedGreenhouse] = useState('');
   const [loadingX, setLoadingX] = useState(true);
   const [role, setRole] = useState(null);
-
-
-  
+  const [selectedFarmObj, setSelectedFarmObj] = useState(null);  
+  const [selectedGreenhouseObj, setSelectedGreenhouseObj] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [IDCurrent, setIDCurrent] = useState(null);
 
 
@@ -236,34 +237,13 @@ const Calculation = () => {
 
 
 
-
-
-  
-  const handleFarmChange = (farmId) => {
-    setSelectedFarm(farmId);
-    
-    const selectedFarm = farms.find(farm => farm.id === farmId);
-    
-    if (selectedFarm && selectedFarm.serres && Array.isArray(selectedFarm.serres)) {
-      setGreenhouses(selectedFarm.serres);
-    } else {
-      setGreenhouses([]);
-    }
-  };
-
-
+ 
 
 
   const fetchData = async () => {
-    if(id){
+    if (id) {
       try {
         setLoading(true);
-        /*
-        
-          const userId = await AsyncStorage.getItem('userId');
-          const userIdNum = parseInt(userId);
-
-        */
         const token = await getToken();         
         const response = await axiosInstance.get(`${ENDPOINT_API}singlePrediction/${id}`, {
           headers: {
@@ -272,27 +252,90 @@ const Calculation = () => {
         });
         
         if (response.status === 200) {
-          setpredictionData(response.data[0]);
-          setpredictionDataModifying(response.data[0]);
+          const prediction = response.data[0];
+          setpredictionData(prediction);
+          setpredictionDataModifying(prediction);
+
+
+          const fetchedDate = new Date(prediction.created_at); // Convert the fetched date string to a Date object
+
+          // Check if the date is valid
+          if (!isNaN(fetchedDate.getTime())) {
+            setpredictionDataModifying(prediction);
+            setSelectedDate(fetchedDate); // Set the date for the picker
+          } else {
+            console.error('Invalid date format:', prediction.created_at);
+          }
+
+        
+
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+
+          const responseFarmsFetching = await axiosInstance.get(`${ENDPOINT_API}getFarmsWithGreenhouses/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+  
+          if(responseFarmsFetching.status  === 200){
+             setFarms(responseFarmsFetching.data);
+          }
+          else{
+            console.log("Not Fetched All Farms With Their Serres");
+          }
+
+          setSelectedFarm(prediction.farm_id); // Set selected farm
+          const selectedFarm = responseFarmsFetching.data.find(farm => farm.id === prediction.farm_id);
+
+           
+          //console.log("Prediction : ");
+          //console.log(prediction);
+
+          //console.log("All Farms With Serres :");
+          //console.log(responseFarmsFetching.data)
+          
+          //console.log('Previous Farm :', selectedFarm); // Log the selected farm
+
+          if (selectedFarm) {
+            setGreenhouses(selectedFarm.serres); // Set greenhouses based on selected farm
+            
+            // Log the greenhouses to check if they are being set correctly
+            //console.log('Available Greenhouses:', selectedFarm.serres);
+
+            // Set the associated greenhouse if it exists
+            if (selectedFarm.serres && selectedFarm.serres.length > 0) {
+              const greenhouseId = prediction.serre_id; // This is the greenhouse id from the prediction
+              //console.log('Predicted Greenhouse ID:', greenhouseId); // Log the predicted greenhouse ID
+
+              // Check if the greenhouse ID exists in the available greenhouses
+              const greenhouseExists = selectedFarm.serres.some(greenhouse => greenhouse.id === greenhouseId);
+              
+              if (greenhouseExists) {
+                setSelectedGreenhouse(greenhouseId); // Set the greenhouse based on prediction data
+                //console.log('Selected Greenhouse:', greenhouseId); // Confirm selection
+              } else {
+                console.warn('Greenhouse ID does not exist in the selected farm’s greenhouses:', greenhouseId);
+                // Optionally reset the selected greenhouse if it doesn't exist
+                setSelectedGreenhouse(null); // Reset if needed
+              }
+            } else {
+              console.warn('No greenhouses available for the selected farm.');
+              // Optionally reset the selected greenhouse
+              setSelectedGreenhouse(null); // Reset if needed
+            }
+          } else {
+            console.warn('Selected farm not found in the farms array for farm_id:', prediction.farm_id);
+          }
+  
           const response2 = await axiosInstance.get(`${ENDPOINT_API}predictions/${id}/images`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
           if (response2.status === 200) {
-            console.log("Fetched images:", response2.data); 
             setDataImages(response2.data[0]);
-            if (response2.data.length > 1) {
-              const imageArray = response2.data.map((img) => {
-                const imageUrl = `http://your-server.com/path/to/images/${img.name}`;  
-                return { uri: imageUrl };
-              });
-              setImages(imageArray);
-              console.log("Fetched images:", imageArray); 
-            } else {
-              setImages([{ uri: 'https://static.aujardin.info/cache/th/img9/aleurodes-500x375.jpg' }]);
-            }
-           } 
+          }
         } else {
           Alert.alert('Erreur lors de la récupération de données.');
         }
@@ -303,6 +346,13 @@ const Calculation = () => {
       }
     }
   };
+  
+
+ 
+
+
+
+
 
   useEffect(()=>{
     fetchData();
@@ -310,6 +360,8 @@ const Calculation = () => {
 
 
   
+
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);  
     const day = String(date.getDate()).padStart(2, '0');  
@@ -320,12 +372,37 @@ const Calculation = () => {
 
 
 
+
+  const formatDateForCreatedAt = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // Format: YYYY-MM-DDTHH:MM:SSZ
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+  };
+
+
+
   const handleSaveData = async (id)=>{
 
+    setloaderMM(true);
+
+    
+    let dataJOJO = {
+      ...predictionDataModifying,
+      farm_id : selectedFarm, 
+      serre_id : selectedGreenhouse, 
+      created_at : formatDateForCreatedAt(selectedDate)
+    }
+
+
    try{
-     // id : prediction id 
       const token = await getToken();         
-      const response = await axiosInstance.patch(`${ENDPOINT_API}updatePrediction/${id}`, predictionDataModifying , {
+      const response = await axiosInstance.patch(`${ENDPOINT_API}predictions/${id}`, dataJOJO , {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -342,14 +419,51 @@ const Calculation = () => {
       Alert.alert('Oops...');
       console.log(e.message);
       setisModifiedClicked(false);
+   } finally{
+    setloaderMM(false);
    }
 
   }
   
 
 
+
+
+  const handleFarmChange = (farmId) => {
+    setSelectedFarm(farmId);
+    setSelectedGreenhouse(null);
+    setSelectedGreenhouseObj(null);
+    const selectedFarm = farms.find(farm => farm.id === farmId);
+    setSelectedFarmObj(selectedFarm); // Set selected farm object
+
+    if (selectedFarm && selectedFarm.serres && Array.isArray(selectedFarm.serres)) {
+      setGreenhouses(selectedFarm.serres);
+      setSelectedGreenhouse(''); // Reset greenhouse when changing farm
+    } else {
+      setGreenhouses([]);
+    }
+  };
+
+
+
+  
+  const handleGreenhouseChange = (serreId) => {
+    setSelectedGreenhouse(serreId);
+    
+    const selectedSerre = greenhouses.find(serre => serre.id === serreId);
+    setSelectedGreenhouseObj(selectedSerre); // Set selected greenhouse object
+  };
+
+
+
+
   return (
     <>
+
+    {
+
+    predictionData && predictionDataModifying &&  
+
     <View style={styles.container}>
 
     <ScrollView>
@@ -389,6 +503,8 @@ const Calculation = () => {
                   }))
                 }
               />
+ 
+
 
               <Text style={styles.label}>Ferme</Text>
               <View style={styles.pickerWrapper}>
@@ -398,7 +514,10 @@ const Calculation = () => {
                   onValueChange={handleFarmChange}
                   enabled={!loadingX}
                 >
-                  <Picker.Item label={`Ferme ancienne`} value={predictionDataModifying.farm_id} />
+                  {/* Render the default option only if there's no selected farm */}
+                  {!selectedFarm && (
+                    <Picker.Item label="Sélectionnez une ferme" value="" />
+                  )}
                   {farms.map(farm => (
                     <Picker.Item key={farm.id} label={farm.name} value={farm.id} />
                   ))}
@@ -410,27 +529,25 @@ const Calculation = () => {
                 <Picker
                   selectedValue={selectedGreenhouse}
                   style={styles.picker}
-                  onValueChange={setSelectedGreenhouse}
+                  onValueChange={handleGreenhouseChange}
                   enabled={!!selectedFarm}
                 >
-                  <Picker.Item label={`Serre anciennce`} value={predictionDataModifying.serre_id} />
+                  {/* Render the default option only if there's no selected greenhouse */}
+                  {!selectedGreenhouse && (
+                    <Picker.Item label="Sélectionnez une serre" value="" />
+                  )}
                   {greenhouses.map(serre => (
                     <Picker.Item key={serre.id} label={serre.name} value={serre.id} />
                   ))}
                 </Picker>
               </View>
 
-              <Text style={styles.label}>Date de Création</Text>
-              <TextInput
-                style={styles.input}
-                value={formatDate(predictionDataModifying.created_at)}
-                onChangeText={(text) => {
-                  setpredictionDataModifying((prevData) => ({
-                    ...prevData,
-                    created_at: convertToMySQLDateTime(text),  
-                  }));
-                }}
-              />
+
+
+                    
+              <Text style={styles.label}>Date de création</Text>
+              <CustomDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
+               
             </>
           }
           </>
@@ -465,11 +582,11 @@ const Calculation = () => {
       {
         isModifyClicked ? 
         <View style={styles.buttonRow1} >
-          <TouchableOpacity onPress={()=>{ setisModifiedClicked(!isModifyClicked);setpredictionDataModifying(predictionData); }} style={styles.cancelButton}>
+          <TouchableOpacity disabled={loaderMM} onPress={()=>{ setisModifiedClicked(!isModifyClicked);setpredictionDataModifying(predictionData); }} style={styles.cancelButton}>
             <Text style={styles.buttonTextB}>Annuler</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.saveButton} onPress={()=>{ handleSaveData(predictionData.id); }} >
-            <Text style={styles.buttonTextW}>Sauvegarder</Text>
+          <TouchableOpacity  disabled={loaderMM} style={styles.saveButton} onPress={()=>{ handleSaveData(predictionData.id); }} >
+            <Text style={styles.buttonTextW}>{loaderMM ? "Modification en cours..." : "Sauvegarder"}</Text>
           </TouchableOpacity>
         </View>
         :
@@ -482,7 +599,7 @@ const Calculation = () => {
 
       
     </View>
-
+  }
    
    
       

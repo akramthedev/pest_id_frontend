@@ -236,7 +236,7 @@ const SingleFarmPage = () => {
                             dataSerre.map((serre, index)=>{
                               return(
                                 <TouchableOpacity
-                                    key={index}
+                                    key={serre}
                                     style={{
                                       height: 50,
                                       flexDirection: 'row',

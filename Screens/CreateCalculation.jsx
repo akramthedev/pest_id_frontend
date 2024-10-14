@@ -282,7 +282,7 @@ const takePhoto = async () => {
 
   return (
     <>
-    <View style={styles.container}>
+    <View style={styles.container} >
       <AlertError message={messageError} visible={showError} />
       <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>
@@ -322,7 +322,7 @@ const takePhoto = async () => {
                 <Picker.Item label="Veuillez saisir la valeur..." value="" />
                 {farms && farms.length > 0 ? (
                   farms.map((farm) => (
-                    <Picker.Item key={farm.id} label={farm.name} value={farm.id} />
+                    <Picker.Item key={farm} label={farm.name} value={farm.id} />
                   ))
                 ) : (
                   <Picker.Item label="Aucune ferme disponible" value="" />  
@@ -342,14 +342,14 @@ const takePhoto = async () => {
               >
                 <Picker.Item label="Veuillez saisir la valeur..." value="" />
                 {greenhouses && greenhouses.length > 0 && greenhouses.map((greenhouse) => (
-                  <Picker.Item key={greenhouse.id} label={greenhouse.name} value={greenhouse.id} />
+                  <Picker.Item key={greenhouse} label={greenhouse.name} value={greenhouse.id} />
                 ))}
               </Picker>
             </View>
 
 
 
-          <Text style={styles.label}>Date de réalisation</Text>
+          <Text style={styles.label}>Date de création </Text>
           <CustomDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
             

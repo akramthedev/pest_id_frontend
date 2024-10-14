@@ -187,7 +187,7 @@ export default function Dashboard({route}) {
           {
             personnelData && personnelData.map((data, index)=>{
               return(
-                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={data}/>
               )})
           }
           </>

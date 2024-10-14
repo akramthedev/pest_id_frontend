@@ -232,7 +232,7 @@ export default function AllStaffs() {
                 :
                 AllStaffs.map((data, index)=>{
                   return(
-                    <CardPersonal item={data}  key={data.id} />
+                    <CardPersonal item={data}  key={data} />
                   )
                 })
               }

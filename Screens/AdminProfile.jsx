@@ -239,7 +239,7 @@ const AdminProfile = () => {
               {
                 personnelData && personnelData.map((data, index)=>{
                     return(
-                    <CardPersonal item={data}  key={index}/>
+                    <CardPersonal item={data}  key={data}/>
                     )
                 })
               }

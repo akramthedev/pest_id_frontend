@@ -14,7 +14,7 @@ const axiosInstance = rateLimit(axios.create(), {
 });
 
 
-const CardCalculation = ({id,key, idFarm,idPlaque, idSerre,  date, percentage }) => {
+const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => {
 
   const { width: screenWidth } = Dimensions.get('window');
   const navigation = useNavigation();

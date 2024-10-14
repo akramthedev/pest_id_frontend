@@ -212,7 +212,7 @@ export default function AllFarms() {
                 :
                 AllFarms.map((data, index)=>{
                   return(
-                    <CardFarm item={data}  key={data.id} />
+                    <CardFarm item={data}  key={data} />
                   )
                 })
               }

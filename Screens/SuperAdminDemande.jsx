@@ -69,13 +69,16 @@ export default function SuperAdminDemande({route}) {
           if (response.status === 200) {
             setAllUsers(response.data.users);
             let x = 0;
+            console.log("____________________________")
             for(let i=0;i<response.data.users.length;i++){
+              console.log(response.data.users[i]);
               if(response.data.users[i].id !== userIdNum){
-                if(response.data.users[i].canAccess === 0){
+                if(response.data.users[i].canAccess === 0 && response.data.users[i].isEmailVerified === 0){
                   x++;
                 }
               }
             }
+            console.log("____________________________")
             setNumberOfDemand(x);
           } else {
             Alert.alert('Erreur lors de la récupération de données.');
@@ -203,7 +206,10 @@ export default function SuperAdminDemande({route}) {
              </> :
             <>
               {
-                AllUsers && NumberOfDemands === 0 ? (
+                AllUsers && 
+                <>
+                {
+                NumberOfDemands === 0 ? (
                   <View style={{ height : 577, alignItems : "center", justifyContent : "center" }} >
                     <Text style={{ fontSize : 15,color : "gray", textAlign : "center" }} >Aucune donnée disponible.</Text>
                   </View>
@@ -233,7 +239,7 @@ export default function SuperAdminDemande({route}) {
                                 <>
                                   {
                                     (data.canAccess === 0 && data.isEmailVerified === 0 ) &&
-                                    <CardAdmin key={index} index={index} item={data} isXClicked={isXClicked} />
+                                    <CardAdmin key={data} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>
                               )
@@ -243,6 +249,8 @@ export default function SuperAdminDemande({route}) {
                     }
                   </>
                 )
+                }
+                </>
               }
             </>
           }

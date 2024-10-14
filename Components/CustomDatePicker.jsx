@@ -7,9 +7,6 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
-import { ENDPOINT_API } from '../Screens/endpoint';
-  
-
 
 const CustomDatePicker = ({ selectedDate, onDateChange }) => {
   const [showPicker, setShowPicker] = useState(false);
@@ -29,20 +26,30 @@ const CustomDatePicker = ({ selectedDate, onDateChange }) => {
   const renderDays = () => {
     const days = [];
     const totalDays = daysInMonth(currentMonth, currentYear);
+    const selectedDay = selectedDate.getDate(); // Get the day from selectedDate
+  
     for (let day = 1; day <= totalDays; day++) {
       days.push(
         <TouchableOpacity
           key={day}
-          style={styles.dayButton}
+          style={[
+            styles.dayButton,
+            day === selectedDay ? styles.selectedDay : null // Apply selected style
+          ]}
           onPress={() => handleDayPress(day)}
         >
-          <Text style={styles.dayText}>{day}</Text>
+          <Text style={[
+            styles.dayText, 
+            day === selectedDay ? styles.selectedDayText : null // Change text color if selected
+          ]}>
+            {day}
+          </Text>
         </TouchableOpacity>
       );
     }
     return days;
   };
-
+  
   const changeMonth = (direction) => {
     if (direction === 'prev') {
       if (currentMonth === 0) {
@@ -61,7 +68,7 @@ const CustomDatePicker = ({ selectedDate, onDateChange }) => {
     }
   };
 
-   const formatDate = (date) => {
+  const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');  
     const year = date.getFullYear();
@@ -79,7 +86,7 @@ const CustomDatePicker = ({ selectedDate, onDateChange }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <View style={styles.header}>
-                <TouchableOpacity style={styles.uçzrshuwdoc}  onPress={() => changeMonth('prev')}>
+                <TouchableOpacity style={styles.uçzrshuwdoc} onPress={() => changeMonth('prev')}>
                   <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.monthYearText}>
@@ -113,13 +120,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'center',
   },
-  uçzrshuwdoc : {
-    backgroundColor : "#487C15", 
-    width : 45,
-    height : 45,
-    borderRadius : 30,
-    justifyContent : "center",
-    alignItems : "center"
+  uçzrshuwdoc: {
+    backgroundColor: "#1F3A04", 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
   dateText: {
     color: 'black',
@@ -145,10 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  changeMonthText: {
-    fontSize: 27,
-    color: 'white',
-  },
   daysContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -173,6 +176,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  selectedDay: {
+    backgroundColor: '#487C15', // Change this color as desired
+    borderRadius: 8, // Optional: Add rounded corners
+  },
+  selectedDayText : {
+    color : "white"
+  }
 });
 
 export default CustomDatePicker;
