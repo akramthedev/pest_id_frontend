@@ -290,8 +290,7 @@ const Calculation = () => {
               setImages(imageArray);
               console.log("Fetched images:", imageArray); 
             } else {
-              setImages([{ uri: 'https://img.freepik.com/photos-gratuite/image-fond-ecran-aquarelle-bleu-acier-clair_53876-94665.jpg' }]);
-              console.log("Using default image:", 'https://img.freepik.com/photos-gratuite/image-fond-ecran-aquarelle-bleu-acier-clair_53876-94665.jpg'); 
+              setImages([{ uri: 'https://static.aujardin.info/cache/th/img9/aleurodes-500x375.jpg' }]);
             }
            } 
         } else {
@@ -439,23 +438,22 @@ const Calculation = () => {
           <>
             <View style={styles.infoContainer}>
               <Text style={styles.title}>Informations du Calcul</Text>
-              <Text style={styles.info}>• ID de ferme: {loading ? "--" : predictionData.farm_id}</Text>
-              <Text style={styles.info}>• ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
-              <Text style={styles.info}>• ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
-              <Text style={styles.info}>• Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
-              <Text style={styles.info}>• Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de ferme: {loading ? "--" : predictionData.farm_id}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
             </View>
 
             <View style={styles.resultsContainer}>
               <Text style={styles.title}>Résultats du Calcul</Text>
-              <Text style={styles.info}>• Pourcentage: {loading ? "--" : `${predictionData.result}%`}</Text>
-              <Text style={styles.info}>• Nombre de mouches: {loading ? "--" : dataImages?.class_A}</Text>
-              <Text style={styles.info}>• Nombre de mineuses: {loading ? "--" : dataImages?.class_B}</Text>
-              <Text style={styles.info}>• Nombre de Thrips: {loading ? "--" : dataImages?.class_C}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Pourcentage: {loading ? "--" : `${predictionData.result}%`}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de mouches: {loading ? "--" : dataImages?.class_A}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de mineuses: {loading ? "--" : dataImages?.class_B}</Text>
+              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de Thrips: {loading ? "--" : dataImages?.class_C}</Text>
             </View>
 
             <View style={styles.carouselContainer}>
-              <Text style={styles.title}>Images du Calcul</Text>
               <Carousel images={images} />
             </View>
           </>
@@ -800,8 +798,8 @@ const styles = StyleSheet.create({
   },
 
   carouselImage: {
-    width: screenWidth * 0.8,   
-    height: 233,  
+    width: screenWidth * 0.3,   
+    height: 170,  
     marginHorizontal: 10,
     resizeMode: 'cover',
     borderRadius: 10,

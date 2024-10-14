@@ -57,12 +57,12 @@ const MainNavigator = ({ isAuthenticated, setIsAuthenticated }) => {
       <Stack.Navigator>
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+            <Stack.Screen name="Historique" component={Historique} options={{ headerShown: false }} />            
             <Stack.Group screenOptions={{ headerShown: false }}>
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="AdminProfile" component={AdminProfile} />
               <Stack.Screen name="MesClients" component={MesClients} />
-              <Stack.Screen name="Historique" component={Historique} />
+              <Stack.Screen name="Dashboard" component={Dashboard}  />
               <Stack.Screen name="NouvelleDemande" component={NouvelleDemande} />
               <Stack.Screen name="MesPersonels" component={MesPersonels} />
               <Stack.Screen name="MesFermes" component={MesFermes} />

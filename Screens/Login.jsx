@@ -60,7 +60,7 @@ const Login = ({ route }) => {
           setEmail('');setPassword('');
           settriggerIt((prev) => !prev);
           setTimeout(()=>{
-            navigation.navigate('Dashboard');
+            navigation.navigate('Historique');
           }, 150);
           
         } else if (response.status === 202)  {
