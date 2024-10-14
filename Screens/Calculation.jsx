@@ -462,7 +462,7 @@ const Calculation = () => {
 
     {
 
-    predictionData && predictionDataModifying &&  
+    !loading && predictionData && predictionDataModifying  ?   
 
     <View style={styles.container}>
 
@@ -599,6 +599,14 @@ const Calculation = () => {
 
       
     </View>
+    :
+      <View style={{ height : "100%" , width : "100%", backgroundColor  :"white", alignItems : "center", justifyContent : "center" }} > 
+        <Image
+          source={LoaderSVG}  
+          style={styles.imageJOZNJORSFDOJFSWNVDO2} 
+        />
+      </View>
+
   }
    
    
@@ -871,6 +879,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   }, imageJOZNJORSFDOJFSWNVDO : {
     height : 23, width : 23
+  },
+  imageJOZNJORSFDOJFSWNVDO2 : {
+    height : 39, width : 39
+
   },
   closeButton: {
     position: 'absolute',
