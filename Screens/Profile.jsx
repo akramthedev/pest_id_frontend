@@ -761,7 +761,7 @@ const Profile = () => {
             
             </Text>
             <Text style={{ 
-              fontSize: 18, 
+              fontSize: 17, 
               fontWeight: '400', 
               marginBottom: 25 
             }}>
@@ -792,7 +792,7 @@ const Profile = () => {
 
 
               <TouchableOpacity style={{
-                backgroundColor: 'black', 
+                backgroundColor: '#AF0000', 
                 paddingVertical: 13,
                 width : "67%",
                 borderRadius: 5,

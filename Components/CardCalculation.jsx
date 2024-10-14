@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity , Dimensions} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Image ,ScrollView, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +21,9 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
   const [data, setData] = useState(null);
   const [loading,setLoading] = useState(true);
   const [role, setRole] = useState(null);
+  const [SerreSingle,setSerreSingle] = useState(null);
+  const [FarmSingle,setFarmSingle] = useState(null);
+
 
   useEffect(()=>{
     const x = async ()=>{
@@ -36,15 +39,20 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
         setLoading(true);
         const IdOfPredi = id;
         const token = await getToken(); 
-        const response = await axiosInstance.get(`${ENDPOINT_API}predictions/${IdOfPredi}/images`, {
+
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
+
+        const response = await axiosInstance.get(`${ENDPOINT_API}farmANDserre/${idFarm}/${idSerre}/${userIdNum}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
         if (response.status === 200) {
-          setData(response.data[0]);
-         } else {
+          setFarmSingle(response.data.farm)
+          setSerreSingle(response.data.serre)
+        } else {
           Alert.alert('Erreur lors de la récupération de données.');
         }
       } catch (error) {
@@ -63,41 +71,122 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
 
 
   return (
-    <View style={styles.card} key={id} >
+
+    <>
     {
-      id && idFarm && idPlaque && idSerre && date && percentage  && 
-      <>
-      <View style={styles.row}>
-        <Text style={styles.idText}>ID Ferme : {idFarm}</Text>
-        <Text style={styles.loremText}>Plaque : {idPlaque}</Text>
+      loading ? 
+      <SkeletonLoader />
+      : 
+      <View style={styles.card} key={id} >
+        {
+          id && idFarm && idPlaque && idSerre && date && percentage  && 
+          <>
+          <View style={styles.row}>
+            <Text style={styles.idText}>Nom Ferme : {FarmSingle && FarmSingle.name}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.idText}>Nom Serre : {SerreSingle && SerreSingle.name}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.idText}>ID Plaque : {idPlaque}</Text>
+          </View>
+
+          <View
+            style={{
+              position : "absolute", 
+              right : 20, 
+              top : 15, 
+            }}
+          >
+            <Text style={styles.percentageText}>{percentage+"%"}</Text>
+            <Text style={styles.dateText}>Chown : +17.00%</Text>
+          </View>
+
+
+          {
+            /*
+            <Text style={styles.detailsText}>
+              Mineuse : {!data ? "--" : data.class_A} • Mouche : {!data ? "--" : data.class_B} • Thrips : {!data ? "--" : data.class_C}
+            </Text>
+            */
+          }
+          <Text style={styles.dateText}>{date}</Text>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.modifyButton} onPress={() => {
+                navigation.navigate('Calculation', { id: id });
+              }}  
+            >
+              <Text style={styles.buttonText1}>Modifier</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.detailsButton} onPress={() => {
+                navigation.navigate('Calculation', { id: id });
+              }}  
+            >
+              <Text style={styles.buttonText}>Voir détails</Text>
+            </TouchableOpacity>
+          </View>
+          </>
+        }
       </View>
-      <View style={styles.row}>
-        <Text style={styles.idText}>ID Serre : {idSerre}</Text>
-        <Text style={styles.percentageText}>{percentage+"%"}</Text>
+    } 
+    </>
+  );
+};
+
+
+
+
+
+const SkeletonLoader = () => {
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 555,
+          useNativeDriver: false,
+        }),
+        Animated.timing(shimmerAnim, {
+          toValue: 0,
+          duration: 555,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [shimmerAnim]);
+
+  const animatedStyle = (inputRange) => ({
+    backgroundColor: shimmerAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#e0e0e0', '#f0f0f0'],
+    }),
+  });
+
+  return (
+    <View style={styles.skeletonCard}>
+      <View style={styles.skeletonRow}>
+        <Animated.View style={[styles.skeletonTextSmall, animatedStyle([0, 1])]} />
+        <Animated.View style={[styles.skeletonTextMedium, animatedStyle([0, 1])]} />
       </View>
-      <Text style={styles.detailsText}>
-        Mineuse : {!data ? "--" : data.class_A} • Mouche : {!data ? "--" : data.class_B} • Thrips : {!data ? "--" : data.class_C}
-      </Text>
-      <Text style={styles.dateText}>{date}</Text>
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.modifyButton} onPress={() => {
-            navigation.navigate('Calculation', { id: id });
-          }}  
-        >
-          <Text style={styles.buttonText1}>Modifier</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.detailsButton} onPress={() => {
-            navigation.navigate('Calculation', { id: id });
-          }}  
-        >
-          <Text style={styles.buttonText}>Voir détails</Text>
-        </TouchableOpacity>
+      <View style={styles.skeletonRow}>
+        <Animated.View style={[styles.skeletonTextSmall, animatedStyle([0, 1])]} />
+        <Animated.View style={[styles.skeletonTextLarge, animatedStyle([0, 1])]} />
       </View>
-      </>
-    }
+      <Animated.View style={[styles.skeletonTextLine, animatedStyle([0, 1])]} />
+      <Animated.View style={[styles.skeletonTextLine, animatedStyle([0, 1])]} />
+      <Animated.View style={[styles.skeletonTextLine, animatedStyle([0, 1])]} />
+      <View style={styles.skeletonRow}>
+        <Animated.View style={[styles.skeletonButton, animatedStyle([0, 1])]} />
+        <Animated.View style={[styles.skeletonButtonWide, animatedStyle([0, 1])]} />
+      </View>
     </View>
   );
 };
+
+
+
 
 const styles = StyleSheet.create({
   card: {
@@ -124,7 +213,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems : "center"
+    alignItems : "center", 
+    marginBottom: 5
   },
   idText: {
     fontSize: 16,
@@ -135,9 +225,10 @@ const styles = StyleSheet.create({
     color: '#8c8c8c',
   },
   percentageText: {
-    fontSize: 25,
-    fontWeight: "700",
+    fontSize: 35,
+    fontWeight: "900",
     color: '#373737', 
+    textAlign : "right"
   },
   detailsText: {
     fontSize: 14,
@@ -146,7 +237,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: '#8c8c8c',
-    marginTop: 5,
+    marginTop: 0,
   },
   chrImpactText: {
     fontSize: 14,
@@ -183,7 +274,69 @@ const styles = StyleSheet.create({
   buttonText1 : {
     fontSize : 16,
     color : "black"
-  }
+  },
+  
+  // Skeleton Loader Styles
+  skeletonCard: {
+    marginLeft: 23,
+    marginRight: 23,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  skeletonTextSmall: {
+    width: '40%',
+    height: 15,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+  },
+  skeletonTextMedium: {
+    width: '30%',
+    height: 15,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+  },
+  skeletonTextLarge: {
+    width: '20%',
+    height: 30,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+  },
+  skeletonTextLine: {
+    width: '100%',
+    height: 15,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  skeletonButton: {
+    width: '40%',
+    height: 40,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+  },
+  skeletonButtonWide: {
+    width: '50%',
+    height: 40,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+  },
+
+  imageJOZNJORSFDOJFSWNVDO : {
+    height : 23, width : 23
+  },
+
 });
 
 export default CardCalculation;

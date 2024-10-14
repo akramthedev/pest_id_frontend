@@ -14,101 +14,17 @@ import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 const { width: screenWidth } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
 import rateLimit from 'axios-rate-limit';
-
+import { FontAwesome5 } from '@expo/vector-icons'; // 
 const axiosInstance = rateLimit(axios.create(), {
-  maxRequests: 5, // maximum number of requests
-  perMilliseconds: 1000, // time window in milliseconds
+  maxRequests: 5, 
+  perMilliseconds: 1000, 
 });
-
-
-const convertToMySQLDateTime = (dateString) => {
-  const [day, month, year] = dateString.split('/');
-
-  // Create a date string in the format "yyyy-mm-dd HH:mm:ss"
-  // Assuming you want to set the time to midnight (00:00:00)
-  return `${year}-${month}-${day} 00:00:00`;
-};
-
-
-
-
-const Carousel = ({ images }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const goNext = () => {
-    if (currentIndex < images.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const goPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  return (
-    <View style={{ alignItems: 'center' }}>
-
-      <FlatList
-        data={[images[currentIndex]]}
-        horizontal
-        pagingEnabled
-        renderItem={({ item }) => (
-          <Image source={item} style={styles.carouselImage} />
-        )}
-        keyExtractor={(item, index) => index.toString()}
-        showsHorizontalScrollIndicator={false}
-      />
-
-      <View style={{ flexDirection: 'row', marginTop: 5 }}>
-        {images.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index === currentIndex ? styles.activeDot : styles.inactiveDot,
-            ]}
-          />
-        ))}
-      </View>
-
-       <View style={{ flexDirection: 'row', marginTop: 10 }}>
-        <TouchableOpacity
-          onPress={goPrevious}
-          disabled={currentIndex === 0}
-          style={[
-            styles.carouselButton,
-            currentIndex === 0 && { backgroundColor: '#ccc' },
-          ]}
-        >
-          <Ionicons name="chevron-back-outline" size={24} color="white" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={goNext}
-          disabled={currentIndex === images.length - 1}
-          style={[
-            styles.carouselButton,
-            currentIndex === images.length - 1 && { backgroundColor: '#ccc' },
-          ]}
-        >
-          <Ionicons name="chevron-forward-outline" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-
- 
-    </View>
-  );
-};
-
-
 
 
 import { useAuth } from '../Helpers/AuthContext';
 
 const Calculation = () => {
-
+  const [showPopup, setShowPopup] = useState(false);
   const [loaderMM, setloaderMM] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -122,6 +38,28 @@ const Calculation = () => {
   const [selectedGreenhouseObj, setSelectedGreenhouseObj] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [IDCurrent, setIDCurrent] = useState(null);
+  const [imageData, setimageData] = useState(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current; 
+
+
+  const togglePopup = () => {
+    if (showPopup) {
+
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,  
+        useNativeDriver: true,
+      }).start(() => setShowPopup(false));  
+    } else {
+      setShowPopup(true);
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
 
 
   useFocusEffect(
@@ -237,7 +175,8 @@ const Calculation = () => {
 
 
 
- 
+  const [NameFarmX, setNameFarmX] = useState(null);
+  const [NameSerreX, setNameSerreX] = useState(null);
 
 
   const fetchData = async () => {
@@ -255,6 +194,8 @@ const Calculation = () => {
           const prediction = response.data[0];
           setpredictionData(prediction);
           setpredictionDataModifying(prediction);
+
+
 
 
           const fetchedDate = new Date(prediction.created_at); // Convert the fetched date string to a Date object
@@ -287,8 +228,9 @@ const Calculation = () => {
 
           setSelectedFarm(prediction.farm_id); // Set selected farm
           const selectedFarm = responseFarmsFetching.data.find(farm => farm.id === prediction.farm_id);
+          setNameFarmX(selectedFarm.name); 
+          
 
-           
           //console.log("Prediction : ");
           //console.log(prediction);
 
@@ -314,6 +256,8 @@ const Calculation = () => {
               if (greenhouseExists) {
                 setSelectedGreenhouse(greenhouseId); // Set the greenhouse based on prediction data
                 //console.log('Selected Greenhouse:', greenhouseId); // Confirm selection
+                const selectedGreenhouseData = selectedFarm.serres.find(greenhouse => greenhouse.id === greenhouseId);
+                setNameSerreX(selectedGreenhouseData.name);
               } else {
                 console.warn('Greenhouse ID does not exist in the selected farm’s greenhouses:', greenhouseId);
                 // Optionally reset the selected greenhouse if it doesn't exist
@@ -334,7 +278,8 @@ const Calculation = () => {
             }
           });
           if (response2.status === 200) {
-            setDataImages(response2.data[0]);
+            setimageData(response2.data[0]);
+            console.log(response2.data[0]);
           }
         } else {
           Alert.alert('Erreur lors de la récupération de données.');
@@ -383,6 +328,8 @@ const Calculation = () => {
     
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
+
+
 
 
   const handleSaveData = async (id)=>{
@@ -452,13 +399,160 @@ const Calculation = () => {
   };
 
 
+  const [loaderD, setLoaderD] = useState(false);
+  const [isSupprimerClicked, setIsSupprimerClicked] = useState(false);
+  
+  const handleLickDelete = async()=>{
+    try{
+      if(predictionData){
+        setLoaderD(true);
+        const token = await getToken();
+
+        const response = await axios.delete(`${ENDPOINT_API}predictions/${predictionData.id}`,{
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if(response.status === 200){
+          setIsSupprimerClicked(false);
+          navigation.goBack();
+          Alert.alert('Deleted Successfully !');
+        }
+        else{
+          Alert.alert('Not Deleted ');
+        }
+
+      
+      }
+    }
+    catch(e){
+      console.log(e.message);
+      Alert.alert('Error 500');
+    } finally{
+      setLoaderD(false);
+    }
+  }
+
+
 
 
   return (
     <>
 
-    {
 
+      {showPopup && (
+        <Animated.View style={[showPopup ? styles.popupContainer : styles.popupContainerNot, { opacity: fadeAnim }]}>
+          <TouchableOpacity activeOpacity={1} style={styles.popupTouchable} onPress={togglePopup}>
+            <Image
+              style={styles.popupBackground}
+              source={{ uri: imageData.name }} // Replace with your popup image URL
+            />
+            <Text style={styles.popupText}>Cliquez n'importe où pour fermer</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
+
+
+
+      
+{
+        isSupprimerClicked && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 999999999,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '90%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: 'bold', 
+              marginBottom: 5 
+            }}>
+
+              Confirmer la suppression
+            
+            </Text>
+            <Text style={{ 
+              fontSize: 17, 
+              fontWeight: '400', 
+              marginBottom: 25 
+            }}>
+
+              Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.
+
+            </Text>
+            <View style={{ 
+              flexDirection: 'row', 
+              justifyContent: 'space-between' 
+            }}>
+
+              <TouchableOpacity style={{
+                backgroundColor: '#eee', 
+                paddingVertical: 13,
+                width : "30%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center"
+                }}
+                onPress={()=>{setIsSupprimerClicked(false)}}
+                disabled={loaderD}
+                >
+                <Text style={{ color: 'black', fontWeight: 'bold' }}>
+                Annuler
+                </Text>
+              </TouchableOpacity>
+
+
+              <TouchableOpacity style={{
+                backgroundColor: '#AF0000', 
+                paddingVertical: 13,
+                width : "67%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={loaderD}
+                onPress={()=>{
+                  handleLickDelete();
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {
+                  loaderD ? 
+                  "Suppression en cours..."
+                  :
+                  "Supprimer définitivement"
+                }
+                </Text>
+              </TouchableOpacity>
+              
+            </View>
+          </View>
+        </View>
+      }
+
+
+
+
+    {
     !loading && predictionData && predictionDataModifying  ?   
 
     <View style={styles.container}>
@@ -550,26 +644,65 @@ const Calculation = () => {
           </>
          : (
           <>
-            <View style={styles.infoContainer}>
-              <Text style={styles.title}>Informations du Calcul</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de ferme: {loading ? "--" : predictionData.farm_id}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de serre: {loading ? "--" : predictionData.serre_id}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• ID de plaque: {loading ? "--" : predictionData.plaque_id}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Date de création: {loading ? "--" : formatDate(predictionData.created_at)}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Date de mise à jour: {loading ? "--" : formatDate(predictionData.updated_at)}</Text>
+
+            <View style={styles.cardKLKLKL}>
+              <View style={styles.cardHeaderKLKLKL}>
+                <FontAwesome5 name="info-circle" size={24} color="#4A90E2" />
+                <Text style={styles.cardTitleKLKLKL}>Informations du Calcul</Text>
+              </View>
+              <View style={styles.cardContentKLKLKL}>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.labelKLKLKL}>Nom de ferme: </Text>
+                  {loading ? "--" : NameFarmX && NameFarmX}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.labelKLKLKL}>Nom de serre: </Text>
+                  {loading ? "--" : NameSerreX && NameSerreX}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.labelKLKLKL}>ID de plaque: </Text>
+                  {loading ? "--" : predictionData.plaque_id}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.labelKLKLKL}>Date de création: </Text>
+                  {loading ? "--" : formatDate(predictionData.created_at)}
+                </Text>
+                <TouchableOpacity onPress={togglePopup} style={styles.saveButton2}>
+                  <Text style={styles.buttonTextB} >
+                    Voir l'image
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View style={styles.resultsContainer}>
-              <Text style={styles.title}>Résultats du Calcul</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Pourcentage: {loading ? "--" : `${predictionData.result}%`}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de mouches: {loading ? "--" : dataImages?.class_A}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de mineuses: {loading ? "--" : dataImages?.class_B}</Text>
-              <Text style={styles.info}>&nbsp;&nbsp;&nbsp;• Nombre de Thrips: {loading ? "--" : dataImages?.class_C}</Text>
+            <View style={styles.cardKLKLKL}>
+              <View style={styles.cardHeaderKLKLKL}>
+                <FontAwesome5 name="chart-bar" size={24} color="#4CAF50" />
+                <Text style={styles.cardTitleKLKLKL}>Résultats du Calcul</Text>
+              </View>
+              <View style={styles.cardContentKLKLKL}>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.label}>Pourcentage: </Text>
+                  {loading ? "--" : `${predictionData.result}%`}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.label}>Nombre de mouches: </Text>
+                  {loading ? "--" : imageData?.class_A}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.label}>Nombre de mineuses: </Text>
+                  {loading ? "--" : imageData?.class_B}
+                </Text>
+                <Text style={styles.infoKLKLKL}>
+                  <Text style={styles.label}>Nombre de Thrips: </Text>
+                  {loading ? "--" : imageData?.class_C}
+                </Text>
+              </View>
             </View>
 
-            <View style={styles.carouselContainer}>
-              <Carousel images={images} />
-            </View>
+ 
+
+
           </>
         )}
 
@@ -588,9 +721,15 @@ const Calculation = () => {
         </View>
         :
         <View style={styles.buttonRow1} >
-          <TouchableOpacity onPress={()=>{ setisModifiedClicked(!isModifyClicked) }} style={styles.saveButton1}>
-            <Text style={styles.buttonTextW}>Modifier le calcul</Text>
+       
+          <TouchableOpacity disabled={loaderD} onPress={()=>{setIsSupprimerClicked(true); }} style={styles.saveButton11}>
+            <Text style={styles.buttonTextW}>Supprimer le Calcul</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity  disabled={loaderD}  onPress={()=>{ setisModifiedClicked(!isModifyClicked) }} style={styles.saveButton1}>
+            <Text style={styles.buttonTextW}>Modifier le Calcul</Text>
+          </TouchableOpacity>
+       
         </View>
       }
 
@@ -806,12 +945,30 @@ const styles = StyleSheet.create({
     width: '64%',
     alignItems: 'center',
   },
+  saveButton2: {
+    backgroundColor: '#EAFFD6',
+    borderRadius: 10,
+    borderColor : "#487C15",
+    paddingVertical: 12,
+    marginTop: 7,
+    paddingHorizontal: 16,
+    width: '96%',
+    alignItems: 'center',
+  },
   saveButton1 : {
     backgroundColor: '#487C15',
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
-    width: '100%',
+    width: '48%',
+    alignItems: 'center',
+  },
+  saveButton11 : {
+    backgroundColor: '#AF0000',
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    width: '48%',
     alignItems: 'center',
   },
   buttonTextW: {
@@ -921,6 +1078,7 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     position: 'relative',
+    alignItems : "center"
   },
 
   carouselImage: {
@@ -971,6 +1129,110 @@ const styles = StyleSheet.create({
   inactiveDot: {
     backgroundColor: '#D5D5D5',
   },
+  popupContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height : '100%',
+    width : "100%",
+    zIndex: 99999999999,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  popupContainerNot : {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height : '0%',
+    width : "0%",
+    zIndex: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  popupBackground: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  popupText: {
+    color: '#fff',
+    fontSize: 24,
+    backgroundColor : "black",
+    textAlign: 'center',
+  },
+  PopUpTitii : {
+    backgroundColor : "black", 
+    width : "100%"
+  },
+  popupTouchable: {
+    width: '100%',
+    height: '100%',
+  },
+  popupBackground: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+
+
+  containerKLKLKL: {
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  cardKLKLKL: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    width : "98.1%",
+    margin : "auto", 
+    borderWidth : 1, 
+    borderColor : "#eee"
+  },
+  cardKLKLKL2: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    width : "98.1%",
+    margin : "auto", 
+    backgroundColor : "black",
+    alignItems : "center", 
+    justifyContent : "center"
+  },
+  cardHeaderKLKLKL: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  cardTitleKLKLKL: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  cardContentKLKLKL: {
+    paddingLeft: 10,
+  },
+  infoKLKLKL: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: '#666',
+  },
+  labelKLKLKL: {
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
+
 });
 export default Calculation;
 
