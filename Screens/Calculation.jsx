@@ -381,17 +381,14 @@ const Calculation = () => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     
-    // Format: YYYY-MM-DDTHH:MM:SSZ
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
-  };
-
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
 
 
   const handleSaveData = async (id)=>{
 
     setloaderMM(true);
 
-    
     let dataJOJO = {
       ...predictionDataModifying,
       farm_id : selectedFarm, 
