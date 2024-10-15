@@ -30,6 +30,8 @@ const Profile = () => {
   const [isSupprimerClicked,setIsSupprimerClicked] = useState(false);
   const [loaderDelete, setloaderDelete] = useState(false);
   const hasFetched = useRef(false);
+  const [dataAdministrateur, setDataAdministrateur] = useState(null)
+  const [dataAdministrateurOfChangement, setdataAdministrateurOfChangement] = useState(null)
   const [showError, setShowError] = useState(false);
   const [messageError,setmessageError] = useState("");
   const [messageSuccess,setmessageSuccess] = useState("");
@@ -100,7 +102,11 @@ const Profile = () => {
     useCallback(() => {
     const fetchProfileData = async ()=>{
 
-      
+      setDataAdministrateur(null);
+      setdataAdministrateurOfChangement(null)
+      setdataOfVisitor(null);
+      setdataProfile(null);
+      setdataProfileOfChangement(null);
       setLoading(true);
       if(id!== null && id !== undefined){
          try{
@@ -118,9 +124,7 @@ const Profile = () => {
 
             if(response.status === 200){
               setdataProfile(response.data);
-              
               setdataProfileOfChangement(response.data);
-               
 
               if(response.data.image === null || response.data.image === ""){
                 setImage("https://cdn-icons-png.flaticon.com/256/149/149071.png");
@@ -128,7 +132,29 @@ const Profile = () => {
               else{
                 setImage(response.data.image);
               }
-               
+              if(response.data.type === "admin" || response.data.type === "superadmin"){
+                const responseZ = await axiosInstance.get(`${ENDPOINT_API}getadmin/${userIdNum}`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if(responseZ.status === 200){
+                  setDataAdministrateur(responseZ.data);
+                  setdataAdministrateurOfChangement(responseZ.data);
+                }
+                else{
+                  setDataAdministrateur({
+                    company_name : "", 
+                    company_mobile : "", 
+                    company_email : ""
+                  });
+                  setdataAdministrateurOfChangement({
+                    company_name : "", 
+                    company_mobile : "", 
+                    company_email : ""
+                  });
+                }
+              }
             }
             else{
               setmessageError("Oups, Une erreur est survenue!");
@@ -140,6 +166,9 @@ const Profile = () => {
                 setmessageError("");
               }, 4000);
             }
+
+           
+
           }
           else{
             //fetch other infos
@@ -176,6 +205,32 @@ const Profile = () => {
               else{
                 setImage(response.data.image)
               }
+
+              if(response.data.type === "admin" || response.data.type === "superadmin"){
+                const responseZ = await axiosInstance.get(`${ENDPOINT_API}getadmin/${response.data.id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                if(responseZ.status === 200){
+                  setDataAdministrateur(responseZ.data);
+                  setdataAdministrateurOfChangement(responseZ.data)
+                }
+                else{
+                  setDataAdministrateur({
+                    company_name : "", 
+                    company_mobile : "", 
+                    company_email : ""
+                  });
+                  setdataAdministrateurOfChangement({
+                    company_name : "", 
+                    company_mobile : "", 
+                    company_email : ""
+                  })
+                }
+              }
+
+
             }
             else{
               setmessageError("Oups, Une erreur est survenue!");
@@ -329,12 +384,30 @@ const Profile = () => {
           image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png", 
           type : dataProfileOfChangement.type
         }
+        let data2 = {
+          company_name : dataAdministrateurOfChangement.company_name,
+          company_mobile : dataAdministrateurOfChangement.company_mobile,
+          company_email : dataAdministrateurOfChangement.company_email,
+        }
         const resp = await axiosInstance.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         if(resp.status === 200){
+          
+          if(dataProfile.type !== "staff"){
+            const resp22 = await axiosInstance.patch(`${ENDPOINT_API}admin/${userIdNum}`, data2, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            if(resp22.status === 200){
+              setdataAdministrateurOfChangement({...dataAdministrateurOfChangement, company_name :data2.company_name, company_mobile : data2.company_mobile, company_email : data2.company_email });
+              setDataAdministrateur({...dataAdministrateur, company_name :data2.company_name, company_mobile : data2.company_mobile, company_email : data2.company_email  })
+            }
+          }
+
           setdataProfile({ ...dataProfile, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image, type : data.type })
           setdataProfileOfChangement({ ...dataProfileOfChangement, email: data.email, fullName : data.fullName, mobile : data.mobile, image : data.image, type : data.type })
           setisModify(false);
@@ -577,6 +650,7 @@ const Profile = () => {
     }
   }
 
+ 
 
 
 
@@ -598,9 +672,6 @@ const Profile = () => {
 
           if(resp0.status === 200){
             const idAdmin = resp0.data.id;
-            console.log("-------------");
-            console.log(idAdmin);
-            console.log('-------------');
             const resp00 = await axiosInstance.get(`${ENDPOINT_API}staffs/${idAdmin}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -609,9 +680,9 @@ const Profile = () => {
 
             if(resp00.status === 200){
               staffsUsers = resp00.data;
-              console.log("-------------");
+              console.log("-------------------");
               console.log(resp00.data);
-              console.log("-------------");
+              console.log("-------------------");
             }
           }
 
@@ -925,17 +996,7 @@ const Profile = () => {
              
 
 
-            <Text style={styles.roleText}>
-              {dataProfile && (
-                <>
-                  {dataProfile.type.toLowerCase() === "admin"
-                    ? "Administrateur"
-                    : dataProfile.type.toLowerCase() === "superadmin"
-                      ? "Super-Administrateur"
-                      : "Personnel"}
-                </>
-              )}
-            </Text>
+            
 
             
             {
@@ -995,6 +1056,7 @@ const Profile = () => {
               <Text style={styles.value}>{dataProfile.email}</Text>
             )}
           </View>
+         
           <View style={styles.rowXXX}>
             <Text style={styles.label}>Téléphone :</Text>
             {isModify ? (
@@ -1006,9 +1068,14 @@ const Profile = () => {
                 onChangeText={(text) => setdataProfileOfChangement({ ...dataProfileOfChangement, mobile: text })}
               />
             ) : (
-              <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : '--'}</Text>
+              <Text style={styles.value}>{dataProfile.mobile ? dataProfile.mobile : '---'}</Text>
             )}
           </View>
+
+         
+         
+          
+         
 
           <>
           {
@@ -1035,10 +1102,111 @@ const Profile = () => {
           }
           </>
           
+           
+
+               
           <View style={styles.rowXXX}>
-            <Text style={styles.label}>Date de création</Text>
+            <Text style={styles.label}>Role : </Text>
+            <Text style={styles.value}>
+              {dataProfile && (
+                <>
+                  {dataProfile.type.toLowerCase() === "admin"
+                    ? "Administrateur"
+                    : dataProfile.type.toLowerCase() === "superadmin"
+                      ? "Super-Administrateur"
+                      : "Personnel"}
+                </>
+              )}
+            </Text>
+          </View>
+
+
+       
+        {
+          dataProfile && 
+          (
+            dataProfile.type !== "staff" && 
+            <>
+              <View style={styles.rowXXX} >
+                      <Text style={styles.label} >Nom Société : </Text>
+                      {isModify ? (
+                        <TextInput
+                          style={styles.input2}
+                          placeholderTextColor="#ccc"
+                          placeholder="Champs non obligatoire"
+                          value={dataAdministrateurOfChangement.company_name}
+                          onChangeText={(text) => setdataAdministrateurOfChangement({ ...dataAdministrateurOfChangement, company_name: text })}
+                        />
+                      ) : (
+                        <Text style={styles.value}>
+                          {dataAdministrateur && 
+                          ( 
+                          (dataAdministrateur.company_name  === null || dataAdministrateur.company_name.length <= 1) ? "---" 
+                          : dataAdministrateur.company_name 
+                          )
+                          }
+                        </Text>
+                      )}
+                    </View>
+
+
+
+                    <View style={styles.rowXXX} >
+                      <Text style={styles.label} >Téléphone Société : </Text>
+                      {isModify ? (
+                        <TextInput
+                          style={styles.input2}
+                          placeholderTextColor="#ccc"
+                          placeholder="Champs non obligatoire"
+                          value={dataAdministrateurOfChangement.company_mobile}
+                          onChangeText={(text) => setdataAdministrateurOfChangement({ ...dataAdministrateurOfChangement, company_mobile: text })}
+                        />
+                      ) : (
+                        <Text style={styles.value}>
+                          {dataAdministrateur && 
+                          ( 
+                          (dataAdministrateur.company_mobile  === null || dataAdministrateur.company_mobile.length <= 1) ? "---" 
+                          : dataAdministrateur.company_mobile 
+                          )
+                          }
+                        </Text>
+                      )}
+                    </View>
+
+                    <View style={styles.rowXXX} >
+                      <Text style={styles.label} >Email Société : </Text>
+                      {isModify ? (
+                        <TextInput
+                          style={styles.input2}
+                          placeholderTextColor="#ccc"
+                          placeholder="Champs non obligatoire"
+                          value={dataAdministrateurOfChangement.company_email}
+                          onChangeText={(text) => setdataAdministrateurOfChangement({ ...dataAdministrateurOfChangement, company_email: text })}
+                        />
+                      ) : (
+                        <Text style={styles.value}>
+                          {dataAdministrateur && 
+                          ( 
+                          (dataAdministrateur.company_email  === null || dataAdministrateur.company_email.length <= 1) ? "---" 
+                          : dataAdministrateur.company_email 
+                          )
+                          }
+                        </Text>
+                      )}
+                    </View>
+
+            </>
+          ) 
+        }
+
+
+
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Date d'inscription</Text>
             <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
           </View>
+
+          
 
           {isCurrent !== null && (
             <>
@@ -1060,12 +1228,7 @@ const Profile = () => {
                       <Ionicons name="arrow-forward" size={24} color="gray" />
                     </TouchableOpacity>
                   }
-                  
-                  <TouchableOpacity  onPress={()=>{handleClick(3)}} style={styles.modifierVotreX}>
-                    <Text style={styles.modifierVotreXText}>Réglages de paiements</Text>
-                    <Ionicons name="arrow-forward" size={24} color="gray" />
-                  </TouchableOpacity >
-                  
+              
                 </>
               )}
             </>
@@ -1229,12 +1392,12 @@ const Profile = () => {
             
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Tableau de bord</Text>
+              <Text style={styles.menuText}>Tableau de bord</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => { navigation.navigate('Profile', { id: 666 }); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mon Profile</Text>
+              <Text style={styles.menuText}>Mon Profile</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
            
             {
@@ -1242,12 +1405,12 @@ const Profile = () => {
               <>
               <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="people-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Liste des Utilisateurs</Text>
+                <Text style={styles.menuText}>Liste des Utilisateurs</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="mail-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Demandes Clients</Text>
+                <Text style={styles.menuText}>Demandes Clients</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
               </TouchableOpacity>
               
               </>
@@ -1257,11 +1420,11 @@ const Profile = () => {
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
             <Ionicons name="archive-outline" size={24} color="black" />
-            <Text style={styles.menuText}>Historique de calcul</Text>
+            <Text style={styles.menuText}>Historique de calcul</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter un calcul</Text>
+              <Text style={styles.menuText}>Ajouter un calcul</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             
             
@@ -1270,11 +1433,11 @@ const Profile = () => {
                 <>
                   <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="business-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes fermes</Text>
+                    <Text style={styles.menuText}>Mes fermes</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Ajouter une ferme</Text>
+                    <Text style={styles.menuText}>Ajouter une ferme</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                  
                  
@@ -1283,14 +1446,14 @@ const Profile = () => {
                   IDCurrent2 && 
                   <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent2}); toggleMenu(); }} style={styles.menuItem}>
                   <Ionicons name="people-outline" size={24} color="black" />
-                  <Text style={styles.menuText}>Mes personnels</Text>
+                  <Text style={styles.menuText}>Mes personnels</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                 </TouchableOpacity>
                  }
 
                   
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Ajouter un personnel</Text>
+                    <Text style={styles.menuText}>Ajouter un personnel</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                 </>
             }
@@ -1309,7 +1472,7 @@ const Profile = () => {
               } 
                 style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Logout</Text>
+              <Text style={styles.menuText}>Logout</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
           </ScrollView>
           <View style={styles.footer}>
@@ -1658,8 +1821,8 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     height: '105%',
-    width: '66%',
-    backgroundColor: '#C4EA9E',  
+    width: '100%',
+    backgroundColor: 'white',  
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 5 },
@@ -1667,9 +1830,7 @@ const styles = StyleSheet.create({
     elevation: 15,
     zIndex: 9999,
   },
-  popupContent: {
-    padding: 20,
-  },
+   
   imagePreview: {
     alignItems: 'center',
     marginVertical: 16,
@@ -1680,13 +1841,17 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 
+  popupContent: {
+    padding: 20,
+  },
   logo: {
     marginTop : 40,
     marginLeft : "auto",
     marginRight : "auto",
-    marginBottom: 20,
+    marginBottom: 40,
     height : 25,
-    width : 111,  },
+    width : 112,
+  },
   imageLogo : {
     height : "100%", 
     width : "100%"
@@ -1694,13 +1859,13 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,    marginLeft: 20 ,
-
+    marginLeft: 40,
+    height : 55,
   },
   menuText: {
     fontSize: 16,
     color: 'black',
-    marginLeft: 10,
+    marginLeft: 16,
   },
   footer: {
     position: 'absolute',
@@ -1717,7 +1882,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 35,
     right: 17,
-    backgroundColor: '#BAE790',
+    backgroundColor: '#dafdd2',
     padding: 10,
     borderRadius: 50,
   },

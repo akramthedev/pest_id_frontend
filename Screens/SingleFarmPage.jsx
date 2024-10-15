@@ -243,7 +243,7 @@ const SingleFarmPage = () => {
                                       justifyContent: 'space-between',
                                       alignItems: 'center',
                                       paddingHorizontal: 10,
-                                      backgroundColor: '#f0f0f0', 
+                                      backgroundColor: '#f9f9f9', 
                                       marginBottom: 10,
                                       borderRadius: 10,
                                       marginRight : 23, 
@@ -319,12 +319,12 @@ const SingleFarmPage = () => {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="bar-chart-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Tableau de bord</Text>
+              <Text style={styles.menuText}>Tableau de bord</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => { navigation.navigate('Profile', { id: 666 }); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="person-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Mon Profile</Text>
+              <Text style={styles.menuText}>Mon Profile</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
            
             {
@@ -332,12 +332,12 @@ const SingleFarmPage = () => {
               <>
               <TouchableOpacity onPress={() => { navigation.navigate('MesClients'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="people-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Liste des Utilisateurs</Text>
+                <Text style={styles.menuText}>Liste des Utilisateurs</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { navigation.navigate('SuperAdminDemande'); toggleMenu(); }} style={styles.menuItem}>
                 <Ionicons name="mail-outline" size={24} color="black" />
-                <Text style={styles.menuText}>Demandes Clients</Text>
+                <Text style={styles.menuText}>Demandes Clients</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
               </TouchableOpacity>
               
               </>
@@ -347,11 +347,11 @@ const SingleFarmPage = () => {
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
             <Ionicons name="archive-outline" size={24} color="black" />
-            <Text style={styles.menuText}>Historique de calcul</Text>
+            <Text style={styles.menuText}>Historique de calcul</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Ajouter un calcul</Text>
+              <Text style={styles.menuText}>Ajouter un calcul</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
             
             
@@ -360,22 +360,22 @@ const SingleFarmPage = () => {
                 <>
                   <TouchableOpacity onPress={() => { navigation.navigate('MesFermes'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="business-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Mes fermes</Text>
+                    <Text style={styles.menuText}>Mes fermes</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUneFerme'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Ajouter une ferme</Text>
+                    <Text style={styles.menuText}>Ajouter une ferme</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                   {
                   IDCurrent && 
                   <TouchableOpacity onPress={() => { navigation.navigate('MesPersonels',{id : IDCurrent}); toggleMenu(); }} style={styles.menuItem}>
                   <Ionicons name="people-outline" size={24} color="black" />
-                  <Text style={styles.menuText}>Mes personnels</Text>
+                  <Text style={styles.menuText}>Mes personnels</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                 </TouchableOpacity>
                  }
                   <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnPersonel'); toggleMenu(); }} style={styles.menuItem}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
-                    <Text style={styles.menuText}>Ajouter un personnel</Text>
+                    <Text style={styles.menuText}>Ajouter un personnel</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
                   </TouchableOpacity>
                 </>
             }
@@ -394,7 +394,7 @@ const SingleFarmPage = () => {
               } 
                 style={styles.menuItem}>
               <Ionicons name="log-out-outline" size={24} color="black" />
-              <Text style={styles.menuText}>Logout</Text>
+              <Text style={styles.menuText}>Logout</Text><Ionicons style={{ position : "absolute",right:23 }}  name="chevron-forward" size={24} color="#565656" />
             </TouchableOpacity>
           </ScrollView>
           <View style={styles.footer}>
@@ -534,14 +534,14 @@ const styles = StyleSheet.create({
     alignItems : "center",
     justifyContent : "center",
     marginRight : 23, 
-    backgroundColor: '#DAFFB7',
+    backgroundColor: '#f6f6f6',
     alignItems: 'center',
     borderRadius: 8,
     borderWidth : 1, 
     borderColor : 'white'
   },
   text487C15 : {
-    color : "#487C15",
+    color : "black",
     fontSize : 16,
     fontWeight : "500"
   },
@@ -563,8 +563,8 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     height: '105%',
-    width: '66%',
-    backgroundColor: '#C4EA9E',  
+    width: '100%',
+    backgroundColor: 'white',  
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 5 },
@@ -579,9 +579,10 @@ const styles = StyleSheet.create({
     marginTop : 40,
     marginLeft : "auto",
     marginRight : "auto",
-    marginBottom: 20,
+    marginBottom: 40,
     height : 25,
-    width : 111,  },
+    width : 112,
+  },
   imageLogo : {
     height : "100%", 
     width : "100%"
@@ -589,13 +590,13 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,    marginLeft: 20 ,
-
+    marginLeft: 40,
+    height : 55,
   },
   menuText: {
     fontSize: 16,
     color: 'black',
-    marginLeft: 10,
+    marginLeft: 16,
   },
   footer: {
     position: 'absolute',
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 35,
     right: 17,
-    backgroundColor: '#BAE790',
+    backgroundColor: '#dafdd2',
     padding: 10,
     borderRadius: 50,
   },

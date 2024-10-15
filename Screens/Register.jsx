@@ -115,6 +115,7 @@ const Register = ({route}) => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <View style={styles.btnRond}>
           <Ionicons name="arrow-back" size={24} color="#3E6715" />
+          
         </View>
       </TouchableOpacity>
 
@@ -266,14 +267,15 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#C4EA9E',
+     
     borderRadius: 10,
-    height : 55,
+    height: 55,
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 20,
-    backgroundColor: '#EAFFD6',
+    backgroundColor: '#f6f6f6',
+    borderWidth: 1,
+    borderColor: '#f6f6f6',
   },
   input: {
     height: 55,
@@ -367,10 +369,11 @@ const styles = StyleSheet.create({
     width: 49,
     height: 49,
     borderRadius: 40,
-    backgroundColor: '#DDFFBD',
+    backgroundColor: '#f6f6f6',
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
+
 
 export default Register;

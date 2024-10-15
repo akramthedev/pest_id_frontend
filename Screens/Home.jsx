@@ -28,18 +28,22 @@ const Home = ({ navigation, route }) => {
       />
       <View style={styles.container}>
         <ImageBackground 
-          source={require('../images/image1.png')}          
+          source={require('./background3.jpg')}          
           style={styles.backgroundImage}
           resizeMode="cover"
         >
           <View style={styles.overlay} />
           
-          <View style={styles.logo}>
+         {
+          /*
+            <View style={styles.logo}>
               <Image
                 style={styles.imageLogo}  
                 source={require('./logo.png')}
               />
-          </View>
+            </View>
+          */
+         }
 
           <View style={styles.content}>
             <Text style={styles.text1}>La solution parfaite pour vos plantes.</Text>
@@ -90,7 +94,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.02)',  
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',  
+
   },
   buttonContainer: {
     position: 'absolute', 
@@ -112,7 +117,6 @@ const styles = StyleSheet.create({
     width: 140, 
     padding : 10,
     height: 45,
-    backgroundColor : "white",
     overflow: "hidden",
     margin: "auto",
     marginTop: 40,
@@ -130,15 +134,16 @@ const styles = StyleSheet.create({
     alignItems : "center",
     justifyContent : "center",
     borderRadius: 10,
-    height: 55,
+    height: 60,
     borderColor: 'transparent', 
   },
   blurView: {
     width: "100%", 
-    height :55,
-    borderRadius : 20, 
+    height :60,
+    borderRadius : 10, 
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 255, 0, 0.15)'
     
   },
   btnCreerCompte: {
@@ -157,7 +162,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'DMSerifDisplay',      
     fontSize: 50,
-    marginBottom :160,
+    marginBottom :-30,
     height: "auto",
     paddingLeft: 29,
     paddingRight: 50,

@@ -84,14 +84,15 @@ const Login = ({ route }) => {
   return (
     <View style={styles.backgroundContainer}>
       <Image 
-        source={require('../images/login2.png')}
+        source={require('./background4.png')}
         style={styles.backgroundImage} 
       />
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <View style={styles.btnRond}>
-            <BlurView intensity={33} tint="light" style={styles.backgroundBlur}>
-              <Ionicons name="arrow-back" size={24} color="#78B142" />
+            
+            <BlurView intensity={110} tint="dark" style={styles.backgroundBlur}>
+              <Ionicons name="arrow-back" size={24} color="white" />
             </BlurView>
           </View>
         </TouchableOpacity>
@@ -237,14 +238,15 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#C4EA9E',
     borderRadius: 10,
     height: 55,
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 20,
-    backgroundColor: '#EAFFD6',
+    borderColor: '#f6f6f6',
+    borderWidth: 1,
+    backgroundColor: '#f6f6f6',
+
   },
   input: {
     height: 55,
