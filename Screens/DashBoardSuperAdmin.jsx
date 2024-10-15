@@ -178,7 +178,7 @@ export default function Dashboard({route}) {
           {
             personnelData2 && personnelData2.map((data, index)=>{
               return(
-                  <CardAdmin item={data} isXClicked={isXClicked}  key={index}/>
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={data.id}/>
               )})
           }
           </>
@@ -187,7 +187,7 @@ export default function Dashboard({route}) {
           {
             personnelData && personnelData.map((data, index)=>{
               return(
-                  <CardAdmin item={data} isXClicked={isXClicked}  key={data}/>
+                  <CardAdmin item={data} isXClicked={isXClicked}  key={data.id}/>
               )})
           }
           </>
@@ -241,8 +241,8 @@ export default function Dashboard({route}) {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />

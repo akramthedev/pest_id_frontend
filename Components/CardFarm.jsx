@@ -6,11 +6,7 @@ import { formatLocation } from '../Helpers/locationTransf';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
- 
-
-
- 
-
+  
 
 export const CardFarm = ({ item }) => {
 
@@ -30,7 +26,7 @@ export const CardFarm = ({ item }) => {
     <>
     {
       item && 
-      <TouchableOpacity key={item} style={styles.card} onPress={ 
+      <TouchableOpacity key={item.id} style={styles.card} onPress={ 
         ()=>{
           navigation.navigate('SingleFarmPage', { id: item.id });
         }

@@ -247,7 +247,7 @@ const Calculation = () => {
              setSelectedFarm(prediction.farm_id);
             const selectedFarm = responseFarmsFetching.data.find(farm => farm.id === prediction.farm_id);
             setNameFarmX(selectedFarm.name);
-            console.warn(selectedFarm)
+            //console.warn(selectedFarm)
             if(selectedFarm){
               setNameFarmX(selectedFarm.name); 
             }
@@ -288,12 +288,12 @@ const Calculation = () => {
                 setSelectedGreenhouse(null); // Reset if needed
               }
             } else {
-              console.warn('No greenhouses available for the selected farm.');
+              //console.warn('No greenhouses available for the selected farm.');
               // Optionally reset the selected greenhouse
               setSelectedGreenhouse(null); // Reset if needed
             }
           } else {
-            console.warn('Selected farm not found in the farms array for farm_id:', prediction.farm_id);
+            //console.warn('Selected farm not found in the farms array for farm_id:', prediction.farm_id);
           }
   
           const response2 = await axiosInstance.get(`${ENDPOINT_API}predictions/${id}/images`, {
@@ -741,13 +741,12 @@ const Calculation = () => {
                   <Text style={styles.labelKLKLKL}>Date de création: </Text>
                   {loading ? "--" : formatDate(predictionData.created_at)}
                 </Text>
-                <TouchableOpacity onPress={togglePopup} style={styles.saveButton2}>
-                  <Text style={styles.buttonTextB} >
-                    Voir l'image
-                  </Text>
-                </TouchableOpacity>
+                 
               </View>
             </View>
+
+            <View style={styles.hr} />
+
 
             <View style={styles.cardKLKLKL}>
               <View style={styles.cardHeaderKLKLKL}>
@@ -771,10 +770,19 @@ const Calculation = () => {
                   <Text style={styles.label}>Nombre de Thrips: </Text>
                   {loading ? "--" : imageData?.class_C}
                 </Text>
-              </View>
-            </View>
-
+               </View>
  
+            </View>
+ 
+            <View style={styles.hr} />
+
+            <View style={styles.cardKLKLKL2}>
+              <TouchableOpacity onPress={togglePopup} style={styles.saveButton2}>
+                <Text style={styles.buttonTextB} >
+                  Voir l'image
+                </Text>
+              </TouchableOpacity>
+            </View>
 
 
           </>
@@ -863,8 +871,8 @@ const Calculation = () => {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />
@@ -1024,9 +1032,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor : "#487C15",
     paddingVertical: 12,
-    marginTop: 7,
-    paddingHorizontal: 16,
-    width: '96%',
+     paddingHorizontal: 16,
+    width: '100%',
     alignItems: 'center',
   },
   saveButton1 : {
@@ -1261,26 +1268,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    paddingBottom : 0,
+     //shadowColor: '#000',
+    //shadowOpacity: 0.1,
+    //shadowRadius: 5,
+    //elevation: 3,
     width : "98.1%",
     margin : "auto", 
-    borderWidth : 1, 
-    borderColor : "#eee"
+    //borderWidth : 1, 
+    //borderColor : "#eee"
   },
   cardKLKLKL2: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 20,
+    paddingBottom : 0,
+     //shadowColor: '#000',
+    //shadowOpacity: 0.1,
+    //shadowRadius: 5,
+    //elevation: 3,
     width : "98.1%",
+    paddingTop : 0,
     margin : "auto", 
-    backgroundColor : "black",
-    alignItems : "center", 
-    justifyContent : "center"
+    //borderWidth : 1, 
+    //borderColor : "#eee"
   },
   cardHeaderKLKLKL: {
     flexDirection: 'row',
@@ -1306,6 +1317,15 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 
+  hr: {
+    borderBottomColor: '#EFEFEF', 
+    borderBottomWidth: 1,         
+     marginRight : 23, 
+    marginLeft : 23, 
+    marginBottom : 25, 
+    marginTop : 25
+  },
+ 
 
 });
 export default Calculation;

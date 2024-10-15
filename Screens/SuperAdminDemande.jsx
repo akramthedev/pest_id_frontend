@@ -239,7 +239,7 @@ export default function SuperAdminDemande({route}) {
                                 <>
                                   {
                                     (data.canAccess === 0 && data.isEmailVerified === 0 ) &&
-                                    <CardAdmin key={data} index={index} item={data} isXClicked={isXClicked} />
+                                    <CardAdmin key={data.id} index={index} item={data} isXClicked={isXClicked} />
                                   }
                                 </>
                               )
@@ -302,8 +302,8 @@ export default function SuperAdminDemande({route}) {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />

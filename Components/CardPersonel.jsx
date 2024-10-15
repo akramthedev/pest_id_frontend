@@ -72,7 +72,7 @@ export const CardPersonal = ({ item }) => {
     <>
     {
      ( item && !loading && data) ? 
-      <TouchableOpacity key={item}  onPress={()=>{nav.navigate('Profile', { id: item.user_id });}}  style={styles.card}>
+      <TouchableOpacity key={item.id}  onPress={()=>{nav.navigate('Profile', { id: item.user_id });}}  style={styles.card}>
         <View style={styles.row}>
           <Image source={{ uri: data.image ? data.image : "https://cdn-icons-png.flaticon.com/512/149/149071.png" }} style={styles.profileImage} />
           <View style={styles.infoContainer}>

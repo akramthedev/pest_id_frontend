@@ -99,41 +99,36 @@ export default function AllFarms() {
       x(); 
   }, []));
 
-  
+  useEffect(()=>{
+    const fetchData = async () => {
+      setAllFarms(null);
+      try {
+        setLoading(true);
+        const token = await getToken(); 
+        const userId = await AsyncStorage.getItem('userId');
+        const userIdNum = parseInt(userId);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-  
-          const token = await getToken(); 
-          const userId = await AsyncStorage.getItem('userId');
-          const userIdNum = parseInt(userId);
-
-          const response = await axiosInstance.get(`${ENDPOINT_API}farms/${userIdNum}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (response.status === 200) {
-            setAllFarms(response.data);
-          } else {
-            Alert.alert('Erreur lors de la récupération de données.');
+        const response = await axiosInstance.get(`${ENDPOINT_API}farms/${userIdNum}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        } catch (error) {
-          console.error('Erreur :', error.message);
-        } finally {
-          setLoading(false);
+        });
+        if (response.status === 200) {
+          setAllFarms(null);
+          setAllFarms(response.data);
+        } else {
+          Alert.alert('Erreur lors de la récupération de données.');
         }
-      };
-  
-      fetchData();
-      
-      return () => setLoading(false);  
-  
-    }, [navigation])
-  );
+      } catch (error) {
+        console.error('Erreur :', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    
+  }, [navigation]);
 
  
   const toggleMenu = () => {
@@ -212,7 +207,7 @@ export default function AllFarms() {
                 :
                 AllFarms.map((data, index)=>{
                   return(
-                    <CardFarm item={data}  key={data} />
+                    <CardFarm item={data}  key={data.id} />
                   )
                 })
               }
@@ -282,8 +277,8 @@ export default function AllFarms() {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />

@@ -239,7 +239,7 @@ const AdminProfile = () => {
               {
                 personnelData && personnelData.map((data, index)=>{
                     return(
-                    <CardPersonal item={data}  key={data}/>
+                    <CardPersonal item={data}  key={data.id}/>
                     )
                 })
               }
@@ -307,8 +307,8 @@ const AdminProfile = () => {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />

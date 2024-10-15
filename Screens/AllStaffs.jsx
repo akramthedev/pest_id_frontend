@@ -94,44 +94,35 @@ export default function AllStaffs() {
   const [IDCurrent2, setIDCurrent2] = useState(null);
 
 
-  
   useFocusEffect(
     useCallback(() => {
-
-      const x = async ()=>{
-        if(id !== null && id !== undefined){
-          const rolex = JSON.parse(await AsyncStorage.getItem('type'));
-          if(rolex !== null && rolex !== undefined ){
-            setRole(rolex);
-            const userId = await AsyncStorage.getItem('userId');
-            const userIdNum = parseInt(userId);
-            setIDCurrent2(userIdNum);
-            if(id!== null && id !== undefined){
-              if(id === 666 || id === "666" || userIdNum === id){setisCurrent(true);setIDCurrent(userIdNum);}else{setisCurrent(false);setIDCurrent(id);}}}
-          else{console.log('Rolex Undefined... WTF');}}}
-      x(); }, [id])  );
-
-
-
-
-      const fetchData = async () => {
+      const fetchDataAndSetRole = async () => {
         if (id !== null && id !== undefined) {
-          try {
-            setLoading(true);
+          const rolex = JSON.parse(await AsyncStorage.getItem('type'));
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
   
+          setRole(rolex);
+          setIDCurrent2(userIdNum);
+  
+          if (id === 666 || id === "666" || userIdNum === id) {
+            setisCurrent(true);
+            setIDCurrent(userIdNum);
+          } else {
+            setisCurrent(false);
+            setIDCurrent(id);
+          }
+  
+          // Fetch data from the server
+          try {
             const token = await getToken();
             const resp0 = await axiosInstance.get(`${ENDPOINT_API}getAdminIdFromUserId/${id}`);
-  
             if (resp0.status === 200) {
               const response = await axiosInstance.get(`${ENDPOINT_API}staffs/${resp0.data.id}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
               });
-  
               if (response.status === 200) {
                 setAllStaffs(response.data);
-                console.log(response.data);
               } else {
                 Alert.alert('Erreur lors de la récupération de données.');
               }
@@ -146,14 +137,12 @@ export default function AllStaffs() {
         }
       };
   
-
-
-      useFocusEffect(
-        useCallback(() => {
-          fetchData();
-        }, [id]) 
-      );
-
+      fetchDataAndSetRole();
+    }, [id])
+  );
+  
+ 
+ 
 
    
   const toggleMenu = () => {
@@ -232,7 +221,7 @@ export default function AllStaffs() {
                 :
                 AllStaffs.map((data, index)=>{
                   return(
-                    <CardPersonal item={data}  key={data} />
+                    <CardPersonal item={data}  key={data.id} />
                   )
                 })
               }
@@ -306,8 +295,8 @@ export default function AllStaffs() {
            
            
             <TouchableOpacity onPress={() => { navigation.navigate('Historique'); toggleMenu(); }} style={styles.menuItem}>
-              <MaterialIcons name="history" size={24} color="black" />
-              <Text style={styles.menuText}>Historique de calcul</Text>
+            <Ionicons name="archive-outline" size={24} color="black" />
+            <Text style={styles.menuText}>Historique de calcul</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => { navigation.navigate('AjouterUnCalcul'); toggleMenu(); }} style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color="black" />

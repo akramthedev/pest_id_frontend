@@ -10,21 +10,15 @@ import { useAuth } from '../Helpers/AuthContext';
 
 
 const Home = ({ navigation, route }) => {
-
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
   const { settriggerIt, triggerIt } = useAuth();
-
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
   });
-
   if (!fontsLoaded) {
     return null;  
   }
-
-
   
   return (
     <>
