@@ -37,7 +37,7 @@ const Home = ({ navigation, route }) => {
           <View style={styles.logo}>
               <Image
                 style={styles.imageLogo}  
-                source={require('../images/logo.png')}
+                source={require('./logo.png')}
               />
           </View>
 
@@ -108,8 +108,9 @@ const styles = StyleSheet.create({
     backgroundColor : "transparent"
   },
   logo: {
-    borderRadius: 20,
+    borderRadius: 11,
     width: 140, 
+    padding : 10,
     height: 45,
     backgroundColor : "white",
     overflow: "hidden",

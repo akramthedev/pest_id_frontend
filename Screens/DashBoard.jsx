@@ -410,7 +410,7 @@ export default function Dashboard({ route }) {
           <ScrollView style={styles.popupContent}>
             <TouchableOpacity onPress={() => { navigation.navigate('Dashboard'); toggleMenu(); }} style={styles.logo}>
               <Image
-                source={require('../images/logo.png')}
+                source={require('./logo.png')}
                 style={styles.imageLogo}
                 resizeMode="cover"
               />
@@ -631,9 +631,8 @@ const styles = StyleSheet.create({
     marginLeft : "auto",
     marginRight : "auto",
     marginBottom: 20,
-    height : 40,
-    width : 130,
-  },
+    height : 25,
+    width : 111,  },
   imageLogo : {
     height : "100%", 
     width : "100%"
