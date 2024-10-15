@@ -27,6 +27,8 @@ const Calculation = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [loaderMM, setloaderMM] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [farms, setFarms] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState('');
@@ -160,11 +162,20 @@ const Calculation = () => {
           setFarms(response.data);
         }
         else{
-          console.log("Not Fetched All Farms With Their Serres");
+          setFarms([]);
         }
       }
       catch(e){
         console.log(e.message);
+        setmessageError("Oups, problème interne du serveur!");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+        setTimeout(() => {
+          setmessageError("");
+        }, 4000);
+
       } finally{
         setLoadingX(false);
 
@@ -223,12 +234,27 @@ const Calculation = () => {
              setFarms(responseFarmsFetching.data);
           }
           else{
-            console.log("Not Fetched All Farms With Their Serres");
+            setmessageError("Oups, Une erreur est survenue!");
+            setShowError(true);
+            setTimeout(() => {
+              setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageError("");
+            }, 4000);
           }
 
-          setSelectedFarm(prediction.farm_id); // Set selected farm
-          const selectedFarm = responseFarmsFetching.data.find(farm => farm.id === prediction.farm_id);
-          setNameFarmX(selectedFarm.name); 
+             setSelectedFarm(prediction.farm_id);
+            const selectedFarm = responseFarmsFetching.data.find(farm => farm.id === prediction.farm_id);
+            setNameFarmX(selectedFarm.name);
+            console.warn(selectedFarm)
+            if(selectedFarm){
+              setNameFarmX(selectedFarm.name); 
+            }
+            else{
+              setNameFarmX(null); 
+            }
+           
           
 
           //console.log("Prediction : ");
@@ -259,8 +285,6 @@ const Calculation = () => {
                 const selectedGreenhouseData = selectedFarm.serres.find(greenhouse => greenhouse.id === greenhouseId);
                 setNameSerreX(selectedGreenhouseData.name);
               } else {
-                console.warn('Greenhouse ID does not exist in the selected farm’s greenhouses:', greenhouseId);
-                // Optionally reset the selected greenhouse if it doesn't exist
                 setSelectedGreenhouse(null); // Reset if needed
               }
             } else {
@@ -279,13 +303,30 @@ const Calculation = () => {
           });
           if (response2.status === 200) {
             setimageData(response2.data[0]);
-            console.log(response2.data[0]);
-          }
+           }
+           else{
+            setimageData(null)
+           }
         } else {
-          Alert.alert('Erreur lors de la récupération de données.');
-        }
+          setmessageError("Erreur 682: un problème lors de la récupération des données.");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
+         }
       } catch (error) {
-        console.error('Erreur :', error.message);
+          console.error('Erreur :', error.message);
+          setmessageError("Oups, Une erreur est survenue!");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
       } finally {
         setLoading(false);
       }
@@ -352,15 +393,37 @@ const Calculation = () => {
         }
       });
       if(response.status === 200){
-        Alert.alert('Modified Successfully ! ');
+        setmessageSuccess("Succès : Vos informations ont été mis à jour.");
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 3000);
+        setTimeout(() => {
+          setmessageSuccess("");
+        }, 4000);
       }
       else{
-        Alert.alert('Oops...');
+        setmessageError("Oups, Une erreur est survenue lors de la modification des informations!");
+        setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
       }
       setisModifiedClicked(false);
     }
    catch(e){
-      Alert.alert('Oops...');
+      setmessageError("Oups, Une erreur est survenue!");
+      setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+
       console.log(e.message);
       setisModifiedClicked(false);
    } finally{
@@ -417,10 +480,17 @@ const Calculation = () => {
         if(response.status === 200){
           setIsSupprimerClicked(false);
           navigation.goBack();
-          Alert.alert('Deleted Successfully !');
-        }
+         }
         else{
-          Alert.alert('Not Deleted ');
+          setIsSupprimerClicked(false);
+          setmessageError("Oups, un incident est survenu lors de la suppression.");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         }
 
       
@@ -428,8 +498,14 @@ const Calculation = () => {
     }
     catch(e){
       console.log(e.message);
-      Alert.alert('Error 500');
-    } finally{
+      setmessageError("Oups, problème interne du serveur!");
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+      setTimeout(() => {
+        setmessageError("");
+      }, 4000);    } finally{
       setLoaderD(false);
     }
   }
@@ -440,24 +516,22 @@ const Calculation = () => {
   return (
     <>
 
+    <AlertError message={messageError} visible={showError} />
+    <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
       {showPopup && (
         <Animated.View style={[showPopup ? styles.popupContainer : styles.popupContainerNot, { opacity: fadeAnim }]}>
           <TouchableOpacity activeOpacity={1} style={styles.popupTouchable} onPress={togglePopup}>
             <Image
               style={styles.popupBackground}
-              source={{ uri: imageData.name }} // Replace with your popup image URL
+              source={{ uri: imageData && imageData.name }}  
             />
             <Text style={styles.popupText}>Cliquez n'importe où pour fermer</Text>
           </TouchableOpacity>
         </Animated.View>
       )}
-
-
-
-
       
-{
+      {
         isSupprimerClicked && 
         <View style={{
           position: 'absolute', 
@@ -609,7 +683,7 @@ const Calculation = () => {
                   {!selectedFarm && (
                     <Picker.Item label="Sélectionnez une ferme" value="" />
                   )}
-                  {farms.map(farm => (
+                  {farms && farms.map(farm => (
                     <Picker.Item key={farm.id} label={farm.name} value={farm.id} />
                   ))}
                 </Picker>
@@ -627,7 +701,7 @@ const Calculation = () => {
                   {!selectedGreenhouse && (
                     <Picker.Item label="Sélectionnez une serre" value="" />
                   )}
-                  {greenhouses.map(serre => (
+                  {greenhouses && greenhouses.map(serre => (
                     <Picker.Item key={serre.id} label={serre.name} value={serre.id} />
                   ))}
                 </Picker>
@@ -653,15 +727,15 @@ const Calculation = () => {
               <View style={styles.cardContentKLKLKL}>
                 <Text style={styles.infoKLKLKL}>
                   <Text style={styles.labelKLKLKL}>Nom de ferme: </Text>
-                  {loading ? "--" : NameFarmX && NameFarmX}
+                  {loading ? "--" : NameFarmX ? NameFarmX : "---"}
                 </Text>
                 <Text style={styles.infoKLKLKL}>
                   <Text style={styles.labelKLKLKL}>Nom de serre: </Text>
-                  {loading ? "--" : NameSerreX && NameSerreX}
+                  {loading ? "--" : NameSerreX && NameSerreX  }
                 </Text>
                 <Text style={styles.infoKLKLKL}>
                   <Text style={styles.labelKLKLKL}>ID de plaque: </Text>
-                  {loading ? "--" : predictionData.plaque_id}
+                  {loading ? "--" : predictionData.plaque_id ? predictionData.plaque_id : "---"  }
                 </Text>
                 <Text style={styles.infoKLKLKL}>
                   <Text style={styles.labelKLKLKL}>Date de création: </Text>

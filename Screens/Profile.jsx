@@ -202,14 +202,14 @@ const Profile = () => {
               }, 4000);           
           }
           else{
-            setmessageError("Oups, problème interne du serveur!");
-              setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+              setmessageError("Oups, problème interne du serveur!");
+                setShowError(true);
+                setTimeout(() => {
+                  setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                  setmessageError("");
+                }, 4000);
           }
         } finally{
           setLoading(false);
@@ -360,8 +360,7 @@ const Profile = () => {
       }
       catch(e){
         console.log(e.message);
-        console.log(e);
-        setmessageError("Oups, problème interne du serveur!");
+         setmessageError("Oups, problème interne du serveur!");
               setShowError(true);
               setTimeout(() => {
                 setShowError(false);

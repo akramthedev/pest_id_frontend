@@ -34,12 +34,11 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
   },[ ]);
 
   const fetchData = async () => {
-    if(id !== null && id !== undefined){
+    if( idFarm !== null && idFarm !== undefined ){
       try {
-        setLoading(true);
-        const IdOfPredi = id;
-        const token = await getToken(); 
 
+        setLoading(true);
+        const token = await getToken(); 
         const userId = await AsyncStorage.getItem('userId');
         const userIdNum = parseInt(userId);
 
@@ -48,19 +47,39 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
             'Authorization': `Bearer ${token}`
           }
         });
-        
         if (response.status === 200) {
           setFarmSingle(response.data.farm)
           setSerreSingle(response.data.serre)
-        } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+        } else if (response.status === 234) {
+          setSerreSingle({
+            ...SerreSingle, 
+            name : "--",
+          });setFarmSingle({
+            ...FarmSingle, 
+            name : "--",
+          })
+        }
+        else if(response.status === 233){
+          setFarmSingle({
+            name : "---",
+          })
+          setSerreSingle({
+            name : "---",
+          })
         }
       } catch (error) {
         console.error('Erreur :', error.message);
-      } finally {
-        setLoading(false);
-      }
+      } 
+    }else{
+      setFarmSingle({
+        name : "---",
+      })
+      setSerreSingle({
+        name : "---",
+      })
     }
+    setLoading(false);
+
   };
 
  
@@ -79,7 +98,7 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
       : 
       <View style={styles.card} key={id} >
         {
-          id && idFarm && idPlaque && idSerre && date && percentage  && 
+          id  && date && percentage  && 
           <>
           <View style={styles.row}>
             <Text style={styles.idText}>Nom Ferme : {FarmSingle && FarmSingle.name}</Text>
@@ -88,7 +107,7 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
             <Text style={styles.idText}>Nom Serre : {SerreSingle && SerreSingle.name}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.idText}>ID Plaque : {idPlaque}</Text>
+            <Text style={styles.idText}>ID Plaque : {idPlaque ? idPlaque : "---"}</Text>
           </View>
 
           <View
