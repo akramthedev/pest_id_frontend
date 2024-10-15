@@ -165,12 +165,12 @@ const SkeletonLoader = () => {
         Animated.timing(shimmerAnim, {
           toValue: 1,
           duration: 555,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(shimmerAnim, {
           toValue: 0,
           duration: 555,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ])
     ).start();

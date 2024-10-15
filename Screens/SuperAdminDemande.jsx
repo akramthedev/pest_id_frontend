@@ -1,6 +1,6 @@
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView,Image, StyleSheet, TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
+import { ScrollView,Image, StyleSheet,Alert,  TouchableOpacity, Text, View, PanResponder, Animated, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
@@ -16,6 +16,7 @@ const { width: screenWidth } = Dimensions.get('window');
 import { useAuth } from '../Helpers/AuthContext';
 import LoaderSVG from '../images/Loader.gif'
 import rateLimit from 'axios-rate-limit';
+import { Svg, Path } from 'react-native-svg';
 
 const axiosInstance = rateLimit(axios.create(), {
   maxRequests: 5, // maximum number of requests
@@ -173,8 +174,207 @@ export default function SuperAdminDemande({route}) {
   
 
 
+
+  
+  const [isNoticeSeen, setIsNoticeSeen] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        try{
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+          setIDCurrent(userIdNum);
+          const token = await getToken(); 
+          const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(response.status === 200){
+            if(parseInt(response.data.nouvelle_demande_notice) === 0 ){
+              setIsNoticeSeen(true);
+            }
+            else{
+              setIsNoticeSeen(false);
+            }
+          }
+        }
+        catch(e){
+          console.log(e.message);
+        }
+      }
+      x(); 
+  }, []));
+
+
+
+
+  const handleClickFreshStart = async()=>{
+    try{
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+       
+      const token = await getToken(); 
+      const response = await axios.get(`${ENDPOINT_API}notice6/${userIdNum}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log(response.data);
+
+      if (response.data.user) {
+        console.log(response.data.user);
+      }
+      else{
+        console.warn(response.data);
+      }
+       
+    }
+    catch(e){
+      console.log(e.message);
+      Alert.alert(JSON.stringify(e.message));
+    }
+  }
+
+
+
+
+
+
   return (
     <View style={styles.container}>
+
+
+      {
+        isNoticeSeen && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '90%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+            <Text style={{ 
+              fontSize: 23, 
+              fontWeight: 'bold', 
+              marginBottom: 25 , 
+              alignItems  :"flex-end", 
+            }}>
+
+              <Svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 57 57">
+                <Path   
+                  fill="#FFC017" 
+                  d="m39.637 40.831-5.771 15.871a1.99 1.99 0 0 1-3.732 0l-5.771-15.87a2.02 2.02 0 0 0-1.194-1.195L7.298 33.866a1.99 1.99 0 0 1 0-3.732l15.87-5.771a2.02 2.02 0 0 0 1.195-1.194l5.771-15.871a1.99 1.99 0 0 1 3.732 0l5.771 15.87a2.02 2.02 0 0 0 1.194 1.195l15.871 5.771a1.99 1.99 0 0 1 0 3.732l-15.87 5.771a2.02 2.02 0 0 0-1.195 1.194"
+                />
+              </Svg>
+              &nbsp;&nbsp;
+              Liste des Nouvelles Demandes
+              </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+                Ici, vous trouverez la liste des nouvelles demandes d'accès à l'application. Vous avez le contrôle total pour décider qui peut rejoindre l'application en tant qu'administrateur et bénéficier des fonctionnalités offertes.
+            
+            </Text>
+            
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '700', 
+              marginBottom: 21 
+            }}>Visualisation des nouvelles demandes </Text>: Chaque demande est accompagnée de leurs informations de base, comme leur nom, leur address email et la date de la demande.
+            </Text>
+
+
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '700', 
+              marginBottom: 21 
+            }}> Accepter une demande </Text> :  En acceptant une demande, le client devient administrateur et obtient la capacité de : créer et gérer des fermes, lancer des prédictions basées sur les calculs et gérer son propre personnel.
+            </Text>
+
+
+
+            <View style={{ 
+              flexDirection: 'row', 
+              justifyContent: 'space-between' 
+            }}>
+           
+
+
+           <TouchableOpacity style={{
+                backgroundColor: 'white', 
+                paddingVertical: 13,
+                width : "60%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={true}
+                 
+              >
+              
+              </TouchableOpacity>
+              <TouchableOpacity style={{
+                backgroundColor: 'black', 
+                paddingVertical: 13,
+                width : "40%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={false}
+                onPress={()=>{
+                  setIsNoticeSeen(false);
+                  handleClickFreshStart();
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                  Fermer
+                </Text>
+              </TouchableOpacity>
+              
+            </View>
+          </View>
+        </View>
+      }
+
+
+
+
+
       <ScrollView>
 
         <View style={styles.titleContainer}>

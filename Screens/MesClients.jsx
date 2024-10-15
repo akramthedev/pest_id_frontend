@@ -14,6 +14,7 @@ import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import LoaderSVG from '../images/Loader.gif'
 import rateLimit from 'axios-rate-limit';
+import { Svg, Path } from 'react-native-svg';
 
 const axiosInstance = rateLimit(axios.create(), {
   maxRequests: 5, // maximum number of requests
@@ -169,8 +170,197 @@ export default function MesClients({route}) {
     })
   ).current;
 
+
+
+ 
+  const [isNoticeSeen, setIsNoticeSeen] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        try{
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+          setIDCurrent(userIdNum);
+          const token = await getToken(); 
+          const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(response.status === 200){
+            if(parseInt(response.data.liste_users_notice) === 0 ){
+              setIsNoticeSeen(true);
+            }
+            else{
+              setIsNoticeSeen(false);
+            }
+          }
+        }
+        catch(e){
+          console.log(e.message);
+        }
+      }
+      x(); 
+  }, []));
+
+
+
+
+  const handleClickFreshStart = async()=>{
+    try{
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+       
+      const token = await getToken(); 
+      const response = await axios.get(`${ENDPOINT_API}notice5/${userIdNum}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log(response.data);
+
+      if (response.data.user) {
+        console.log(response.data.user);
+      }
+       
+    }
+    catch(e){
+      console.log(e.message);
+      Alert.alert(JSON.stringify(e.message));
+    }
+  }
+
+
+
+
+
   return (
     <View style={styles.container}>
+ 
+{
+        isNoticeSeen && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '90%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+            <Text style={{ 
+              fontSize: 23, 
+              fontWeight: 'bold', 
+              marginBottom: 25 , 
+              alignItems  :"flex-end", 
+            }}>
+
+              <Svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 57 57">
+                <Path   
+                  fill="#FFC017" 
+                  d="m39.637 40.831-5.771 15.871a1.99 1.99 0 0 1-3.732 0l-5.771-15.87a2.02 2.02 0 0 0-1.194-1.195L7.298 33.866a1.99 1.99 0 0 1 0-3.732l15.87-5.771a2.02 2.02 0 0 0 1.195-1.194l5.771-15.871a1.99 1.99 0 0 1 3.732 0l5.771 15.87a2.02 2.02 0 0 0 1.194 1.195l15.871 5.771a1.99 1.99 0 0 1 0 3.732l-15.87 5.771a2.02 2.02 0 0 0-1.195 1.194"
+                />
+              </Svg>
+              &nbsp;&nbsp;
+              Liste des Clients
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+                Ici, vous pouvez gérer l'ensemble de vos clients avec facilité. Vous y trouverez la liste complète de tous les clients de l'application, que vous pouvez trier en fonction de différents critères pour mieux organiser votre gestion.
+            
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '700', 
+              marginBottom: 21 
+            }}>Différenciation des rôles </Text> :  Les clients seront clairement identifiés comme étant administrateurs ou personnels, vous permettant ainsi d'agir en fonction de leur rôle au sein de l'application.
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '700', 
+              marginBottom: 21 
+            }}>Voir plus de détails </Text>: Cliquez sur un client pour consulter toutes ses informations, telles que ses coordonnées, ses personnels si c'est un administrateur, ainsi que de le supprimer, lui restreindre l'accès.
+            </Text>
+
+            <View style={{ 
+              flexDirection: 'row', 
+              justifyContent: 'space-between' 
+            }}>
+           
+
+
+           <TouchableOpacity style={{
+                backgroundColor: 'white', 
+                paddingVertical: 13,
+                width : "60%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={true}
+                 
+              >
+              
+              </TouchableOpacity>
+              <TouchableOpacity style={{
+                backgroundColor: 'black', 
+                paddingVertical: 13,
+                width : "40%",
+                borderRadius: 5,
+                alignItems : "center", 
+                justifyContent : "center",                
+                borderRadius: 5
+              }}
+                disabled={false}
+                onPress={()=>{
+                  setIsNoticeSeen(false);
+                  handleClickFreshStart();
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                  Fermer
+                </Text>
+              </TouchableOpacity>
+              
+            </View>
+          </View>
+        </View>
+      }
+
+
+
+
       <ScrollView>
         <View style={styles.titleContainer}>
         {

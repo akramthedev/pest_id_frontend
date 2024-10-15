@@ -1,11 +1,10 @@
 php artisan serve --host=0.0.0.0 --port=8000
 
 
-* Agrandir la navbar (100% x 100%)
+ 
 * Delete the Authentification Part with Facebook/Google/Apple
 * Errors & Success handling to all other actions of pages
-* Delete Medium Star and writte (nouveau) with parenthese 
-* add a popUp like 'Welcome Pop Up ' for each page to clarify what can the user do in this current page 
+* * *  * * * * * * add a popUp like 'Welcome Pop Up ' for each page to clarify what can the user do in page 
 * change background of popUp Navbar 
 * Nouveau Calcul / implementation de : prendre une photo 
 * change backgorund of a button "supprimer definitivement" (Single Farm Page maybe)
