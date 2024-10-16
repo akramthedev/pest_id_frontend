@@ -14,13 +14,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { formatLocation } from '../Helpers/locationTransf';
 import { formatDate } from '../Components/fct';
-import { ENDPOINT_API } from './endpoint';
+import { ENDPOINT_API } from './endpoint'; 
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import CardAdmin from '../Components/CardAdmin2';
 const { width: screenWidth, height : screenHeight  } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif'
 import rateLimit from 'axios-rate-limit';
-
+import { Svg, Path } from 'react-native-svg';
 const axiosInstance = rateLimit(axios.create(), {
   maxRequests: 8, // maximum number of requests
   perMilliseconds: 1000, // time window in milliseconds
@@ -794,9 +794,189 @@ const Profile = () => {
   }
 
 
+
+
+  
+  
+  const [isNoticeSeen, setIsNoticeSeen] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const x = async ()=>{
+        try{
+          const userId = await AsyncStorage.getItem('userId');
+          const userIdNum = parseInt(userId);
+          setIDCurrent(userIdNum);
+          const token = await getToken(); 
+          const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if(response.status === 200){
+            if(parseInt(response.data.profile_notice) === 0 ){
+              setIsNoticeSeen(true);
+            }
+            else{
+              setIsNoticeSeen(false);
+            }
+          }
+        }
+        catch(e){
+          console.log(e.message);
+        }
+      }
+      x(); 
+  }, []));
+
+
+
+
+  const handleClickFreshStart = async()=>{
+    try{
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+       
+      const token = await getToken(); 
+      const response = await axios.get(`${ENDPOINT_API}notice7/${userIdNum}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log(response.data);
+
+      if (response.data.user) {
+        console.log(response.data.user);
+      }
+       
+    }
+    catch(e){
+      console.log(e.message);
+      Alert.alert(JSON.stringify(e.message));
+    }
+  }
+
+
   return (
     <>
      
+
+     
+
+     {(isNoticeSeen && isCurrent !== null && dataProfile!== null) && 
+      <View style={{
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        zIndex : 10000,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+        justifyContent: 'center', 
+        alignItems: 'center'
+      }}>
+        <View style={{
+          backgroundColor: 'white', 
+          padding: 20, 
+          borderRadius: 10, 
+          width: '90%', 
+          shadowColor: '#000', 
+          shadowOpacity: 0.2, 
+          shadowRadius: 10,
+          elevation: 5 
+        }}>
+
+          <TouchableOpacity style={{
+              backgroundColor: 'black', 
+              height: 35,
+              width: 35,
+              alignItems: "center", 
+              justifyContent: "center",  
+              position: "absolute",
+              top: 9,
+              right: 9,              
+              borderRadius: 100, 
+              zIndex: 9999,
+            }}
+            disabled={false}
+            onPress={()=> {
+              setIsNoticeSeen(false);
+              handleClickFreshStart();
+            }}
+          >
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
+
+          <Text style={{ 
+              fontSize: 23, 
+              fontWeight: 'bold', 
+              marginBottom: 25 , 
+              marginTop : 10,
+              alignItems  :"flex-end", 
+            }}>
+
+            
+              
+
+              <Svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 57 57">
+                <Path   
+                  fill="#FFC017" 
+                  d="m39.637 40.831-5.771 15.871a1.99 1.99 0 0 1-3.732 0l-5.771-15.87a2.02 2.02 0 0 0-1.194-1.195L7.298 33.866a1.99 1.99 0 0 1 0-3.732l15.87-5.771a2.02 2.02 0 0 0 1.195-1.194l5.771-15.871a1.99 1.99 0 0 1 3.732 0l5.771 15.87a2.02 2.02 0 0 0 1.194 1.195l15.871 5.771a1.99 1.99 0 0 1 0 3.732l-15.87 5.771a2.02 2.02 0 0 0-1.195 1.194"
+                />
+              </Svg>
+              &nbsp;&nbsp;
+              Profil Utilisateur
+            </Text>
+          <Text style={{ 
+            fontSize: 18, 
+            fontWeight: '400', 
+            marginBottom: 21 
+          }}>
+            Ici, vous pouvez consulter et modifier les informations de votre profil. Assurez-vous de garder vos informations à jour afin de bénéficier d'une meilleure expérience.
+          </Text>
+          <Text style={{ 
+            fontSize: 18, 
+            fontWeight: '400', 
+            marginBottom: 21 
+          }}>
+            • <Text style={{ 
+            fontSize: 18, 
+            fontWeight: '700', 
+            marginBottom: 21 
+          }}>Mettre à jour vos informations personnelles </Text>: modifiez votre nom, adresse e-mail et autres informations pour garder votre profil à jour.
+          </Text>
+          <Text style={{ 
+            fontSize: 18, 
+            fontWeight: '400', 
+            marginBottom: 21 
+          }}>
+            • <Text style={{ 
+            fontSize: 18, 
+            fontWeight: '700', 
+            marginBottom: 21 
+          }}>Voir les profils de vos personnels </Text>: accédez aux informations des membres de votre équipe. En tant que super administrateur, vous pouvez également modifier ou supprimer les informations des autres utilisateurs pour maintenir la gestion de votre équipe à jour.
+          </Text>
+          {
+            (dataProfile!== null  && isCurrent!== null) && (
+
+              isCurrent === true && dataProfile.type !== "staff" &&
+              <Text style={{ 
+                fontSize: 18, 
+                fontWeight: '400', 
+                marginBottom: 21 
+              }}>
+                • <Text style={{ 
+                fontSize: 18, 
+                fontWeight: '700', 
+                marginBottom: 21 
+              }}>Voir les profils de vos personnels </Text>: accédez aux informations de vos clients, en tant que super administrateur, vous pouvez également les modifier.
+              </Text>
+            ) 
+          }
+        </View>
+      </View>
+    }
     {
         isSupprimerClicked && 
         <View style={{
@@ -988,7 +1168,7 @@ const Profile = () => {
                   source={{
                     uri: dataProfile && dataProfile.image
                       ? dataProfile.image
-                      : "https://cdn-icons-png.flaticon.com/256/149/149071.png"
+                      : "https://github.com/akramthedev/pest_id_frontend/blob/master/images/avatar.png?raw=true"
                   }}
                 />
             }

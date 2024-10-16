@@ -172,15 +172,6 @@ const CreateSerre = () => {
 
         <ScrollView>
           <View style={styles.titleContainer}>
-          {
-            loading && 
-            <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
-              <Image
-                source={LoaderSVG}  
-                style={styles.imageJOZNJORSFDOJFSWNVDO} 
-              />
-            </View>
-          }
             <Text style={styles.titleText}>Nouvelle Serre</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />

@@ -11,7 +11,6 @@ import { useAuth } from '../Helpers/AuthContext';
 import axios from 'axios';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
-import LoaderSVG from '../images/Loader.gif'
 import rateLimit from 'axios-rate-limit';
 
 const axiosInstance = rateLimit(axios.create(), {
@@ -197,15 +196,7 @@ const CreateStaff = ({route}) => {
       <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>
           <View style={styles.titleContainer}>
-          {
-            loading && 
-            <View style={{ position: "absolute", left :0 ,zIndex: 10,}} > 
-              <Image
-                source={LoaderSVG}  
-                style={styles.imageJOZNJORSFDOJFSWNVDO} 
-              />
-            </View>
-          }
+           
             <Text style={styles.titleText}>Nouveau Personel</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.menu}>
               <Ionicons name="menu" size={24} color="#3E6715" />

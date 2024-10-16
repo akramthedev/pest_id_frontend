@@ -48,10 +48,10 @@ const Login = ({ route }) => {
       setShowError(true);
           setTimeout(() => {
             setShowError(false);
-          }, 3000);
+          }, 5000);
           setTimeout(() => {
             setmessageError("");
-          }, 4000);
+          }, 5000);
       return;
     } else {
       setLoading(true);
@@ -77,34 +77,34 @@ const Login = ({ route }) => {
           }, 300);
         } else if (response.status === 202)  {
           setmessageError(`Vos informations sont incorrects.`);
-              setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 5000);
         }
         else if(response.status === 203){
           setmessageError("Nous traitons actuellement votre demande d'accès à l'application.")
           setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+          setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 5000);
         }
         
       } catch (error) {
         setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
-              setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+        setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 5000);
         console.log(error.message);
       } finally {
         setLoading(false);
@@ -128,9 +128,7 @@ const Login = ({ route }) => {
       :
       <View style={styles.backgroundContainer}>
 
-      <AlertError message={messageError} visible={showError} />
-      <AlertSuccess message={messageSuccess} visible={showSuccess} />
-
+ 
 
         <Image 
           source={require('./background4.png')}
@@ -183,6 +181,11 @@ const Login = ({ route }) => {
           <TouchableOpacity style={styles.hrContainer}>
             <Text style={styles.orText}> Mot de passe oublié ?</Text>
           </TouchableOpacity>
+
+          <View style={styles.hrContainer}>
+            <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
+          </View>
+
 
 
           <View style={styles.flexibleContainer}> 

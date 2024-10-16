@@ -101,7 +101,7 @@ export default function AllFarms() {
       x(); 
   }, []));
 
-  useEffect(()=>{
+ 
     const fetchData = async () => {
       setAllFarms(null);
       try {
@@ -142,9 +142,10 @@ export default function AllFarms() {
       }
     };
 
-    fetchData();
-    
-  }, [navigation]);
+    useFocusEffect(
+      useCallback(() => {
+        fetchData();        
+    }, [navigation]));
 
  
   const toggleMenu = () => {

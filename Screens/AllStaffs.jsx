@@ -159,7 +159,7 @@ export default function AllStaffs() {
       };
   
       fetchDataAndSetRole();
-    }, [id])
+    }, [id, navigation])
   );
   
  

@@ -52,13 +52,13 @@ const Register = ({route}) => {
   const register = async () => {
     if (password.length < 1 || email.length < 5 || fullName.length < 2) {
       setmessageError("Veuillez sasir des informations correctes.")
-          setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+      setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 5000);
       return;  
     } else {
       setLoading(true);
@@ -92,12 +92,12 @@ const Register = ({route}) => {
           const errorMessage = Object.values(errors).flat().join(', ');  
           setmessageError("Échec de l'inscription : "+errorMessage)
           setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+          setTimeout(() => {
+            setShowError(false);
+          }, 5000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 5000);
           seterror(errorMessage);
           setshowerror(true);
 
@@ -118,13 +118,13 @@ const Register = ({route}) => {
         seterror(errorMessage);
 
         setmessageError("Oups, problème interne du serveur!")
-          setShowError(true);
-              setTimeout(() => {
-                setShowError(false);
-              }, 3000);
-              setTimeout(() => {
-                setmessageError("");
-              }, 4000);
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 5000);
+        setTimeout(() => {
+          setmessageError("");
+        }, 5000);
           seterror(errorMessage);
           setshowerror(true);
 
@@ -294,6 +294,10 @@ const Register = ({route}) => {
         </View>
 
 
+        <View style={styles.hrContainer}>
+            <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
+          </View>
+
 
         {
           showerror ? 
@@ -396,6 +400,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 20,
+    alignItems : "center", 
+    justifyContent : "center"
   },
   hr: {
     flex: 1,

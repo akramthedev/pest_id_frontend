@@ -293,7 +293,7 @@ const History = ({route}) => {
               fontSize: 23, 
               fontWeight: 'bold', 
               marginBottom: 25 , 
-              marginTop : 30,
+              marginTop : 18,
               alignItems  :"flex-end", 
             }}>
 
