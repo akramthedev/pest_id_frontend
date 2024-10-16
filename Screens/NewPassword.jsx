@@ -19,17 +19,20 @@ const axiosInstance = rateLimit(axios.create(), {
   perMilliseconds: 1000, // time window in milliseconds
 });
 
-const Login = ({ route }) => {
+const NewPassword = ({ route }) => {
   const { settriggerIt, triggerIt } = useAuth();
   const [messageError,setmessageError] = useState("");
   const [messageSuccess,setmessageSuccess] = useState("");
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [passwordCheck, setpasswordCheck] = useState("");
+  const [password, setpassword] = useState("");
+
+  
   
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
  
   const [fontsLoaded] = useFonts({
     'DMSerifDisplay': require('../fonts/DMSerifDisplay-Regular.ttf'),  
@@ -42,74 +45,32 @@ const Login = ({ route }) => {
   const  [loader43, setloader43] = useState(false);
 
 
-  const login = async () => {
-    if (password.length < 1 || email.length < 5) {
-      setmessageError('Veuillez saisir des valeurs corrects.')
-      setShowError(true);
-          setTimeout(() => {
-            setShowError(false);
-          }, 5000);
-          setTimeout(() => {
-            setmessageError("");
-          }, 5000);
-      return;
-    } else {
-      setLoading(true);
-  
-      try {
-        let dataX = {
-          email: email,
-          password: password,
-        };
-        const response = await axiosInstance.post(`${ENDPOINT_API}login`, dataX);
-        
-        if (response.status === 200) {
-          const token = response.data.token;
-          const user = response.data.user;
-          saveToken(token); 
-          await AsyncStorage.setItem('userId', JSON.stringify(user.id));
-          await AsyncStorage.setItem('type', JSON.stringify(user.type));
-          setEmail('');setPassword('');
-          settriggerIt((prev) => !prev);
-          setloader43(true);
-          setTimeout(()=>{
-            navigation.navigate('Historique');
-          }, 300);
-        } else if (response.status === 202)  {
-          setmessageError(`Vos informations sont incorrects.`);
-          setShowError(true);
-          setTimeout(() => {
-            setShowError(false);
-          }, 5000);
-          setTimeout(() => {
-            setmessageError("");
-          }, 5000);
-        }
-        else if(response.status === 203){
-          setmessageError("Nous traitons actuellement votre demande d'accès à l'application.")
-          setShowError(true);
-          setTimeout(() => {
-            setShowError(false);
-          }, 5000);
-          setTimeout(() => {
-            setmessageError("");
-          }, 5000);
-        }
-        
-      } catch (error) {
-        setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
-        setShowError(true);
-          setTimeout(() => {
-            setShowError(false);
-          }, 5000);
-          setTimeout(() => {
-            setmessageError("");
-          }, 5000);
-        console.log(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const resetTheShit = async () => {
+
+
+         
+            setLoading(true);
+            try {
+
+
+                navigation.navigate('');
+
+
+            } 
+            catch (error) {
+                setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
+                setShowError(true);
+                setTimeout(() => {
+                    setShowError(false);
+                }, 5000);
+                setTimeout(() => {
+                    setmessageError("");
+                }, 5000);
+                console.log(error.message);
+            } 
+            finally {
+                setLoading(false);
+            }
   };
 
 
@@ -145,10 +106,10 @@ const Login = ({ route }) => {
           </TouchableOpacity>
 
           <View style={styles.titleView}>
-            <Text style={styles.title}>Welcome Back !</Text>
+            <Text style={styles.title}>Nouvel mot de passe</Text>
           </View>
           <View style={styles.descView}>
-            <Text style={styles.description}>Connectez vous à votre compte</Text>
+            <Text style={styles.description}>Saisissez votre nouveau mot de passe et confirmez-le pour mettre à jour votre compte.</Text>
           </View>
 
           <View style={styles.inputContainer}>
@@ -164,23 +125,38 @@ const Login = ({ route }) => {
                 placeholderTextColor="#325A0A" 
               />
             </View>
-            <View style={styles.inputWrapper2}>
+
+            <View style={styles.inputWrapper}>
               <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
               <TextInput 
                 value={password}
                 style={styles.input} 
-                onChangeText={setPassword}
                 autoCapitalize="none"
-                placeholder="Mot de passe" 
+                onChangeText={setpassword}
+                placeholder="Nouveau mot de passe" 
                 placeholderTextColor="#325A0A" 
-                secureTextEntry 
               />
             </View>
+
+
+            <View style={styles.inputWrapper}>
+              <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
+              <TextInput 
+                value={passwordCheck}
+                style={styles.input} 
+                autoCapitalize="none"
+                onChangeText={setpasswordCheck}
+                placeholder="Confirmer le mot de passe" 
+                placeholderTextColor="#325A0A" 
+              />
+            </View>
+
+
           </View>
 
-          <TouchableOpacity style={styles.hrContainer} onPress={()=>{ navigation.navigate("ForgotPassword"); }} >
-            <Text style={styles.orText}> Mot de passe oublié ?</Text>
-          </TouchableOpacity>
+          
+
+          
 
           <View style={styles.hrContainer}>
             <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
@@ -189,9 +165,9 @@ const Login = ({ route }) => {
 
 
           <View style={styles.flexibleContainer}> 
-          <TouchableOpacity onPress={login} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+          <TouchableOpacity onPress={resetTheShit} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
             <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
-              {loading ? "Authentification en cours..." : "Se connecter"}
+              {loading ? "Traitement en cours..." : "Mettre à jour"}
             </Text>
           </TouchableOpacity>
             <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
@@ -245,6 +221,7 @@ const styles = StyleSheet.create({
     minHeight: 29,
     marginBottom: 70,
     width: '90%',
+    marginTop : 20,
     marginLeft: 'auto',
     marginRight: 'auto',
     alignItems: 'center',
@@ -257,7 +234,6 @@ const styles = StyleSheet.create({
     fontSize: 35,
     color: '#325A0A',
     textAlign : "center",
-
     fontFamily: 'DMSerifDisplay',
   },
   description: {
@@ -427,4 +403,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default NewPassword;

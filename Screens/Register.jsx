@@ -285,7 +285,6 @@ const Register = ({route}) => {
             autoCapitalize="none"
             placeholder="Mot de passe" 
             placeholderTextColor="#325A0A" 
-            secureTextEntry 
           />
         </View>
 
@@ -363,6 +362,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 35,
+    textAlign : "center",
     color: '#325A0A',
     fontFamily: 'DMSerifDisplay',
   },

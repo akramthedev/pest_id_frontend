@@ -5,11 +5,13 @@ import Home from './Screens/Home';
 import LoadingScreen from './Screens/LoadingScreen';
 import Login from './Screens/Login';
 import Register from './Screens/Register';
+import ForgotPassword from "./Screens/ForgotPassword"
 import Dashboard from './Screens/DashBoard';
 import Profile from './Screens/Profile';
 import AdminProfile from './Screens/AdminProfile';
 import MesClients from './Screens/MesClients';
 import Historique from './Screens/History';
+import NewPassword from './Screens/NewPassword'
 import NouvelleDemande from './Screens/NouvelleDemande';
 import MesPersonels from './Screens/AllStaffs';
 import MesFermes from './Screens/AllFarms';
@@ -81,6 +83,8 @@ const MainNavigator = ({ isAuthenticated, setIsAuthenticated }) => {
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="NewPassword" component={NewPassword} />
           </Stack.Group>
         )}
       </Stack.Navigator>
