@@ -363,9 +363,7 @@ const Profile = () => {
             }, 4000);
     }
     else{
-
-    
-      setLoader1(true);
+          setLoader1(true);
           const userId = await AsyncStorage.getItem('userId');
           const token = await getToken(); 
           let userIdNum;
@@ -384,11 +382,7 @@ const Profile = () => {
           image : image ? image : "https://cdn-icons-png.flaticon.com/256/149/149071.png", 
           type : dataProfileOfChangement.type
         }
-        let data2 = {
-          company_name : dataAdministrateurOfChangement.company_name,
-          company_mobile : dataAdministrateurOfChangement.company_mobile,
-          company_email : dataAdministrateurOfChangement.company_email,
-        }
+        
         const resp = await axiosInstance.post(`${ENDPOINT_API}updateUserInfos/${userIdNum}`, data, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -396,7 +390,16 @@ const Profile = () => {
         });
         if(resp.status === 200){
           
+          
           if(dataProfile.type !== "staff"){
+
+            let data2 = {
+              company_name : dataAdministrateurOfChangement.company_name,
+              company_mobile : dataAdministrateurOfChangement.company_mobile,
+              company_email : dataAdministrateurOfChangement.company_email,
+            }
+
+
             const resp22 = await axiosInstance.patch(`${ENDPOINT_API}admin/${userIdNum}`, data2, {
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -1119,6 +1122,13 @@ const Profile = () => {
               )}
             </Text>
           </View>
+          
+
+          <View style={styles.rowXXX}>
+            <Text style={styles.label}>Date d'inscription</Text>
+            <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
+          </View>
+              
 
 
        
@@ -1127,6 +1137,7 @@ const Profile = () => {
           (
             dataProfile.type !== "staff" && 
             <>
+            <View style={styles.hr} />
               <View style={styles.rowXXX} >
                       <Text style={styles.label} >Nom Société : </Text>
                       {isModify ? (
@@ -1201,11 +1212,6 @@ const Profile = () => {
 
 
 
-          <View style={styles.rowXXX}>
-            <Text style={styles.label}>Date d'inscription</Text>
-            <Text style={styles.value}>{formatDate(dataProfile.created_at)}</Text>
-          </View>
-
           
 
           {isCurrent !== null && (
@@ -1213,14 +1219,10 @@ const Profile = () => {
               <View style={styles.hr} />
               {(isCurrent === true || (role && role === "superadmin")) && (
                 <>
-
-                   
-                   
                   <TouchableOpacity  onPress={()=>{handleClick(2)}} style={styles.modifierVotreX}>
                     <Text style={styles.modifierVotreXText}>Modifier le mot de passe</Text>
                     <Ionicons name="arrow-forward" size={24} color="gray" />
                   </TouchableOpacity>
-                  
                   {
                     (IDCurrent !== null && dataProfile.type !== "staff") && 
                     <TouchableOpacity  onPress={()=>{ navigation.navigate('MesPersonels', { id: IDCurrent }) }} style={styles.modifierVotreX}>
@@ -1228,7 +1230,6 @@ const Profile = () => {
                       <Ionicons name="arrow-forward" size={24} color="gray" />
                     </TouchableOpacity>
                   }
-              
                 </>
               )}
             </>
@@ -1268,7 +1269,25 @@ const Profile = () => {
                         </>
                         :
                         <>
-                          
+                         
+
+                          <TouchableOpacity
+                            onPress={()=>{
+                              setIsSupprimerClicked(true);
+                            }}
+                            disabled={loading || loader2 || loader1 || !dataProfile}
+                            style={[
+                              
+                              styles.supprimerLepersonel2, 
+                              { opacity: loading ? 0.3 : 1 } 
+                            ]}
+                          >
+                            <Text style={styles.buttonTextWhite}>Supprimer</Text>
+                          </TouchableOpacity>
+
+
+
+ 
                           {
                             dataProfile!== null && 
                             (
@@ -1285,6 +1304,9 @@ const Profile = () => {
                             )
                           }
 
+
+
+
                           <TouchableOpacity
                             disabled={loading || !dataProfile || loader1 || loader2}
                             style={[
@@ -1296,20 +1318,7 @@ const Profile = () => {
                             <Text style={styles.buttonTextWhite}>Modifier</Text>
                           </TouchableOpacity>
 
-                          <TouchableOpacity
-                            onPress={()=>{
-                              setIsSupprimerClicked(true);
-                            }}
-                            disabled={loading || loader2 || loader1 || !dataProfile}
-                            style={[
-                              
-                              styles.supprimerLepersonel2, 
-                              { opacity: loading ? 0.3 : 1 } 
-                            ]}
-                          >
-                            <Text style={styles.buttonTextWhite}>Supprimer</Text>
-                          </TouchableOpacity>
-
+                      
                         </>
                       }
                       
@@ -1511,12 +1520,12 @@ const styles = StyleSheet.create({
   rowXXX: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height : 40,
+    height : 35,
     marginLeft : 23,
     marginRight : 23 
   },
   hr: {
-    borderBottomColor: '#dcdcdc', 
+    borderBottomColor: '#EFEFEF', 
     borderBottomWidth: 1,         
     marginTop : 20,
     marginBottom : 20,

@@ -270,10 +270,35 @@ export default function SuperAdminDemande({route}) {
             shadowRadius: 10,
             elevation: 5 // Ombre pour Android
           }}>
+
+
+            
+<TouchableOpacity style={{
+                backgroundColor: 'black', 
+                height : 35,
+                width : 35,
+                alignItems : "center", 
+                justifyContent : "center",  
+                position : "absolute",
+                top : 9,
+                right : 9,              
+                borderRadius: 100, 
+                zIndex : 9999,
+              }}
+                disabled={false}
+                onPress={()=>{
+                  setIsNoticeSeen(false);
+                  handleClickFreshStart();
+                }}
+              >
+                 <Ionicons name="close" size={24} color="white" />
+
+              </TouchableOpacity>
             <Text style={{ 
               fontSize: 23, 
               fontWeight: 'bold', 
-              marginBottom: 25 , 
+              marginBottom: 25,
+              marginTop : 10 , 
               alignItems  :"flex-end", 
             }}>
 
@@ -323,50 +348,6 @@ export default function SuperAdminDemande({route}) {
             }}> Accepter une demande </Text> :  En acceptant une demande, le client devient administrateur et obtient la capacité de : créer et gérer des fermes, lancer des prédictions basées sur les calculs et gérer son propre personnel.
             </Text>
 
-
-
-            <View style={{ 
-              flexDirection: 'row', 
-              justifyContent: 'space-between' 
-            }}>
-           
-
-
-           <TouchableOpacity style={{
-                backgroundColor: 'white', 
-                paddingVertical: 13,
-                width : "60%",
-                borderRadius: 5,
-                alignItems : "center", 
-                justifyContent : "center",                
-                borderRadius: 5
-              }}
-                disabled={true}
-                 
-              >
-              
-              </TouchableOpacity>
-              <TouchableOpacity style={{
-                backgroundColor: 'black', 
-                paddingVertical: 13,
-                width : "40%",
-                borderRadius: 5,
-                alignItems : "center", 
-                justifyContent : "center",                
-                borderRadius: 5
-              }}
-                disabled={false}
-                onPress={()=>{
-                  setIsNoticeSeen(false);
-                  handleClickFreshStart();
-                }}
-              >
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                  Fermer
-                </Text>
-              </TouchableOpacity>
-              
-            </View>
           </View>
         </View>
       }

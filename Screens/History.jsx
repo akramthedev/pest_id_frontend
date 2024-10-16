@@ -247,12 +247,39 @@ const History = ({route}) => {
             shadowRadius: 10,
             elevation: 5 // Ombre pour Android
           }}>
+
+<TouchableOpacity style={{
+                backgroundColor: 'black', 
+                height : 35,
+                width : 35,
+                alignItems : "center", 
+                justifyContent : "center",  
+                position : "absolute",
+                top : 9,
+                right : 9,              
+                borderRadius: 100, 
+                zIndex : 9999,
+              }}
+                disabled={false}
+                onPress={()=>{
+                  setIsNoticeSeen(false);
+                  handleClickFreshStart();
+                }}
+              >
+                 <Ionicons name="close" size={24} color="white" />
+
+              </TouchableOpacity>
+
             <Text style={{ 
               fontSize: 23, 
               fontWeight: 'bold', 
               marginBottom: 25 , 
+              marginTop : 30,
               alignItems  :"flex-end", 
             }}>
+
+            
+              
 
               <Svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 57 57">
                 <Path   
@@ -311,53 +338,8 @@ const History = ({route}) => {
             }}>Supprimer des prédictions </Text> : si un calcul n'est plus nécessaire ou si vous souhaitez nettoyer votre historique, vous pouvez également supprimer les prédictions que vous ne souhaitez plus conserver.
 
             </Text>
+  
  
-
-
-
-
-            <View style={{ 
-              flexDirection: 'row', 
-              justifyContent: 'space-between' 
-            }}>
-           
-
-
-           <TouchableOpacity style={{
-                backgroundColor: 'white', 
-                paddingVertical: 13,
-                width : "60%",
-                borderRadius: 5,
-                alignItems : "center", 
-                justifyContent : "center",                
-                borderRadius: 5
-              }}
-                disabled={true}
-                 
-              >
-              
-              </TouchableOpacity>
-              <TouchableOpacity style={{
-                backgroundColor: 'black', 
-                paddingVertical: 13,
-                width : "40%",
-                borderRadius: 5,
-                alignItems : "center", 
-                justifyContent : "center",                
-                borderRadius: 5
-              }}
-                disabled={false}
-                onPress={()=>{
-                  setIsNoticeSeen(false);
-                  handleClickFreshStart();
-                }}
-              >
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                  Fermer
-                </Text>
-              </TouchableOpacity>
-              
-            </View>
           </View>
         </View>
       }

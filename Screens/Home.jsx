@@ -28,7 +28,7 @@ const Home = ({ navigation, route }) => {
       />
       <View style={styles.container}>
         <ImageBackground 
-          source={require('./background3.jpg')}          
+          source={require('./background2.jpg')}          
           style={styles.backgroundImage}
           resizeMode="cover"
         >
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',  
+    backgroundColor: 'rgba(0, 0, 0, 0.666)',  
 
   },
   buttonContainer: {
