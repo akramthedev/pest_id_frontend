@@ -67,6 +67,8 @@ export default function AllStaffs() {
 
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [TriggerITTTT, setTriggerITTTT] = useState(false);
   const route = useRoute();
   const { id } = route.params; 
@@ -128,12 +130,27 @@ export default function AllStaffs() {
               if (response.status === 200) {
                 setAllStaffs(response.data);
               } else {
-                Alert.alert('Erreur lors de la récupération de données.');
+                setmessageError("Oups, problème interne du serveur!");
+                setShowError(true);
+                setTimeout(() => {
+                  setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                  setmessageError("");
+                }, 4000);
               }
             } else {
               navigation.navigate('Dashboard');
             }
           } catch (error) {
+            setmessageError("Oups, problème interne du serveur!");
+                setShowError(true);
+                setTimeout(() => {
+                  setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                  setmessageError("");
+                }, 4000);
             console.error('Erreur :', error.message);
           } finally {
             setLoading(false);
@@ -261,6 +278,8 @@ export default function AllStaffs() {
   return (
     <View style={styles.container}>
       
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
       {

@@ -31,6 +31,8 @@ const Register = ({route}) => {
   const [showerror, setshowerror] = useState(false);
   const { settriggerIt, triggerIt } = useAuth();
   const [showError, setShowError] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isNoticeSeen, setIsNoticeSeen] = useState(false);
 
@@ -49,7 +51,14 @@ const Register = ({route}) => {
 
   const register = async () => {
     if (password.length < 1 || email.length < 5 || fullName.length < 2) {
-      Alert.alert('Erreur', 'Veuillez saisir des valeurs correctes');
+      setmessageError("Veuillez sasir des informations correctes.")
+          setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
       return;  
     } else {
       setLoading(true);
@@ -81,12 +90,19 @@ const Register = ({route}) => {
         } else {
            const errors = response.data.errors;
           const errorMessage = Object.values(errors).flat().join(', ');  
-          Alert.alert("Échec de l'inscription", errorMessage);
+          setmessageError("Échec de l'inscription : "+errorMessage)
+          setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           seterror(errorMessage);
           setshowerror(true);
+
         }
   
-        console.log(response.data);
   
       } catch (error) {
         setshowerror(true);
@@ -100,6 +116,18 @@ const Register = ({route}) => {
             : 'Erreur inconnue';  
         
         seterror(errorMessage);
+
+        setmessageError("Oups, problème interne du serveur!")
+          setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
+          seterror(errorMessage);
+          setshowerror(true);
+
         console.log(errorMessage);
       } finally {
         setLoading(false);
@@ -114,6 +142,8 @@ const Register = ({route}) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
+<AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
 

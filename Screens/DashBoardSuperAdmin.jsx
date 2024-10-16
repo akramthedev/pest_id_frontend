@@ -75,7 +75,8 @@ export default function Dashboard({route}) {
 
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [isXClicked, setisXClicked] = useState(false);
     const slideAnim = useRef(new Animated.Value(screenWidth)).current;

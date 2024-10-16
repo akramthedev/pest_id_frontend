@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { ENDPOINT_API } from '../Screens/endpoint';
 import rateLimit from 'axios-rate-limit';
+import { AlertError, AlertSuccess } from "./AlertMessage";
 
 
 const axiosInstance = rateLimit(axios.create(), {
@@ -23,7 +24,10 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
   const [role, setRole] = useState(null);
   const [SerreSingle,setSerreSingle] = useState(null);
   const [FarmSingle,setFarmSingle] = useState(null);
-
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
   useEffect(()=>{
     const x = async ()=>{
@@ -69,6 +73,14 @@ const CardCalculation = ({id, idFarm,idPlaque, idSerre,  date, percentage }) => 
         }
       } catch (error) {
         console.error('Erreur :', error.message);
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
       } 
     }else{
       setFarmSingle({

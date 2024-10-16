@@ -216,7 +216,14 @@ const Calculation = () => {
             setpredictionDataModifying(prediction);
             setSelectedDate(fetchedDate); // Set the date for the picker
           } else {
-            console.error('Invalid date format:', prediction.created_at);
+            setmessageError("Le format de date est invalide.");
+                setShowError(true);
+                setTimeout(() => {
+                  setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                  setmessageError("");
+                }, 4000);
           }
 
         

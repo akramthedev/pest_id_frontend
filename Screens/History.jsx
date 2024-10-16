@@ -29,7 +29,8 @@ const History = ({route}) => {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [role, setRole] = useState(null);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
  
   useEffect(()=>{
     const x = async ()=>{
@@ -126,10 +127,25 @@ const History = ({route}) => {
           if (response.status === 200) {
             setAllPredictions(response.data);
           } else {
-            Alert.alert('Erreur lors de la récupération de données.');
+            setmessageError("Oups, une erreur est survenue lors de la récupération des données.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
         } catch (error) {
           console.error('Erreur :', error.message);
+          setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         } finally {
           setLoading(false);
         }
@@ -166,7 +182,7 @@ const History = ({route}) => {
           const userIdNum = parseInt(userId);
           setIDCurrent(userIdNum);
           const token = await getToken(); 
-          const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
+          const response = await axiosInstance.get(`${ENDPOINT_API}user/${userIdNum}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -196,7 +212,7 @@ const History = ({route}) => {
       const userIdNum = parseInt(userId);
        
       const token = await getToken(); 
-      const response = await axios.get(`${ENDPOINT_API}notice1/${userIdNum}`, {
+      const response = await axiosInstance.get(`${ENDPOINT_API}notice1/${userIdNum}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -222,7 +238,10 @@ const History = ({route}) => {
   return (
     <View style={styles.container}>
 
-      
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
+
  
       {
         isNoticeSeen && 

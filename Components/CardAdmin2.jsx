@@ -10,6 +10,7 @@ import SkeletonLoader from './SkeletonLoader';
 import { useRoute } from '@react-navigation/native';
 import rateLimit from 'axios-rate-limit';
 import { Svg, Path } from 'react-native-svg';
+import { AlertError, AlertSuccess } from "./AlertMessage";
 
 
 const axiosInstance = rateLimit(axios.create(), {
@@ -21,7 +22,10 @@ const axiosInstance = rateLimit(axios.create(), {
 
 
 export  const CardAdmin2 = ({ item,index, isXClicked }) => {
-  
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
   const nav = useNavigation();
   const [diffInDays, setDiffInDays] = useState(null);
@@ -69,6 +73,14 @@ export  const CardAdmin2 = ({ item,index, isXClicked }) => {
             mobile : "Indefini"
           })
           console.log(e.message);
+          setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         } finally{
           setloading(false);
         }

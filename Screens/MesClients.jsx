@@ -30,7 +30,8 @@ import { useAuth } from '../Helpers/AuthContext';
 export default function MesClients({route}) {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [IDCurrent, setIDCurrent] = useState(null);
 
 
@@ -97,9 +98,24 @@ export default function MesClients({route}) {
               setNumberOfDemand(numberOfNewDemands);
               setNumberOfClients(numberOfCLients);
             } else {
-              Alert.alert('Erreur lors de la récupération de données.');
+              setmessageError("Oups, une erreur est survenue lors de la récupération des données.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
             }
           } catch (error) {
+            setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
             console.error('Erreur :', error.message);
           } finally {
             setLoading(false);
@@ -198,6 +214,14 @@ export default function MesClients({route}) {
           }
         }
         catch(e){
+          setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           console.log(e.message);
         }
       }
@@ -238,6 +262,10 @@ export default function MesClients({route}) {
 
   return (
     <View style={styles.container}>
+
+<AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
  
 {
         isNoticeSeen && 

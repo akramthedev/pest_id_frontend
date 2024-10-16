@@ -30,7 +30,8 @@ const axiosInstance = rateLimit(axios.create(), {
 const SingleFarmPage = () => {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
   const [role, setRole] = useState(null);
 
@@ -133,9 +134,24 @@ const SingleFarmPage = () => {
                 setdataSerre([]);
               }
             } else {
-              Alert.alert('Erreur lors de la récupération de données.');
+              setmessageError("Oups, Une erreur est survenue lors de la récupération des données.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
             }
           } catch (error) {
+            setmessageError("Oups, problème interne du serveur!");
+            setShowError(true);
+            setTimeout(() => {
+              setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+              setmessageError("");
+            }, 4000);
             console.error('Erreur :', error.message);
           } finally {
             setLoading(false);
@@ -159,6 +175,12 @@ const SingleFarmPage = () => {
   return (
     <>
       <View style={styles.container}>
+
+
+
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
           <ScrollView>
 
                 <View style={styles.titleContainer}>

@@ -6,14 +6,20 @@ import { formatLocation } from '../Helpers/locationTransf';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from '../Screens/endpoint';
-  
+import { AlertError, AlertSuccess } from "./AlertMessage";
+
 
 export const CardFarm = ({ item }) => {
 
 
   const navigation = useNavigation();
   const [role, setRole] = useState(null);
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
+  
   useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));

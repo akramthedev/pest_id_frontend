@@ -683,9 +683,7 @@ const Profile = () => {
 
             if(resp00.status === 200){
               staffsUsers = resp00.data;
-              console.log("-------------------");
-              console.log(resp00.data);
-              console.log("-------------------");
+               
             }
           }
 
@@ -798,8 +796,6 @@ const Profile = () => {
 
   return (
     <>
-     
-
      
     {
         isSupprimerClicked && 

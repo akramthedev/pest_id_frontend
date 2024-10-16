@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonLoader from "./SkeletonLoader"
 import { ENDPOINT_API } from '../Screens/endpoint';
 import rateLimit from 'axios-rate-limit';
-
+import { AlertError, AlertSuccess } from "./AlertMessage";
 
 const axiosInstance = rateLimit(axios.create(), {
   maxRequests: 10, // maximum number of requests
@@ -21,6 +21,13 @@ export const CardPersonal = ({ item }) => {
 
   const nav = useNavigation();
 
+
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
+
+  
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -50,9 +57,24 @@ export const CardPersonal = ({ item }) => {
           setData(response.data);
           console.log(response.data)
          } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       } catch (error) {
+        setmessageError("Oups, problème interne du serveur!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.error('Erreur :', error.message);
       } finally {
         setLoading(false);

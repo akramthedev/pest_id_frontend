@@ -21,10 +21,12 @@ const axiosInstance = rateLimit(axios.create(), {
 
 const Login = ({ route }) => {
   const { settriggerIt, triggerIt } = useAuth();
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
   const navigation = useNavigation();
+  
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +44,14 @@ const Login = ({ route }) => {
 
   const login = async () => {
     if (password.length < 1 || email.length < 5) {
-      Alert.alert('Erreur', 'Veuillez saisir des valeurs correctes');
+      setmessageError('Veuillez saisir des valeurs corrects.')
+      setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
       return;
     } else {
       setLoading(true);
@@ -67,14 +76,35 @@ const Login = ({ route }) => {
             navigation.navigate('Historique');
           }, 300);
         } else if (response.status === 202)  {
-          Alert.alert("Invalid Credentials");
+          setmessageError(`Vos informations sont incorrects.`);
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
         else if(response.status === 203){
-          Alert.alert("Veuillez attendre l'approuvation d'un admin.");
+          setmessageError("Nous traitons actuellement votre demande d'accès à l'application.")
+          setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
         
       } catch (error) {
-        Alert.alert("Erreur", JSON.stringify(error.message));
+        setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         console.log(error.message);
       } finally {
         setLoading(false);
@@ -97,6 +127,11 @@ const Login = ({ route }) => {
       </View>
       :
       <View style={styles.backgroundContainer}>
+
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
+
         <Image 
           source={require('./background4.png')}
           style={styles.backgroundImage} 

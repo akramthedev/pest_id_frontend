@@ -28,7 +28,8 @@ const axiosInstance = rateLimit(axios.create(), {
 export default function SuperAdminDemande({route}) {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [role, setRole] = useState(null);
 
   useEffect(()=>{
@@ -82,10 +83,25 @@ export default function SuperAdminDemande({route}) {
             console.log("____________________________")
             setNumberOfDemand(x);
           } else {
-            Alert.alert('Erreur lors de la récupération de données.');
+            setmessageError("Oups, Une erreur est survenue lors de la récupération des données.");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
           }
         } catch (error) {
           console.error('Erreur :', error.message);
+          setmessageError("Oups, Une erreur est survenue!");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         } finally {
           setLoading(false);
         }
@@ -245,6 +261,9 @@ export default function SuperAdminDemande({route}) {
 
   return (
     <View style={styles.container}>
+
+<AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
       {

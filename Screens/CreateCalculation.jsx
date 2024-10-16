@@ -32,7 +32,6 @@ const CreateCalculation = ({route}) => {
   const [selectedGreenhouse, setSelectedGreenhouse] = useState('');
   const [LoadingX,setLoadingX] = useState(true);
   const [role, setRole] = useState(null);
-
   useEffect(()=>{
     const x = async ()=>{
       const rolex = JSON.parse(await AsyncStorage.getItem('type'));
@@ -297,6 +296,8 @@ const formatDateForCreatedAt = (date) => {
   return (
     <>
     <View style={styles.container} >
+
+      
       <AlertError message={messageError} visible={showError} />
       <AlertSuccess message={messageSuccess} visible={showSuccess} />
         <ScrollView>

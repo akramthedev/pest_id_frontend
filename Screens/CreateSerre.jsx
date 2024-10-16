@@ -24,7 +24,8 @@ const CreateSerre = () => {
  
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
 
 
   const [IDCurrent, setIDCurrent] = useState(null);
@@ -134,11 +135,26 @@ const CreateSerre = () => {
           navigation.navigate('SingleFarmPage', { id: id });
         }
         else{
-          console.log('not created')
+          setmessageError("Oups, une erreur est survenue!");
+          setShowError(true);
+          setTimeout(() => {
+            setShowError(false);
+          }, 3000);
+          setTimeout(() => {
+            setmessageError("");
+          }, 4000);
         }
       }
   
       catch(e){
+        setmessageError("Oups, problème interne du serveur!");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+        }, 3000);
+        setTimeout(() => {
+          setmessageError("");
+        }, 4000);
         console.log(e.message);
       } finally{
         setloading(false);
@@ -151,6 +167,8 @@ const CreateSerre = () => {
   return (
     <>
     <View style={styles.container}>
+    <AlertError message={messageError} visible={showError} />
+    <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
         <ScrollView>
           <View style={styles.titleContainer}>

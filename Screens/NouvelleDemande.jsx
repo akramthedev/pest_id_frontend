@@ -274,6 +274,9 @@ const NouvelleDemande = () => {
   return (
     <>
       
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
+
 
       {
         loading ? 
@@ -287,8 +290,6 @@ const NouvelleDemande = () => {
         :
         <View style={styles.container}>
 
-          <AlertError message={messageError} visible={showError} />
-          <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
           <View>

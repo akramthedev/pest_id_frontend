@@ -66,8 +66,9 @@ export default function AllFarms() {
 
 
   const [showError, setShowError] = useState(false);
+  const [messageError,setmessageError] = useState("");
+  const [messageSuccess,setmessageSuccess] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-
   const { settriggerIt, triggerIt } = useAuth();
   
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -118,10 +119,24 @@ export default function AllFarms() {
           setAllFarms(null);
           setAllFarms(response.data);
         } else {
-          Alert.alert('Erreur lors de la récupération de données.');
+          setmessageError("Oups, Une erreur est survenue!");
+              setShowError(true);
+              setTimeout(() => {
+                setShowError(false);
+              }, 3000);
+              setTimeout(() => {
+                setmessageError("");
+              }, 4000);
         }
       } catch (error) {
-        console.error('Erreur :', error.message);
+        setmessageError("Oups, problème interne du serveur!");
+                setShowError(true);
+                setTimeout(() => {
+                  setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                  setmessageError("");
+                }, 4000);
       } finally {
         setLoading(false);
       }
@@ -233,6 +248,8 @@ export default function AllFarms() {
   return (
     <View style={styles.container}>
       
+      <AlertError message={messageError} visible={showError} />
+      <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
       {
