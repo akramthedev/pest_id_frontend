@@ -6,6 +6,5 @@ php artisan serve --host=0.0.0.0 --port=8000
 * Errors & Success handling to all other actions of pages
 * Nouveau Calcul / implementation de : prendre une photo 
 * Agrandir le button "Stack" de la Navbar PopUp
-* supprimer la couleur du background de Tableau de Bord dans le graphique 
 * Implementer la fonctionnalité :"mot de passe oublié" 
 * Implementer le graphique de tableau de Board

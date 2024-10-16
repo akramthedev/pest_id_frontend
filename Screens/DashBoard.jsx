@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ENDPOINT_API } from './endpoint';
 import { AlertError, AlertSuccess } from "../Components/AlertMessage";
 import { useAuth } from '../Helpers/AuthContext';
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 import LoaderSVG from '../images/Loader.gif';
 import axios from "axios";
 import rateLimit from 'axios-rate-limit';
@@ -512,13 +512,13 @@ export default function Dashboard({ route }) {
           <Text style={styles.graphicContainerText}>Moyenne des {selectedChart} par plaque {viewType === 'Year' ? 'par an' : `pour ${selectedMonth}`}</Text>
           <LineChart
             data={data}
-            width={screenWidth - 40}  
-            height={300}
+            width={screenWidth - 30}  
             bezier  
+            height={screenHeight - 444}
             chartConfig={{
-              backgroundColor : "#E5FFCC",
-              backgroundGradientFrom: '#F3FFE8',
-              backgroundGradientTo: '#F3FFE8',
+              backgroundColor : "white",
+              backgroundGradientFrom: 'white',
+              backgroundGradientTo: 'white',
               decimalPlaces: 2,
               color: (opacity = 1) => `rgba(72, 124, 21, ${opacity})`,
               style: {
@@ -703,6 +703,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 30,
+    flex: 1,
     borderRadius: 0,
   },
   BtnXXX: {

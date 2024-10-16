@@ -1560,6 +1560,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 110,
     height: 110,
+    borderColor : "gainsboro",
     borderRadius: 1000,
   },
   roleText: {

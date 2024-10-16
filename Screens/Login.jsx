@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Alert,View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Alert,View, Text,Image, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { BlurView } from 'expo-blur';
+import LoaderSVG from '../images/Loader.gif'
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import * as Font from 'expo-font';
@@ -36,6 +37,8 @@ const Login = ({ route }) => {
     return null;  
   }
 
+  const  [loader43, setloader43] = useState(false);
+
 
   const login = async () => {
     if (password.length < 1 || email.length < 5) {
@@ -59,10 +62,10 @@ const Login = ({ route }) => {
           await AsyncStorage.setItem('type', JSON.stringify(user.type));
           setEmail('');setPassword('');
           settriggerIt((prev) => !prev);
+          setloader43(true);
           setTimeout(()=>{
             navigation.navigate('Historique');
-          }, 150);
-          
+          }, 300);
         } else if (response.status === 202)  {
           Alert.alert("Invalid Credentials");
         }
@@ -82,99 +85,90 @@ const Login = ({ route }) => {
 
 
   return (
-    <View style={styles.backgroundContainer}>
-      <Image 
-        source={require('./background4.png')}
-        style={styles.backgroundImage} 
-      />
-      <ScrollView contentContainerStyle={styles.container}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <View style={styles.btnRond}>
-            
-            <BlurView intensity={110} tint="dark" style={styles.backgroundBlur}>
-              <Ionicons name="arrow-back" size={24} color="white" />
-            </BlurView>
-          </View>
-        </TouchableOpacity>
 
-        <View style={styles.titleView}>
-          <Text style={styles.title}>Welcome Back !</Text>
-        </View>
-        <View style={styles.descView}>
-          <Text style={styles.description}>Connectez vous à votre compte</Text>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <Ionicons style={styles.iconX} name="mail" size={20} color="#325A0A" />
-            <TextInput 
-              value={email}
-              style={styles.input} 
-              autoCapitalize="none"
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              placeholder="Adresse email" 
-              placeholderTextColor="#325A0A" 
-            />
-          </View>
-          <View style={styles.inputWrapper}>
-            <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
-            <TextInput 
-              value={password}
-              style={styles.input} 
-              onChangeText={setPassword}
-              autoCapitalize="none"
-              placeholder="Mot de passe" 
-              placeholderTextColor="#325A0A" 
-              secureTextEntry 
-            />
-          </View>
-        </View>
-
-        <View style={styles.hrContainer}>
-          <View style={styles.hr} />
-          <Text style={styles.orText}>ou connectez-vous via</Text>
-          <View style={styles.hr} />
-        </View>
-
-        <View style={styles.socialButtonsContainer}>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" }}
-              style={styles.socialIcon}
-            />
+    <>
+    {
+      loader43 ? 
+      <View style={styles.containerOZFSD}>
+          <Image
+            source={LoaderSVG}  
+            style={styles.image} 
+          />
+      </View>
+      :
+      <View style={styles.backgroundContainer}>
+        <Image 
+          source={require('./background4.png')}
+          style={styles.backgroundImage} 
+        />
+        <ScrollView contentContainerStyle={styles.container}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <View style={styles.btnRond}>
+              
+              <BlurView intensity={110} tint="dark" style={styles.backgroundBlur}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </BlurView>
+            </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: "https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png" }}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvpQr7jRfGRZXz54j5HdGf6MDP8w5l53a3UQ&s" }}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
-        </View>
 
-        <View style={styles.flexibleContainer}> 
-        <TouchableOpacity onPress={login} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
-          <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
-            {loading ? "Authentification en cours..." : "Se connecter"}
-          </Text>
-        </TouchableOpacity>
-          <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.alreadyRegisteredText}>
-              Non inscrit ?{' '}{' '}   
-              <Text style={styles.loginText}>
-                Créez votre compte
-              </Text>
+          <View style={styles.titleView}>
+            <Text style={styles.title}>Welcome Back !</Text>
+          </View>
+          <View style={styles.descView}>
+            <Text style={styles.description}>Connectez vous à votre compte</Text>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <Ionicons style={styles.iconX} name="mail" size={20} color="#325A0A" />
+              <TextInput 
+                value={email}
+                style={styles.input} 
+                autoCapitalize="none"
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                placeholder="Adresse email" 
+                placeholderTextColor="#325A0A" 
+              />
+            </View>
+            <View style={styles.inputWrapper2}>
+              <Ionicons style={styles.iconX} name="lock-closed" size={20} color="#325A0A" />
+              <TextInput 
+                value={password}
+                style={styles.input} 
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                placeholder="Mot de passe" 
+                placeholderTextColor="#325A0A" 
+                secureTextEntry 
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.hrContainer}>
+            <Text style={styles.orText}> Mot de passe oublié ?</Text>
+          </TouchableOpacity>
+
+
+          <View style={styles.flexibleContainer}> 
+          <TouchableOpacity onPress={login} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+            <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
+              {loading ? "Authentification en cours..." : "Se connecter"}
             </Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+            <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
+              <Text style={styles.alreadyRegisteredText}>
+                Non inscrit ?{' '}{' '}   
+                <Text style={styles.loginText}>
+                  Créez votre compte
+                </Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    }
+    </>
   );
 };
 
@@ -205,7 +199,7 @@ const styles = StyleSheet.create({
   },
   titleView: {
     width: 'auto',
-    marginTop: 120,
+    marginTop: 167,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
@@ -248,6 +242,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#f6f6f6',
 
   },
+
+  inputWrapper2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    height: 55,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderColor: '#f6f6f6',
+    borderWidth: 1,
+    backgroundColor: '#f6f6f6',
+
+  },
+
   input: {
     height: 55,
     width : '100%',
@@ -258,7 +266,7 @@ const styles = StyleSheet.create({
   hrContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    justifyContent : "center",
   },
   hr: {
     flex: 1,
@@ -266,9 +274,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
   },
   orText: {
-    marginHorizontal: 10,
-    fontSize: 15,
+    fontSize: 16,
+    height :  60,
+    paddingTop : 13,
+    width : "100%",
+    alignItems : "center",
+    justifyContent : "center",
+    textAlign : "center",
+    fontWeight : "700",
     color: '#8A8A8A',
+    textDecorationLine : "underline"
   },
   socialButtonsContainer: {
     flexDirection: 'row',
@@ -307,7 +322,21 @@ const styles = StyleSheet.create({
   alreadyRegisteredContainer: {
     alignItems: 'center',
   },
-
+  containerOZFSD: {
+    flex: 1,
+    justifyContent: 'center',  
+    alignItems: 'center',      
+    backgroundColor: '#fff',   
+  },
+  loadingText: {
+    fontSize: 15,             
+    fontWeight: '500',         
+    color: '#000',            
+  },
+  image: {
+    width: 39,
+    height: 39,  
+  },
   registerButtonDisabled : {
     backgroundColor: '#DAFFB5',
     height : 55,

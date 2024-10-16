@@ -258,6 +258,13 @@ const Register = ({route}) => {
             secureTextEntry 
           />
         </View>
+
+        <View style={styles.hrContainer}>
+          <Text style={styles.orText}> En vous connectant, vous acceptez nos conditions générales d'utilisation et notre politique de confidentialité.</Text>
+        </View>
+
+
+
         {
           showerror ? 
           <Text style={{ textAlign : "center" , color : "red", fontWeight : "bold", fontSize : 17 }} >
@@ -266,33 +273,7 @@ const Register = ({route}) => {
           : null
         }
       </View>
-
-      <View style={styles.hrContainer}>
-        <View style={styles.hr} />
-        <Text style={styles.orText}>ou inscrivez-vous via</Text>
-        <View style={styles.hr} />
-      </View>
-
-      <View style={styles.socialButtonsContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" }}
-            style={styles.socialIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={{ uri: "https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png" }}
-            style={styles.socialIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvpQr7jRfGRZXz54j5HdGf6MDP8w5l53a3UQ&s" }}
-            style={styles.socialIcon}
-          />
-        </TouchableOpacity>
-      </View>
+ 
 
       <View style={styles.flexibleContainer}> 
         <TouchableOpacity onPress={register} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
@@ -330,7 +311,7 @@ const styles = StyleSheet.create({
   },
   titleView: {
     width: 'auto',
-    marginTop: 60,
+    marginTop: 70,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
@@ -395,7 +376,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontSize: 15,
     color: '#8A8A8A',
-    
+    textAlign : "center"
 
   },
   socialButtonsContainer: {
