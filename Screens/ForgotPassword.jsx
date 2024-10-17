@@ -24,6 +24,7 @@ const ForgotPassword = ({ route }) => {
   const [messageError,setmessageError] = useState("");
   const [messageSuccess,setmessageSuccess] = useState("");
   const [showError, setShowError] = useState(false);
+  const [email2,setEmail2] = useState("");
   const [OTP, setOTP] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const navigation = useNavigation();
@@ -52,16 +53,43 @@ const ForgotPassword = ({ route }) => {
             setShowError(true);
             setTimeout(() => {
                 setShowError(false);
-            }, 5000);
+            }, 3000);
             setTimeout(() => {
                 setmessageError("");
-            }, 5000);
+            }, 4000);
             return;
         } 
         else {
             setLoading(true);
             try {
-                setchangeToOTP(true);
+
+              const resp = await axios.post(`${ENDPOINT_API}password/email`, {
+                email : email
+              });
+
+              if(resp.status === 200){
+                setEmail2(email)
+                setmessageSuccess("Un code à 6 chiffre vous a été envoyé.");
+                setShowSuccess(true);
+                setTimeout(() => {
+                  setShowSuccess(false);
+                }, 2500);
+                setTimeout(() => {
+                  setmessageSuccess("");
+                  setEmail('');
+                  setchangeToOTP(true);
+                }, 3100);                
+              }
+              else{
+                setmessageError(`${resp.message}`);
+                setShowError(true);
+                setTimeout(() => {
+                    setShowError(false);
+                }, 5000);
+                setTimeout(() => {
+                    setmessageError("");
+                }, 5000);
+              }
             } 
             catch (error) {
                 setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
@@ -85,7 +113,25 @@ const ForgotPassword = ({ route }) => {
   const checkOTP = async () => {
             setLoading(true);
             try {
-                navigation.navigate('NewPassword');                
+              const resp = await axios.post(`${ENDPOINT_API}password/otp`, {
+                email : email2,
+                otp : OTP
+              });
+
+              if(resp.status === 200){
+                setOTP('');
+                navigation.navigate('NewPassword',{ email2 : email2});
+              }              
+              else{
+                setmessageError(`Le code que vous avez saisi est incorrect.`);
+                setShowError(true);
+                setTimeout(() => {
+                    setShowError(false);
+                }, 5000);
+                setTimeout(() => {
+                    setmessageError("");
+                }, 5000);
+              }
             } 
             catch (error) {
                 setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
@@ -150,15 +196,24 @@ const ForgotPassword = ({ route }) => {
             
 
             <View style={styles.hrContainer}>
-                <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
+                {showError && (
+                    <Text style={{ textAlign: "center", color: "red", fontSize: 16, fontWeight: '700' }}>
+                        {messageError}
+                    </Text>
+                )}
+                {showSuccess && (
+                    <Text style={{ textAlign: "center", color: "green", fontSize: 16, fontWeight: '700' }}>
+                        {messageSuccess}
+                    </Text>
+                )}
             </View>
 
 
 
             <View style={styles.flexibleContainer}> 
-            <TouchableOpacity onPress={envoiCode} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+            <TouchableOpacity onPress={envoiCode} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading || messageSuccess!== ""}>
                 <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
-                {loading ? "Envoi en cours..." : "Recevoir le lien"}
+                {loading ? "Envoi en cours..." : "Recevoir le code OTP"}
                 </Text>
             </TouchableOpacity>
                 <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
@@ -212,9 +267,17 @@ const ForgotPassword = ({ route }) => {
             
 
             <View style={styles.hrContainer}>
-                <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
+                {showError && (
+                    <Text style={{ textAlign: "center", color: "red", fontSize: 16, fontWeight: '700' }}>
+                        {messageError}
+                    </Text>
+                )}
+                {showSuccess && (
+                    <Text style={{ textAlign: "center", color: "green", fontSize: 16, fontWeight: '700' }}>
+                        {messageSuccess}
+                    </Text>
+                )}
             </View>
-
 
 
                 <View style={styles.flexibleContainer}> 
@@ -223,11 +286,11 @@ const ForgotPassword = ({ route }) => {
                         {loading ? "Vérification en cours..." : "Vérifier le code"}
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
+                    <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => {setOTP('') ;setchangeToOTP(false)}}>
                     <Text style={styles.alreadyRegisteredText}>
-                        Non inscrit ?{' '}{' '}   
+                        Vous n'avez pas recu le code?{' '}{' '}   
                         <Text style={styles.loginText}>
-                        Créez votre compte
+                        Renvoyer
                         </Text>
                     </Text>
                     </TouchableOpacity>

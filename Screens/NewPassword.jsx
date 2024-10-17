@@ -4,7 +4,7 @@ import { saveToken, getToken, deleteToken } from '../Helpers/tokenStorage';
 import { BlurView } from 'expo-blur';
 import LoaderSVG from '../images/Loader.gif'
 import { Ionicons } from '@expo/vector-icons'; 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,7 +19,10 @@ const axiosInstance = rateLimit(axios.create(), {
   perMilliseconds: 1000, // time window in milliseconds
 });
 
-const NewPassword = ({ route }) => {
+const NewPassword = ( ) => {
+
+  const route = useRoute();
+  const { email2 } = route.params; 
   const { settriggerIt, triggerIt } = useAuth();
   const [messageError,setmessageError] = useState("");
   const [messageSuccess,setmessageSuccess] = useState("");
@@ -29,8 +32,7 @@ const NewPassword = ({ route }) => {
   const [email, setEmail] = useState("");
   const [passwordCheck, setpasswordCheck] = useState("");
   const [password, setpassword] = useState("");
-
-  
+   
   
   const [loading, setLoading] = useState(false);
  
@@ -42,20 +44,78 @@ const NewPassword = ({ route }) => {
     return null;  
   }
 
-  const  [loader43, setloader43] = useState(false);
 
+  useEffect(()=>{
+    if(email2){
+      setEmail(email2)
+    }
+  }, [email2]);
+ 
 
   const resetTheShit = async () => {
 
 
-         
+    const emailRegex = /\S+@\S+\.\S+/;
+
+
+
+          if (!emailRegex.test(email)) {
+            setmessageError('Veuillez saisir une addresse email valide.');
+            setShowError(true);
+            setTimeout(() => {
+                setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+                setmessageError("");
+            }, 4000);
+            return;
+          }
+          else if(password !== passwordCheck){
+            setmessageError('Les mots de passe ne sont pas identiques.');
+            setShowError(true);
+            setTimeout(() => {
+                setShowError(false);
+            }, 3000);
+            setTimeout(() => {
+                setmessageError("");
+            }, 4000);
+            return;
+          } 
+          else{
+            
             setLoading(true);
             try {
+ 
+              const resp = await axios.post(`${ENDPOINT_API}updatePassword2`, {
+                email : email,
+                nouveau : password
+              });
 
-
-                navigation.navigate('');
-
-
+              if(resp.status === 200){
+                setEmail('');
+                setpassword('');
+                setpasswordCheck('');
+                setmessageSuccess("Le mot de passe a été réinitialisé avec succès.");
+                setShowSuccess(true);
+                setTimeout(() => {
+                  setShowSuccess(false);
+                }, 2000);
+                setTimeout(() => {
+                  setmessageSuccess("");    
+                   navigation.navigate('Login');
+                }, 2900);   
+                 
+               }  
+               else{
+                setmessageError(`Oups, le mot de passe n'a pas été changé.`);
+                setShowError(true);
+                setTimeout(() => {
+                    setShowError(false);
+                }, 3000);
+                setTimeout(() => {
+                    setmessageError("");
+                }, 4000);
+               }
             } 
             catch (error) {
                 setmessageError(`Oups, une erreur est survenue : ${JSON.stringify(error.message)}`);
@@ -71,6 +131,8 @@ const NewPassword = ({ route }) => {
             finally {
                 setLoading(false);
             }
+          }
+          
   };
 
 
@@ -78,15 +140,7 @@ const NewPassword = ({ route }) => {
   return (
 
     <>
-    {
-      loader43 ? 
-      <View style={styles.containerOZFSD}>
-          <Image
-            source={LoaderSVG}  
-            style={styles.image} 
-          />
-      </View>
-      :
+     
       <View style={styles.backgroundContainer}>
 
  
@@ -150,24 +204,28 @@ const NewPassword = ({ route }) => {
                 placeholderTextColor="#325A0A" 
               />
             </View>
+           </View>
 
+     
 
-          </View>
-
-          
-
-          
-
-          <View style={styles.hrContainer}>
-            <Text style={{ textAlign : "center",color : "red", fontSize : 16, fontWeight : '700' }}>{showError && messageError}</Text>
-          </View>
-
-
+   
+           <View style={styles.hrContainer}>
+                {showError && (
+                    <Text style={{ textAlign: "center", color: "red", fontSize: 16, fontWeight: '700' }}>
+                        {messageError}
+                    </Text>
+                )}
+                {showSuccess && (
+                    <Text style={{ textAlign: "center", color: "green", fontSize: 16, fontWeight: '700' }}>
+                        {messageSuccess}
+                    </Text>
+                )}
+            </View>
 
           <View style={styles.flexibleContainer}> 
-          <TouchableOpacity onPress={resetTheShit} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading}>
+          <TouchableOpacity onPress={resetTheShit} style={[styles.registerButton, loading && styles.registerButtonDisabled]} disabled={loading || messageSuccess!==""}>
             <Text style={[styles.registerButtonText, loading && styles.registerButtonDisabledText]}>
-              {loading ? "Traitement en cours..." : "Mettre à jour"}
+              {loading ? "Traitement en cours..." : "Modifier le mot de passe"}
             </Text>
           </TouchableOpacity>
             <TouchableOpacity style={styles.alreadyRegisteredContainer} onPress={() => navigation.navigate('Register')}>
@@ -181,8 +239,7 @@ const NewPassword = ({ route }) => {
           </View>
         </ScrollView>
       </View>
-    }
-    </>
+     </>
   );
 };
 
