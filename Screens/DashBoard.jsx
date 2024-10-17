@@ -146,6 +146,8 @@ export default function Dashboard({ route }) {
         }
       }
       x(); 
+
+      
   }, []));
 
 

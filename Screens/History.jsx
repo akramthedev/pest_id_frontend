@@ -173,6 +173,9 @@ const History = ({route}) => {
 
 
   const [isNoticeSeen, setIsNoticeSeen] = useState(false);
+  const [isFirstTime, setisFirstTime] = useState(false);
+  const [showItX, setshowItX] = useState(false);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -182,18 +185,30 @@ const History = ({route}) => {
           const userIdNum = parseInt(userId);
           setIDCurrent(userIdNum);
           const token = await getToken(); 
-          const response = await axiosInstance.get(`${ENDPOINT_API}user/${userIdNum}`, {
+          const response = await axios.get(`${ENDPOINT_API}user/${userIdNum}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
           if(response.status === 200){
+            
+            if(parseInt(response.data.is_first_time_connected) === 0 ){
+              setisFirstTime(true);
+              setshowItX(false);
+            }
+            else{
+              setisFirstTime(false);
+              setshowItX(true);
+            }
+
             if(parseInt(response.data.historique_notice) === 0 ){
               setIsNoticeSeen(true);
             }
             else{
               setIsNoticeSeen(false);
             }
+
+
           }
         }
         catch(e){
@@ -204,6 +219,31 @@ const History = ({route}) => {
   }, []));
 
 
+   
+  const handleClickWelcomSeen = async()=>{
+    try{
+      const userId = await AsyncStorage.getItem('userId');
+      const userIdNum = parseInt(userId);
+       
+      const token = await getToken(); 
+      const response = await axios.get(`${ENDPOINT_API}user_is_welcomed_done/${userIdNum}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log(response.data);
+
+      if (response.data.user) {
+        console.log(response.data.user);
+      }
+       
+    }
+    catch(e){
+      console.log(e.message);
+      Alert.alert(JSON.stringify(e.message));
+    }
+  }
 
 
   const handleClickFreshStart = async()=>{
@@ -242,9 +282,122 @@ const History = ({route}) => {
       <AlertSuccess message={messageSuccess} visible={showSuccess} />
 
 
+
+
+      {
+        isFirstTime && 
+        <View style={{
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex : 10000,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond sombre transparent
+          justifyContent: 'center', 
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: 'white', // Pop-up en blanc
+            padding: 20, 
+            borderRadius: 10, 
+            width: '90%', 
+            shadowColor: '#000', 
+            shadowOpacity: 0.2, 
+            shadowRadius: 10,
+            elevation: 5 // Ombre pour Android
+          }}>
+
+
+<TouchableOpacity style={{
+                backgroundColor: 'black', 
+                height : 35,
+                width : 35,
+                alignItems : "center", 
+                justifyContent : "center",  
+                position : "absolute",
+                top : 9,
+                right : 9,              
+                borderRadius: 100, 
+                zIndex : 9999,
+              }}
+                disabled={false}
+                onPress={()=>{
+                  setisFirstTime(false);
+                  setshowItX(true);
+                  handleClickWelcomSeen();
+                }}
+              >
+                 <Ionicons name="close" size={24} color="white" />
+
+              </TouchableOpacity>
+              
+            <Text style={{ 
+              fontSize: 23, 
+              fontWeight: 'bold', 
+              marginBottom: 25 , 
+              marginTop : 10,
+
+              alignItems  :"flex-end", 
+            }}>
+
+              <Svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 57 57">
+                <Path 
+                  fill="#FFC017" 
+                  d="m39.637 40.831-5.771 15.871a1.99 1.99 0 0 1-3.732 0l-5.771-15.87a2.02 2.02 0 0 0-1.194-1.195L7.298 33.866a1.99 1.99 0 0 1 0-3.732l15.87-5.771a2.02 2.02 0 0 0 1.195-1.194l5.771-15.871a1.99 1.99 0 0 1 3.732 0l5.771 15.87a2.02 2.02 0 0 0 1.194 1.195l15.871 5.771a1.99 1.99 0 0 1 0 3.732l-15.87 5.771a2.02 2.02 0 0 0-1.195 1.194"
+                />
+              </Svg>
+              &nbsp;&nbsp;
+              Bienvenue !
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              Nous sommes ravis de vous accueillir parmi nous. Vous avez fait un excellent choix en rejoignant notre communauté. 
+
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • Explorez toutes les fonctionnalités disponibles pour tirer le meilleur parti de notre service.
+
+            </Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '400', 
+              marginBottom: 21 
+            }}>
+
+              • N'hésitez pas à consulter notre centre d'aide pour toute question ou assistance.
+
+            </Text>
+
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: 'bold', 
+              marginBottom: 21,
+            }}>
+              Bonne exploration !
+            </Text>
+
+
+ 
+
+ 
+          </View>
+        </View>
+      }
+
+
  
       {
-        isNoticeSeen && 
+          (isNoticeSeen && showItX) &&         
         <View style={{
           position: 'absolute', 
           top: 0, 
